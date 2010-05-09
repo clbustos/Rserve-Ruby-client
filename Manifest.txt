@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/rserve
+lib/rserve.rb
+test/test_rserve.rb
