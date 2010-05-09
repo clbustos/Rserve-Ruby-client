@@ -3,6 +3,7 @@ $:.unshift(File.dirname(__FILE__)+"/lib")
 require 'rubygems'
 require 'hoe'
 require 'rserve'
+Hoe.plugin :git
 Hoe.spec 'ruby-rserve' do
   self.testlib=:rspec
    self.version=Rserve::VERSION

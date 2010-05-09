@@ -1,10 +1,13 @@
 require 'socket'
+require 'rserve/protocol'
+require 'rserve/packet'
+require 'rserve/talk'
+
 module Rserve
   VERSION = '1.0.0'
   
   class Connection
     include Rserve::Protocol
-  
     IncorrectServer=Class.new(Exception)
     IncorrectServerVersion=Class.new(Exception)
     IncorrectProtocol=Class.new(Exception)
@@ -16,13 +19,13 @@ module Rserve
       @tries=0
       @max_tries=5
       begin 
-        puts "Tryin to connect..."
+        #puts "Tryin to connect..."
         connect
       rescue Errno::ECONNREFUSED
         if @tries<@max_tries
-          puts "Init RServe"
+          #puts "Init RServe"
           system "R CMD Rserve"
-          puts "Ok"
+          #puts "Ok"
           retry
         else
           raise
@@ -33,7 +36,7 @@ module Rserve
 
     def connect
         @socket = TCPSocket::new(@hostname, @port_number)
-        puts "Connected"
+        #puts "Connected"
         # Accept first input
         input=@socket.recv(32).unpack("a4a4a4a20")
         raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received #{input[0]}" unless input[0]=="Rsrv"

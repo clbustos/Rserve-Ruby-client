@@ -2,6 +2,15 @@ History.txt
 Manifest.txt
 README.txt
 Rakefile
-bin/rserve
 lib/rserve.rb
-test/test_rserve.rb
+lib/rserve/packet.rb
+lib/rserve/protocol.rb
+lib/rserve/rexp.rb
+lib/rserve/talk.rb
+spec/rserve_connection_spec.rb
+spec/rserve_packet_spec.rb
+spec/rserve_protocol_spec.rb
+spec/rserve_spec.rb
+spec/rserve_talk_spec.rb
+spec/spec.opts
+spec/spec_helper.rb
