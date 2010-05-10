@@ -1,42 +1,222 @@
-module Rserve
-  # representation of R-eXpressions in Java
-  # I didn't decide if better implementation of this is a Module or a Class
-  class Rexp
+module RServe
+  #  Basic class representing an object of any type in R. Each type in R in represented by a specific subclass.
+  # 
+  # This class defines basic accessor methods (<tt>as</tt><i>XXX</i>), type check methods (<tt>is</tt><i>XXX</i>), gives access to attributes ({@link #getAttribute}, {@link #hasAttribute}) as well as several convenience methods. If a given method is not applicable to a particular type, it will throw the {@link MismatchException} exception.
+  #
+  # This root class will throw on any accessor call and returns <code>false</code> for all type methods. This allows subclasses to override accessor and type methods selectively.
+  # 
+  class REXP
+    MismatchException= Class.new(Exception)
+    attr_reader :attr
+    def initialize(attr=nil)
+      @attr=attr
+    end
+    # specifies how many items of a vector or list will be displayed in {@link #toDebugString} */
+    MaxDebugItems = 32
+    # :section: type checks
+	# check whether the <code>REXP</code> object is a character vector (string)
+	# @return <code>true</code> if the receiver is a character vector, <code>false</code> otherwise */
+	
+  def is_string?;return false;end
     
-  #/* XpressionTypes
-  #   REXP - R expressions are packed in the same way as command parameters
-  #   transport format of the encoded Xpressions:
-  #   [0] int type/len (1 byte type, 3 bytes len - same as SET_PAR)
-  #   [4] REXP attr (if bit 8 in type is set)
-  #   [4/8] data .. */
+	# # check whether the <code>REXP</code> object is a numeric vector
+	# @return <code>true</code> if the receiver is a numeric vector, <code>false</code> otherwise */
   
-  XT_NULL=0  #  P  data: [0] */
-  XT_INT=1  #  -  data: [4]int */
-  XT_DOUBLE=2  #  -  data: [8]double */
-  XT_STR=3  #  P  data: [n]char null-term. strg. */
-  XT_LANG=4  #  -  data: same as XT_LIST */
-  XT_SYM=5  #  -  data: [n]char symbol name */
-  XT_BOOL=6  #  -  data: [1]byte boolean (1=TRUE, 0=FALSE, 2=NA) */
-  XT_S4=7  #  P  data: [0] */
-  XT_VECTOR=16 #  P  data: [?]REXP,REXP,.. */
-  XT_LIST=17 #  -  X head, X vals, X tag (since 0.1-5) */
-  XT_CLOS=18 #  P  X formals, X body  (closure; since 0.1-5) */
-  XT_SYMNAME=19 #  s  same as XT_STR (since 0.5) */
-  XT_LIST_NOTAG=20 #  s  same as XT_VECTOR (since 0.5) */
-  XT_LIST_TAG=21 #  P  X tag, X val, Y tag, Y val, ... (since 0.5) */
-  XT_LANG_NOTAG=22 #  s  same as XT_LIST_NOTAG (since 0.5) */
-  XT_LANG_TAG=23 #  s  same as XT_LIST_TAG (since 0.5) */
-  XT_VECTOR_EXP=26 #  s  same as XT_VECTOR (since 0.5) */
-  XT_VECTOR_STR=27 #  -  same as XT_VECTOR (since 0.5 but unused, use XT_ARRAY_STR instead) */
-  XT_ARRAY_INT=32 #  P  data: [n*4]int,int,.. */
-  XT_ARRAY_DOUBLE=33 #  P  data: [n*8]double,double,.. */
-  XT_ARRAY_STR=34 #  P  data: string,string,.. (string=byte,byte,...,0) padded with '\01' */
-  XT_ARRAY_BOOL_UA=35 #  -  data: [n]byte,byte,..  (unaligned! NOT supported anymore) */
-  XT_ARRAY_BOOL=36 #  P  data: int(n),byte,byte,... */
-  XT_RAW=37 #  P  data: int(n),byte,byte,... */
-  XT_ARRAY_CPLX=38 #  P  data: [n*16]double,double,... (Re,Im,Re,Im,...) */
-  XT_UNKNOWN=48 # P  data: [4]int - SEXP type (as from TYPEOF(x)) */ #                             
-  XT_LARGE=64 #  new in 0102: if this flag is set then the length of the object is coded as 56-bit integer enlarging the header by 4 bytes */
-  XT_HAS_ATTR=128 #  flag; if set, the following REXP is the attribute */
+	def is_numeric?;false;end
+	# check whether the <code>REXP</code> object is an integer vector
+	# @return <code>true</code> if the receiver is an integer vector, <code>false</code> otherwise */
+	def is_integer?;false;end
+	# check whether the <code>REXP</code> object is NULL
+	# @return <code>true</code> if the receiver is NULL, <code>false</code> otherwise */
+	def is_null?;false;end
+	# check whether the <code>REXP</code> object is a factor
+	# @return <code>true</code> if the receiver is a factor, <code>false</code> otherwise */
+	def is_factor?;false;end
+	# check whether the <code>REXP</code> object is a list (either generic vector or a pairlist - i.e. {@link #asList()} will succeed)
+	# @return <code>true</code> if the receiver is a generic vector or a pair-list, <code>false</code> otherwise */
+	def is_list?;false;end
+	# check whether the <code>REXP</code> object is a pair-list
+	# @return <code>true</code> if the receiver is a pair-list, <code>false</code> otherwise */
+	def is_pair_list?;false;end
+	# check whether the <code>REXP</code> object is a logical vector
+	# @return <code>true</code> if the receiver is a logical vector, <code>false</code> otherwise */
+	def is_logical?;false;end
+	#  check whether the <code>REXP</code> object is an environment
+	# @return <code>true</code> if the receiver is an environment, <code>false</code> otherwise */
+	def is_environment?;false;end
+	# check whether the <code>REXP</code> object is a language object
+	# @return <code>true</code> if the receiver is a language object, <code>false</code> otherwise */
+	def is_language?;false;end
+	# check whether the <code>REXP</code> object is an expression vector
+	# @return <code>true</code> if the receiver is an expression vector, <code>false</code> otherwise */
+	def is_expression?;false;end
+	# check whether the <code>REXP</code> object is a symbol
+	# @return <code>true</code> if the receiver is a symbol, <code>false</code> otherwise */
+	def is_symbol?;false;end
+	# check whether the <code>REXP</code> object is a vector
+	# @return <code>true</code> if the receiver is a vector, <code>false</code> otherwise */
+	def is_vector?;false;end
+	# check whether the <code>REXP</code> object is a raw vector
+	# @return <code>true</code> if the receiver is a raw vector, <code>false</code> otherwise */
+	def is_raw?;false;end
+	# check whether the <code>REXP</code> object is a complex vector
+	# @return <code>true</code> if the receiver is a complex vector, <code>false</code> otherwise */
+	def is_complex?;false;end
+	# check whether the <code>REXP</code> object is a recursive obejct
+	# @return <code>true</code> if the receiver is a recursive object, <code>false</code> otherwise */
+	def is_recursive?;false;end
+	# check whether the <code>REXP</code> object is a reference to an R object
+	# @return <code>true</code> if the receiver is a reference, <code>false</code> otherwise */
+	def is_Reference?;false;end
+
+  # :section: basic accessor methods
+	# returns the contents as an array of Strings (if supported by the represented object) 
+  def as_strings;raise MismatchException, "String";end
+	# returns the contents as an array of integers (if supported by the represented object) */
+  
+	def as_integers; raise MismatchException, "int";end;
+	# returns the contents as an array of doubles (if supported by the represented object) */
+	def as_doubles; raise MismatchException,"double";end;
+	# returns the contents as an array of bytes (if supported by the represented object) */
+	def as_bytes; raise MismatchException , "byte";end;
+	# returns the contents as a (named) list (if supported by the represented object) */
+	def as_list; raise MismatchException,"list";end;
+	# returns the contents as a factor (if supported by the represented object) */
+	def as_factor; raise MismatchException,"factor";end;
+
+	# returns the length of a vector object. Note that we use R semantics here, i.e. a matrix will have a length of <i>m * n</i> since it is represented by a single vector (see {@link #dim} for retrieving matrix and multidimentional-array dimensions).
+	# * @return length (number of elements) in a vector object
+	# * @throws MismatchException if this is not a vector object */
+	def length()
+    raise MismatchException, "vector";
+  end
+
+	# returns a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
+	# *  @return a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
+	# * @throws MismatchException if this is not a vector object */
+	def is_na?
+    raise MismatchException, "vector"
+  end
+	
+	# :section: convenience accessor methods
+	# convenience method corresponding to <code>as_integer()[0]</code>
+	# @return first entry returned by {@link #as_integer} */
+	def as_integer
+    as_integers[0]
+  end 
+	# convenience method corresponding to <code>asDoubles()[0]</code>
+	# @return first entry returned by {@link #asDoubles} */
+  def as_double
+    as_doubles[0]
+  end
+	# convenience method corresponding to <code>asStrings()[0]</code>
+	# @return first entry returned by {@link #asStrings} */
+  def as_string
+    as_strings[0]
+  end
+	# // methods common to all REXPs
+	
+	# retrieve an attribute of the given name from this object
+  # * @param name attribute name
+	# * @return attribute value or <code>null</code> if the attribute does not exist */
+  
+  def get_attribute(name)
+    nil if @attr.nil? or !@attr.is_list?
+    @attr.as_list[name]
+  end
+	
+	# checks whether this obejct has a given attribute
+	# * @param name attribute name
+	# * @return <code>true</code> if the attribute exists, <code>false</code> otherwise */
+	def has_attribute? (name) 
+      return (!@attr.nil? and @attr.is_list and !@attr.as_list[name].nil?);
+  end
+	
+	
+	# :section: helper methods common to all REXPs
+	
+	# returns dimensions of the object (as determined by the "<code>dim</code>" attribute)
+	#  @return an array of integers with corresponding dimensions or <code>null</code> if the object has no dimension attribute */
+	def dim
+    begin
+			return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
+    rescue MismatchException
+    end
+		nil
+  end
+	
+	# determines whether this object inherits from a given class in the same fashion as the <code>inherits()</code> function in R does (i.e. ignoring S4 inheritance)
+	# @param klass class name
+	# @return <code>true</code> if this object is of the class <code>klass</code>, <code>false</code> otherwise */
+	def inherits?(klass) 
+    return false if (!has_attribute? "class")
+    begin
+			c = get_attribute("class").as_strings;
+			if (!c.nil?)
+        return c.any? {|v| v.equals klass}
+      end
+    rescue MismatchException
+    end
+		return false;
+  end
+
+
+	
+	# returns a string description of the object
+	# @return string describing the object - it can be of an arbitrary form and used only for debugging (do not confuse with {@link #asString()} for accessing string REXPs) */
+	#def to_s
+      #return super+((!@attr.nil?) ? "+" : "");
+  # end
+	
+	# returns representation that it useful for debugging (e.g. it includes attributes and may include vector values -- see {@link #maxDebugItems})
+	# @return extended description of the obejct -- it may include vector values
+  #def inspect {
+  #     (!@attr.nil?) ? (("<"+@attr.inspect()+">")+to_s()) : to_s;
+	#}
+	
+	#//======= complex convenience methods
+	# returns the content of the REXP as a ruby matrix of doubles (2D-array: m[rows][cols]). You could use Matrix.rows(result) to create
+  # a ruby dfeault library matrix.
+  # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").asDoubleMatrix());</code>
+  # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles */
+  def as_double_matrix() 
+		ct = as_doubles()
+    dim =get_attribute "dim"
+    raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
+    ds = dim.as_integers
+    raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
+
+		m = ds[0], n = ds[1]
+    # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
+    # we need to copy everything, since we create 2d array from 1d array
+    r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
+  end
+	
+	
+	# :section: tools
+  
+	# creates a data frame object from a list object using integer row names
+	# *  @param l a (named) list of vectors ({@link REXPVector} subclasses), each element corresponds to a column and all elements must have the same length
+	# *  @return a data frame object
+	#  *  @throws MismatchException if the list is empty or any of the elements is not a vector */
+	def create_data_frame(l)
+    raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
+    raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
+		fe = l[0]
+		return
+		REXP::GenericVector.new(l,
+      REXP::List.new(
+        RList.new(
+										   [
+                       REXP::String.new("data.frame"),
+											 REXP::String.new(l.keys()),
+											 REXP::Integer.new([REXP::Integer.NA, -fe.length()])
+                       ],
+										   ["class", "names", "row.names" ])
+        )
+      )
+  end
+
+    
   end
 end

@@ -5,14 +5,14 @@ describe Rserve::Talk do
     @iomock=mock('IO Mock')
     @talk=Rserve::Talk.new(@iomock)
   end
-  it "should raise an error on incorrect argument" do
+  it "should raise an error on incorrect type of cont" do
     ty=Rserve::Protocol::CMD_shutdown
     lambda {
       @talk.request(:cmd=>ty, :cont=>"no")
     }.should raise_exception()
       
   end
-  it "method request should accept only a cmd" do
+  it "should behave correctly with cmd as only argument" do
     ty=Rserve::Protocol::CMD_shutdown
     buf=[0]*16
     @talk.set_int(ty, buf, 0)
@@ -33,7 +33,7 @@ describe Rserve::Talk do
     ret.cont_len.should==cl
     ret.cont.should==cont.unpack("C*")
   end
-  it "method request should accept cmd and content" do
+  it "should behave correctly with cmd and cont as arguments" do
     
 
     ty=Rserve::Protocol::CMD_eval
@@ -58,9 +58,6 @@ describe Rserve::Talk do
     ret.cmd.should==rep
     ret.cont_len.should==cl
     ret.cont.should==cont.unpack("C*")
-    
-    
-    
   end
 
 end
