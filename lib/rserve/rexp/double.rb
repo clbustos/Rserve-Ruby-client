@@ -1,15 +1,12 @@
 module Rserve
   class REXP
-    class Integer < REXP::Vector
-      public_class_method :new
+    class Double < REXP::Vector
       attr_reader :payload
-      NA = -2147483648;
+      NA = 0x7ff00000000007a2;
       def initialize(data, attrs=nil)
         @payload=case data
-          when Integer
-            [data]
           when Numeric
-            [data.to_i]
+            [data.to_f]
           when Array
             data
           else
@@ -27,10 +24,10 @@ module Rserve
         true
       end
       def as_integers
-        @payload
+        @payload.map(&:to_i)
       end
       def as_doubles
-        @payload.map(&:to_f)
+        @payload
       end
       def as_strings
         @payload.map(&:to_s)

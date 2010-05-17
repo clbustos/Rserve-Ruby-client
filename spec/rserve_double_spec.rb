@@ -1,16 +1,16 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
 
-describe Rserve::REXP::Integer do
+describe Rserve::REXP::Double do
   describe "initialization" do
     it "should accept array as payload" do
       payload=[1,2,3]
-      a=Rserve::REXP::Integer.new(payload)
-      a.payload.should==payload
+      a=Rserve::REXP::Double.new(payload)
+      a.payload.should==payload.map(&:to_f)
     end
-    it "should accept integer as payload" do
-      payload=1
-      a=Rserve::REXP::Integer.new(payload)
-      a.payload.should==[1]
+    it "should accept float as payload" do
+      payload=1.1
+      a=Rserve::REXP::Double.new(payload)
+      a.payload.should==[1.1]
     end
     
     
@@ -19,8 +19,8 @@ describe Rserve::REXP::Integer do
     describe "common methods" do
     before do
       @n=rand(10)+10
-      @payload=@n.times.map {rand(10)}
-      @a=Rserve::REXP::Integer.new(@payload)
+      @payload=@n.times.map {rand(10).to_f}
+      @a=Rserve::REXP::Double.new(@payload)
     end
     subject {@a}
     it "should return correct length of payload" do
@@ -28,18 +28,18 @@ describe Rserve::REXP::Integer do
     end
     it {should be_numeric}
     it {should be_integer}
-    it "method as_integer should return payload" do
-      @a.as_integers.should==@payload
+    it "method as_integer should return payload as integers" do
+      @a.as_integers.should==@payload.map(&:to_i)
     end
     it "method as_doubles should return floats" do
-      @a.as_doubles.should==@payload.map(&:to_f)
+      @a.as_doubles.should==@payload
     end
-    it "method as_string should return string" do
+    it "method as_strings should return strings" do
       @a.as_strings.should==@payload.map(&:to_s)
     end
-    it "method is_NA should return coherent answer" do
-      payload=[3,5,Rserve::REXP::Integer::NA, 10,20]
-      a=Rserve::REXP::Integer.new(payload)
+    it "method na? should return coherent answer" do
+      payload=[3,5,Rserve::REXP::Double::NA, 10,20]
+      a=Rserve::REXP::Double.new(payload)
       a.na?(a.as_integers[0]).should be_false
       a.na?(a.as_integers[2]).should be_true
       a.na?.should==[false,false,true,false,false]

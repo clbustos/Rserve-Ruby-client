@@ -17,57 +17,57 @@ module Rserve
     # check whether the <code>REXP</code> object is a character vector (string)
     # @return <code>true</code> if the receiver is a character vector, <code>false</code> otherwise */
 	
-    def is_string?;return false;end
+    def string?;return false;end
 
     # # check whether the <code>REXP</code> object is a numeric vector
     # @return <code>true</code> if the receiver is a numeric vector, <code>false</code> otherwise */
 
-    def is_numeric?;false;end
+    def numeric?;false;end
     # check whether the <code>REXP</code> object is an integer vector
     # @return <code>true</code> if the receiver is an integer vector, <code>false</code> otherwise */
-    def is_integer?;false;end
+    def integer?;false;end
     # check whether the <code>REXP</code> object is NULL
     # @return <code>true</code> if the receiver is NULL, <code>false</code> otherwise */
-    def is_null?;false;end
+    def null?;false;end
     # check whether the <code>REXP</code> object is a factor
     # @return <code>true</code> if the receiver is a factor, <code>false</code> otherwise */
-    def is_factor?;false;end
+    def factor?;false;end
     # check whether the <code>REXP</code> object is a list (either generic vector or a pairlist - i.e. {@link #asList()} will succeed)
     # @return <code>true</code> if the receiver is a generic vector or a pair-list, <code>false</code> otherwise */
-    def is_list?;false;end
+    def list?;false;end
     # check whether the <code>REXP</code> object is a pair-list
     # @return <code>true</code> if the receiver is a pair-list, <code>false</code> otherwise */
-    def is_pair_list?;false;end
+    def pair_list?;false;end
     # check whether the <code>REXP</code> object is a logical vector
     # @return <code>true</code> if the receiver is a logical vector, <code>false</code> otherwise */
-    def is_logical?;false;end
+    def logical?;false;end
     #  check whether the <code>REXP</code> object is an environment
     # @return <code>true</code> if the receiver is an environment, <code>false</code> otherwise */
-    def is_environment?;false;end
+    def environment?;false;end
     # check whether the <code>REXP</code> object is a language object
     # @return <code>true</code> if the receiver is a language object, <code>false</code> otherwise */
-    def is_language?;false;end
+    def language?;false;end
     # check whether the <code>REXP</code> object is an expression vector
     # @return <code>true</code> if the receiver is an expression vector, <code>false</code> otherwise */
-    def is_expression?;false;end
+    def expression?;false;end
     # check whether the <code>REXP</code> object is a symbol
     # @return <code>true</code> if the receiver is a symbol, <code>false</code> otherwise */
-    def is_symbol?;false;end
+    def symbol?;false;end
     # check whether the <code>REXP</code> object is a vector
     # @return <code>true</code> if the receiver is a vector, <code>false</code> otherwise */
-    def is_vector?;false;end
+    def vector?;false;end
     # check whether the <code>REXP</code> object is a raw vector
     # @return <code>true</code> if the receiver is a raw vector, <code>false</code> otherwise */
-    def is_raw?;false;end
+    def raw?;false;end
     # check whether the <code>REXP</code> object is a complex vector
     # @return <code>true</code> if the receiver is a complex vector, <code>false</code> otherwise */
-    def is_complex?;false;end
+    def complex?;false;end
     # check whether the <code>REXP</code> object is a recursive obejct
     # @return <code>true</code> if the receiver is a recursive object, <code>false</code> otherwise */
-    def is_recursive?;false;end
+    def recursive?;false;end
     # check whether the <code>REXP</code> object is a reference to an R object
     # @return <code>true</code> if the receiver is a reference, <code>false</code> otherwise */
-    def is_reference?;false;end
+    def reference?;false;end
 
         # :section: basic accessor methods
 	# returns the contents as an array of Strings (if supported by the represented object) 
@@ -94,7 +94,7 @@ module Rserve
 	# returns a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
 	# *  @return a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
 	# * @throws MismatchException if this is not a vector object */
-	def is_na?
+	def na?
     raise MismatchException, "vector"
   end
 	
@@ -227,3 +227,5 @@ end
 
 require 'rserve/rexp/vector'
 require 'rserve/rexp/integer'
+require 'rserve/rexp/double'
+require 'rserve/rexp/list'
