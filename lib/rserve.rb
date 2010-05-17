@@ -2,12 +2,13 @@ require 'socket'
 require 'rserve/protocol'
 require 'rserve/packet'
 require 'rserve/talk'
-
+require 'rserve/rexp'
 module Rserve
   VERSION = '1.0.0'
   
   class Connection
     include Rserve::Protocol
+    ServerNotInstalled=Class.new(Exception)
     IncorrectServer=Class.new(Exception)
     IncorrectServerVersion=Class.new(Exception)
     IncorrectProtocol=Class.new(Exception)
@@ -24,9 +25,12 @@ module Rserve
       rescue Errno::ECONNREFUSED
         if @tries<@max_tries
           #puts "Init RServe"
-          system "R CMD Rserve"
+          if system "R CMD Rserve"
           #puts "Ok"
-          retry
+            retry
+	  else
+	    raise ServerNotInstalled, "Rserve not installed"
+	  end
         else
           raise
         end

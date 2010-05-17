@@ -1,4 +1,4 @@
-module RServe
+module Rserve
   #  Basic class representing an object of any type in R. Each type in R in represented by a specific subclass.
   # 
   # This class defines basic accessor methods (<tt>as</tt><i>XXX</i>), type check methods (<tt>is</tt><i>XXX</i>), gives access to attributes ({@link #getAttribute}, {@link #hasAttribute}) as well as several convenience methods. If a given method is not applicable to a particular type, it will throw the {@link MismatchException} exception.
@@ -14,64 +14,64 @@ module RServe
     # specifies how many items of a vector or list will be displayed in {@link #toDebugString} */
     MaxDebugItems = 32
     # :section: type checks
-	# check whether the <code>REXP</code> object is a character vector (string)
-	# @return <code>true</code> if the receiver is a character vector, <code>false</code> otherwise */
+    # check whether the <code>REXP</code> object is a character vector (string)
+    # @return <code>true</code> if the receiver is a character vector, <code>false</code> otherwise */
 	
-  def is_string?;return false;end
-    
-	# # check whether the <code>REXP</code> object is a numeric vector
-	# @return <code>true</code> if the receiver is a numeric vector, <code>false</code> otherwise */
-  
-	def is_numeric?;false;end
-	# check whether the <code>REXP</code> object is an integer vector
-	# @return <code>true</code> if the receiver is an integer vector, <code>false</code> otherwise */
-	def is_integer?;false;end
-	# check whether the <code>REXP</code> object is NULL
-	# @return <code>true</code> if the receiver is NULL, <code>false</code> otherwise */
-	def is_null?;false;end
-	# check whether the <code>REXP</code> object is a factor
-	# @return <code>true</code> if the receiver is a factor, <code>false</code> otherwise */
-	def is_factor?;false;end
-	# check whether the <code>REXP</code> object is a list (either generic vector or a pairlist - i.e. {@link #asList()} will succeed)
-	# @return <code>true</code> if the receiver is a generic vector or a pair-list, <code>false</code> otherwise */
-	def is_list?;false;end
-	# check whether the <code>REXP</code> object is a pair-list
-	# @return <code>true</code> if the receiver is a pair-list, <code>false</code> otherwise */
-	def is_pair_list?;false;end
-	# check whether the <code>REXP</code> object is a logical vector
-	# @return <code>true</code> if the receiver is a logical vector, <code>false</code> otherwise */
-	def is_logical?;false;end
-	#  check whether the <code>REXP</code> object is an environment
-	# @return <code>true</code> if the receiver is an environment, <code>false</code> otherwise */
-	def is_environment?;false;end
-	# check whether the <code>REXP</code> object is a language object
-	# @return <code>true</code> if the receiver is a language object, <code>false</code> otherwise */
-	def is_language?;false;end
-	# check whether the <code>REXP</code> object is an expression vector
-	# @return <code>true</code> if the receiver is an expression vector, <code>false</code> otherwise */
-	def is_expression?;false;end
-	# check whether the <code>REXP</code> object is a symbol
-	# @return <code>true</code> if the receiver is a symbol, <code>false</code> otherwise */
-	def is_symbol?;false;end
-	# check whether the <code>REXP</code> object is a vector
-	# @return <code>true</code> if the receiver is a vector, <code>false</code> otherwise */
-	def is_vector?;false;end
-	# check whether the <code>REXP</code> object is a raw vector
-	# @return <code>true</code> if the receiver is a raw vector, <code>false</code> otherwise */
-	def is_raw?;false;end
-	# check whether the <code>REXP</code> object is a complex vector
-	# @return <code>true</code> if the receiver is a complex vector, <code>false</code> otherwise */
-	def is_complex?;false;end
-	# check whether the <code>REXP</code> object is a recursive obejct
-	# @return <code>true</code> if the receiver is a recursive object, <code>false</code> otherwise */
-	def is_recursive?;false;end
-	# check whether the <code>REXP</code> object is a reference to an R object
-	# @return <code>true</code> if the receiver is a reference, <code>false</code> otherwise */
-	def is_Reference?;false;end
+    def is_string?;return false;end
 
-  # :section: basic accessor methods
+    # # check whether the <code>REXP</code> object is a numeric vector
+    # @return <code>true</code> if the receiver is a numeric vector, <code>false</code> otherwise */
+
+    def is_numeric?;false;end
+    # check whether the <code>REXP</code> object is an integer vector
+    # @return <code>true</code> if the receiver is an integer vector, <code>false</code> otherwise */
+    def is_integer?;false;end
+    # check whether the <code>REXP</code> object is NULL
+    # @return <code>true</code> if the receiver is NULL, <code>false</code> otherwise */
+    def is_null?;false;end
+    # check whether the <code>REXP</code> object is a factor
+    # @return <code>true</code> if the receiver is a factor, <code>false</code> otherwise */
+    def is_factor?;false;end
+    # check whether the <code>REXP</code> object is a list (either generic vector or a pairlist - i.e. {@link #asList()} will succeed)
+    # @return <code>true</code> if the receiver is a generic vector or a pair-list, <code>false</code> otherwise */
+    def is_list?;false;end
+    # check whether the <code>REXP</code> object is a pair-list
+    # @return <code>true</code> if the receiver is a pair-list, <code>false</code> otherwise */
+    def is_pair_list?;false;end
+    # check whether the <code>REXP</code> object is a logical vector
+    # @return <code>true</code> if the receiver is a logical vector, <code>false</code> otherwise */
+    def is_logical?;false;end
+    #  check whether the <code>REXP</code> object is an environment
+    # @return <code>true</code> if the receiver is an environment, <code>false</code> otherwise */
+    def is_environment?;false;end
+    # check whether the <code>REXP</code> object is a language object
+    # @return <code>true</code> if the receiver is a language object, <code>false</code> otherwise */
+    def is_language?;false;end
+    # check whether the <code>REXP</code> object is an expression vector
+    # @return <code>true</code> if the receiver is an expression vector, <code>false</code> otherwise */
+    def is_expression?;false;end
+    # check whether the <code>REXP</code> object is a symbol
+    # @return <code>true</code> if the receiver is a symbol, <code>false</code> otherwise */
+    def is_symbol?;false;end
+    # check whether the <code>REXP</code> object is a vector
+    # @return <code>true</code> if the receiver is a vector, <code>false</code> otherwise */
+    def is_vector?;false;end
+    # check whether the <code>REXP</code> object is a raw vector
+    # @return <code>true</code> if the receiver is a raw vector, <code>false</code> otherwise */
+    def is_raw?;false;end
+    # check whether the <code>REXP</code> object is a complex vector
+    # @return <code>true</code> if the receiver is a complex vector, <code>false</code> otherwise */
+    def is_complex?;false;end
+    # check whether the <code>REXP</code> object is a recursive obejct
+    # @return <code>true</code> if the receiver is a recursive object, <code>false</code> otherwise */
+    def is_recursive?;false;end
+    # check whether the <code>REXP</code> object is a reference to an R object
+    # @return <code>true</code> if the receiver is a reference, <code>false</code> otherwise */
+    def is_reference?;false;end
+
+        # :section: basic accessor methods
 	# returns the contents as an array of Strings (if supported by the represented object) 
-  def as_strings;raise MismatchException, "String";end
+        def as_strings;raise MismatchException, "String";end
 	# returns the contents as an array of integers (if supported by the represented object) */
   
 	def as_integers; raise MismatchException, "int";end;
@@ -125,24 +125,25 @@ module RServe
     @attr.as_list[name]
   end
 	
-	# checks whether this obejct has a given attribute
-	# * @param name attribute name
-	# * @return <code>true</code> if the attribute exists, <code>false</code> otherwise */
-	def has_attribute? (name) 
-      return (!@attr.nil? and @attr.is_list and !@attr.as_list[name].nil?);
+  # checks whether this obejct has a given attribute
+  # * @param name attribute name
+  # * @return <code>true</code> if the attribute exists, <code>false</code> otherwise */
+  def has_attribute? (name) 
+    return (!@attr.nil? and @attr.is_list and !@attr.as_list[name].nil?);
   end
-	
-	
-	# :section: helper methods common to all REXPs
-	
-	# returns dimensions of the object (as determined by the "<code>dim</code>" attribute)
-	#  @return an array of integers with corresponding dimensions or <code>null</code> if the object has no dimension attribute */
-	def dim
+
+
+  # :section: helper methods common to all REXPs
+
+  # returns dimensions of the object (as determined by the "<code>dim</code>" attribute)
+  #  @return an array of integers with corresponding dimensions or <code>null</code> if the object has no dimension attribute */
+  def dim
     begin
-			return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
+      return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
     rescue MismatchException
+      # nothing to do
     end
-		nil
+     nil
   end
 	
 	# determines whether this object inherits from a given class in the same fashion as the <code>inherits()</code> function in R does (i.e. ignoring S4 inheritance)
@@ -179,17 +180,22 @@ module RServe
   # a ruby dfeault library matrix.
   # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").asDoubleMatrix());</code>
   # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles */
-  def as_double_matrix() 
-		ct = as_doubles()
+  def as_double_matrix()  
+    ct = as_doubles()
     dim =get_attribute "dim"
     raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
     ds = dim.as_integers
     raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
-
-		m = ds[0], n = ds[1]
+    m = ds[0], n = ds[1]
     # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
     # we need to copy everything, since we create 2d array from 1d array
     r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
+  end
+  def to_s
+    (@attr.nil? ? "" : "+")
+  end
+  def to_debug_string
+    (@attr.nil? ? "" : "<"+@attr.to_debug_string+">")
   end
 	
 	
@@ -216,7 +222,8 @@ module RServe
         )
       )
   end
-
-    
   end
 end
+
+require 'rserve/rexp/vector'
+require 'rserve/rexp/integer'
