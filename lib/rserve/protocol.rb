@@ -2,7 +2,7 @@ module Rserve
   #
   # This module encapsulates methods and constants related to QAP1 protocol used by Rserv. Follows almost exactly the interface on RTalk class 
   # on Java version, except for use of undescores instead of CamelCase
-  # Implementation could differ if a better or faster ruby version is available
+  # Implementation could differ if a cleaner/faster ruby version is available
   # 
   # Policy: No other class should know about the internal of protocol!
   # See Rtalk class on Java version.
