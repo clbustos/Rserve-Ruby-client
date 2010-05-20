@@ -2,8 +2,8 @@ module Rserve
   class Packet
     attr_reader :cont
     attr_reader :cmd
-    def initialize(cmd,cont)
-      raise "Cont should respond to :length" unless cont.respond_to? :length
+    def initialize(cmd, cont)
+      raise "cont [#{cont.class} - #{cont.to_s}] should respond to :length" if !cont.nil? and !cont.respond_to? :length
       @cmd=cmd
       @cont=cont
     end
@@ -20,7 +20,7 @@ module Rserve
       (@cmd>>24)&127
     end
     def to_s
-      "Packet[cmd=#{@cmd},len="+((cont.nil?)?"<null>":(""+cont.length.to_s))+",con='"+cont.pack("C*")+"']"
+      "Packet[cmd=#{@cmd},len="+((cont.nil?)?"<nil>":(""+cont.length.to_s))+", con='"+(cont.nil?  ? "<nil>" : cont.pack("C*"))+"', status="+(ok? ? "ok":"error")+"]"
     end
   end
 end

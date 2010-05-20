@@ -123,9 +123,211 @@ module Rserve
           @type=xt
           @attr=Factory.new()
           @cont=nil
-          o = attr.parse_REXP(get_attr)+
-          Sif has_at 
-        end
-    end
-  end
-end
+          o=attr.parse_REXP(buf,o) if has_at 
+          if xt==XT_NULL
+            @cont=REXP::Null(get_attr)
+            return o
+          end
+          if xt==XT_DOUBLE
+            lr=get_long(buf,o)
+            d=[lr]
+            o+=8
+            if(o!=eox)
+              $STDERR.puts("Warning: double SEXP size mismatch\n");
+              o=eox
+            end
+            @cont=REXP::Double.new(d,get_attr)
+            return o
+          end
+          if xt==XT_ARRAY_DOUBLE
+            as=(eox-o).quo(8)
+            i=0
+            d=Array.new(as)
+            while(o<eox)
+              d[i]=get_long(buf,o)
+              o+=8
+              i+=1
+            end
+            if(o!=eox)
+              $STDERR.puts("Warning: double SEXP size mismatch\n");
+              o=eox
+            end
+            @cont=REXP::Double.new(d,get_attr)
+            return o
+          end
+          if xt==XT_BOOL
+            b=[buf[o]]
+            if (b[0]!=0 && b[0]!=1) 
+              b[0]=REXP::Logical::NA
+            end
+            @cont=REXP::Logical.new(b,get_attr)
+            o+=1
+            return o
+          end
+          if xt==XT_ARRAY_BOOL_UA
+            as=(eox-o)
+            i=0
+            d=Array.new(as)
+            (eox-i).times {|i| d[i]=buf[o+i]}
+            o=eox
+            d.length.each {|j| 
+              if d[j]!=0 && d[j]!=1 
+                d[j]==REXP::Logical::NA
+              end
+            }
+            @cont=REXP::Logical.new(d,get_attr)
+            return o
+          end
+          if xt==XT_ARRAY_BOOL
+            as=get_int(buf, o)
+            o+=4
+            d=Array.new(as)
+            as.times {|i| d[i]=buf[o+i]}
+            d.length.each {|j| 
+              if d[j]!=0 && d[j]!=1 
+                d[j]==REXP::Logical::NA
+              end
+            }
+            o=eox
+            @cont=REXP::Logical.new(d,get_attr)
+            return o
+          end
+          if xt==XT_INT
+            i=Array.new(get_int(buf,o))
+            @cont=REXP::Integer.new(i,get_attr)
+            o+=4
+            if o!=eox
+              $STDERR.puts "int SEXP size mismatch"
+              o=eox
+            end
+            return o
+          end
+          
+          if xt==XT_ARRAY_INT
+            as=(eox-o).quo(4)
+            i=0
+            d=Array.new(as)
+            while(o<eox)
+              d[i]=get_int(buf,o)
+              o+=4
+              i+=1
+            end
+            if o!=eox
+              $STDERR.puts "int SEXP size mismatch"
+              o=eox
+            end
+          # hack for list. Not implemented yet!
+            @cont=nil
+            @cont=REXP::Integer(d,get_attr)
+            return o
+          end
+          
+          # RAW not implemented yet
+          if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
+            lc=REXPFactory.new
+            nf=REXPFactory.new
+            l=RList.new
+            while(o<eox)
+              name=nil
+              o=lc.parse_REXP(buf,o)
+              if(xt==XT_LIST_TAG or xt==XT_LANG_TAG)
+                o=nf.parse_REXP(buf,o)
+                name=nf.cont.as_strings if(nf.cont.symbol? or nf.cont.string?)
+              end
+              if name.nil?
+                l.add(lc.cont) 
+              else
+                l.put(name,lc.cont)
+              end
+            end
+            @cont=(xt==XT_LANG_NOTAG or xt==XT_LANG_TAG) ? REXP::Language.new(l,get_attr) : REXP::List.new(l, get_attr)
+            if(o!=eox)
+              $STDERR.puts "Mismatch"
+              o=eox
+            end
+            return o
+          end
+          # XT_LIST and XT_LANG not implemented yet
+          
+          if xt==XT_VECTOR or xt==XT_VECTOR_EXP
+            v=Array.new
+            while(o<eox)
+              xx=new REXPFactory.new()
+              o = xx.parse_REXP(buf,o);
+              v.push(xx.cont);
+            end
+            if (o!=eox) 
+              $STDERR.puts("Warning: int vector SEXP size mismatch\n");
+              o=eox;
+            end
+            # fixup for lists since they're stored as attributes of vectors
+            if !get_attr.nil? and !get_attr.as_list['names'].nil?
+              nam=get_attr.as_list['names']
+              names=nil
+              if nam.string?
+                names=nam.as_strings 
+              elsif nam.vector?
+                l=nam.to_a
+                names=Array.new(aa.length)
+                aa.length.times {|i| names[i]=aa[i].as_string}
+              end
+              l=RList.new(v,names)
+              @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(l,get_attr) : REXP::GenericVector.new(l,get_attr)
+            else
+              @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(RList.new(v), get_attr) : REXP::GenericVector(RList.new(v), get_attr)
+              
+            end
+            return o
+          end
+          if xt==XT_ARRAY_STR
+            c=0
+            i=o
+            while(i<eox) 
+              c+=1 if buf(i)==0
+              i+=1
+            end
+            s=Array.new(c)
+            if c>0
+              c=0; i=o;
+              while(o < eox)
+                if buf[0]==0
+                  begin
+                    s[c]=buf[i..(o-i)].join("")
+                  rescue
+                    s[c]=""
+                  end
+                  c+=1
+                  i=o+1
+                end
+                o+=1
+              end
+              
+            end
+            @cont=REXP::String.new(s,get_attr)
+            return o
+          end
+          if xt==XT_VECTOR_STR
+            v=Array.new
+            while(o<eox)
+              xx=REXP::Factory.new
+              o=xx.parse_REXP(buf,o)
+              v.push(xx.cont.as_string)
+            end
+            sa=Array.new(v.size)
+            i=0
+            while(i<sa.length)
+              sa[i]=v.get(i)
+              i+=1
+            end
+            @cont=REXP::String.new(sa,get_attr)
+            return o
+          end
+          #not implemented XT_STR, XT_SYMNANE, XT_SYM, XT_CLOSS, XT_UNKNOWN, XT_S4
+          @cont=nil
+          o=eox
+          $STDERR.puts "Unhandled type:#{xt}"
+          return o
+        end # def 
+    end # Factory
+  end # end Protocol
+end # end Rserve

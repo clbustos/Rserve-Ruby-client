@@ -53,7 +53,9 @@ describe Rserve::Talk do
     
     @iomock.should_receive(:recv).once.with(16).and_return(server_response_1)
     @iomock.should_receive(:recv).once.with(cl).and_return(server_response_2)
-    ret=@talk.request(:cmd=>ty,:cont=>es.unpack("C*"))
+    
+    ret=@talk.request(:cmd=>ty,:cont=>es)
+    
     ret.should be_instance_of(Rserve::Packet)
     ret.cmd.should==rep
     ret.cont_len.should==cl

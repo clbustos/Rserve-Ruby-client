@@ -163,65 +163,63 @@ module Rserve
 
 
 	
-	# returns a string description of the object
-	# @return string describing the object - it can be of an arbitrary form and used only for debugging (do not confuse with {@link #asString()} for accessing string REXPs) */
-	#def to_s
-      #return super+((!@attr.nil?) ? "+" : "");
-  # end
-	
-	# returns representation that it useful for debugging (e.g. it includes attributes and may include vector values -- see {@link #maxDebugItems})
-	# @return extended description of the obejct -- it may include vector values
-  #def inspect {
-  #     (!@attr.nil?) ? (("<"+@attr.inspect()+">")+to_s()) : to_s;
-	#}
-	
-	#//======= complex convenience methods
-	# returns the content of the REXP as a ruby matrix of doubles (2D-array: m[rows][cols]). You could use Matrix.rows(result) to create
-  # a ruby dfeault library matrix.
-  # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").asDoubleMatrix());</code>
-  # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles */
-  def as_double_matrix()  
-    ct = as_doubles()
-    dim =get_attribute "dim"
-    raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
-    ds = dim.as_integers
-    raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
-    m = ds[0], n = ds[1]
-    # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
-    # we need to copy everything, since we create 2d array from 1d array
-    r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
-  end
-  def to_s
-    (@attr.nil? ? "" : "+")
-  end
-  def to_debug_string
-    (@attr.nil? ? "" : "<"+@attr.to_debug_string+">")
-  end
-	
-	
-	# :section: tools
-  
-	# creates a data frame object from a list object using integer row names
-	# *  @param l a (named) list of vectors ({@link REXPVector} subclasses), each element corresponds to a column and all elements must have the same length
-	# *  @return a data frame object
-	#  *  @throws MismatchException if the list is empty or any of the elements is not a vector */
-	def create_data_frame(l)
-    raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
-    raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
-		fe = l[0]
-		return
-		REXP::GenericVector.new(l,
+    # returns a string description of the object
+    # @return string describing the object - it can be of an arbitrary form and used only for debugging (do not confuse with {@link #asString()} for accessing string REXPs) */
+    #def to_s
+    #return super+((!@attr.nil?) ? "+" : "");
+    # end
+
+    # returns representation that it useful for debugging (e.g. it includes attributes and may include vector values -- see {@link #maxDebugItems})
+    # @return extended description of the obejct -- it may include vector values
+    #def inspect {
+    #     (!@attr.nil?) ? (("<"+@attr.inspect()+">")+to_s()) : to_s;
+    #}
+
+    #//======= complex convenience methods
+    # returns the content of the REXP as a ruby matrix of doubles (2D-array: m[rows][cols]). You could use Matrix.rows(result) to create
+    # a ruby dfeault library matrix.
+    # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").asDoubleMatrix());</code>
+    # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles */
+    def as_double_matrix()  
+      ct = as_doubles()
+      dim =get_attribute "dim"
+      raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
+      ds = dim.as_integers
+      raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
+      m = ds[0], n = ds[1]
+      # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
+      # we need to copy everything, since we create 2d array from 1d array
+      r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
+    end
+    def to_s
+      (@attr.nil? ? "" : "+")
+    end
+    def to_debug_string
+      (@attr.nil? ? "" : "<"+@attr.to_debug_string+">")
+    end
+    
+    # :section: tools
+
+    # creates a data frame object from a list object using integer row names
+    # *  @param l a (named) list of vectors ({@link REXPVector} subclasses), each element corresponds to a column and all elements must have the same length
+    # *  @return a data frame object
+    #  *  @throws MismatchException if the list is empty or any of the elements is not a vector */
+    def create_data_frame(l)
+      raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
+      raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
+      fe = l[0]
+      return REXP::GenericVector.new(l,
       REXP::List.new(
-        RList.new(
-										   [
-                       REXP::String.new("data.frame"),
-											 REXP::String.new(l.keys()),
-											 REXP::Integer.new([REXP::Integer.NA, -fe.length()])
-                       ],
-										   ["class", "names", "row.names" ])
-        )
+      RList.new(
+              [
+              REXP::String.new("data.frame"),
+              REXP::String.new(l.keys()),
+              REXP::Integer.new([REXP::Integer.NA, -fe.length()])
+              ],
+              ["class", "names", "row.names" ])
       )
-  end
+      )
+    end
   end
 end
 

@@ -27,6 +27,9 @@ module Rserve
         offset  = params.delete :offset
         len     = params.delete :len
         
+        # transform cont from String to Array of bytes
+        cont=cont.unpack("C*") if cont.is_a? String
+        
         raise ArgumentError, ":cont should be an Enumerable" if !cont.nil? and !cont.is_a? Enumerable
         if len.nil? 
           len=(cont.nil?) ? 0 : cont.length
@@ -62,6 +65,7 @@ module Rserve
         return nil if (ih.length!=16)
         
         rep=get_int(ih,0);
+        
         rl =get_int(ih,4);
         if (rl>0)
           ct=Array.new();
@@ -74,6 +78,7 @@ module Rserve
           end
           return Packet.new(rep,ct);
         end
+        
         return Packet.new(rep,nil);
     end
   end
