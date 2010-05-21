@@ -1,3 +1,5 @@
+.autotest
+.gitignore
 History.txt
 Manifest.txt
 README.txt
@@ -12,10 +14,13 @@ lib/rserve/rexp.rb
 lib/rserve/rexp/double.rb
 lib/rserve/rexp/genericvector.rb
 lib/rserve/rexp/integer.rb
+lib/rserve/rexp/language.rb
 lib/rserve/rexp/list.rb
 lib/rserve/rexp/logical.rb
+lib/rserve/rexp/null.rb
 lib/rserve/rexp/string.rb
 lib/rserve/rexp/symbol.rb
+lib/rserve/rexp/unknown.rb
 lib/rserve/rexp/vector.rb
 lib/rserve/rlist.rb
 lib/rserve/talk.rb
