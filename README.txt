@@ -9,7 +9,12 @@ Ruby client for Rserve, a Binary R server (http://www.rforge.net/Rserve/).
 
 Follows closely the new Java client API, but maintains all Ruby conventions when possible.
 
-Connection to Rserve not yet developed, but between June-July 2010 the system should be operational.
+== FEATURES / LIMITATIONS
+
+* Easy way to connect to R from Ruby
+* Doesn't need any extension, so works on Windows
+* Very fast (uses TCP)
+* Basic implementation compared to Java Client. You should use only eval and void_eval for now.
 
 == SYNOPSIS:
 
