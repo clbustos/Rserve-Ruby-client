@@ -38,7 +38,9 @@ describe Rserve::Protocol::REXPFactory do
   it "should process list" do
     require 'pp'
     la=@r.eval("list(name='Fred',age=30,10,20,kids=c(1,2,3))")
-    pp la
+    la.should be_list
+    la.should be_recursive
+    la.as_list.names.should==['name','age','','','kids']
   end
 
 end

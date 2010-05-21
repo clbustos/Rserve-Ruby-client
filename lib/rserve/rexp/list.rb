@@ -25,8 +25,13 @@ module Rserve
         super+(as_list.named? ? "named":"")
       end
       def to_debug_string
-        t=super
-        t << "{"  << @payload.map {|k,v| "#{k}=#{v}"}.join(",\n") << "}"
+        t=super+(as_list.named? ? "named":"")
+        if @payload.named?
+          inner="{"+@payload.size.times.map {|i| "#{@payload.names[i]}=#{@payload.data[i].to_debug_string}"}.join(",")+"}"
+        else
+          inner="{"+@payload.size.times.map {|i| "#{@payload.data[i].to_debug_string}"}.join(",")+"}"
+        end
+        t+inner
       end
     end
   end
