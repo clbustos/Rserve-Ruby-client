@@ -1,6 +1,7 @@
-= rserve
+= rserve-client
 
-* http://github.com/clbustos/rserve
+* http://github.com/clbustos/Rserve-Ruby-client
+
 
 == DESCRIPTION:
 
@@ -14,7 +15,10 @@ Connection to Rserve not yet developed, but between June-July 2010 the system sh
 
   require 'rserve'
   con=Rserve::Connection.new
-  con.eval("x<-rnornm(100)")
+  con.eval("x<-renorm(1)")
+  => #<Rserve::REXP::Double:0x000000011a13c8 
+        @payload=[(5339785585931699/2251799813685248)], 
+	@attr=nil>
 
 == REQUIREMENTS:
 
@@ -23,7 +27,7 @@ Connection to Rserve not yet developed, but between June-July 2010 the system sh
 
 == INSTALL:
 
-* For now, install from source.
+  sudo gem install rserve-client
 
 == LICENSE:
 
