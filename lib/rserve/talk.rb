@@ -27,13 +27,17 @@ module Rserve
         offset  = params.delete :offset
         len     = params.delete :len
         
-        # transform cont from String to Array of bytes
-        cont=cont.unpack("C*") if cont.is_a? String
-        
+        if cont.is_a? String
+          cont=request_string(cont)
+        elsif cont.is_a? Integer
+          cont=request_int(cont)
+        end
         raise ArgumentError, ":cont should be an Enumerable" if !cont.nil? and !cont.is_a? Enumerable
+        
         if len.nil? 
           len=(cont.nil?) ? 0 : cont.length
         end
+        
         offset||=0
         
       
@@ -53,20 +57,33 @@ module Rserve
       set_int(cmd,hdr,0)
       set_int(contlen,hdr,4);
       8.upto(15) {|i| hdr[i]=0}
-      
-      
-        if (cmd!=-1)
-          io.write(hdr.pack("C*"));
-          io.write(prefix.pack("C*")) if (!prefix.nil? && prefix.length>0)
-          io.write(cont.slice(offset,len).pack("C*")) if (!cont.nil? && cont.length>0)
+      if (cmd!=-1)
+        io.write(hdr.pack("C*"))
+        if (!prefix.nil? && prefix.length>0)
+          io.write(prefix.pack("C*"))
+          puts "SEND PREFIX #{prefix}" if $DEBUG
         end
+        if (!cont.nil? && cont.length>0)
+          io.write(cont.slice(offset, len).pack("C*")) 
+          puts "SEND CONTENT '#{cont.slice(offset, len).pack("C*")}'" if $DEBUG
+        end
+      end
         
         ih=io.recv(16).unpack("C*")
+        
         return nil if (ih.length!=16)
+        
+        puts "Answer: #{ih.to_s}" if $DEBUG
         
         rep=get_int(ih,0);
         
         rl =get_int(ih,4);
+        
+        if $DEBUG
+          puts "rep: #{rep} #{rep.class} #{rep & 0x00FFFFFF}"
+          puts "rl: #{rl} #{rl.class}"
+        end
+        
         if (rl>0)
           ct=Array.new();
           n=0;
@@ -76,10 +93,30 @@ module Rserve
             rd=data.length
             n+=rd;
           end
+          
           return Packet.new(rep,ct);
         end
         
         return Packet.new(rep,nil);
+    end
+    def request_string(s)
+      b=s.unpack("C*")
+      sl=b.length+1;
+      sl=(sl&0xfffffc)+4 if ((sl&3)>0)  # make sure the length is divisible by 4
+      rq=Array.new(sl+5)
+      
+      b.length.times {|i| rq[i+4]=b[i]}
+      ((b.length)..sl).each {|i|
+        rq[i+4]=0
+      }
+      set_hdr(DT_STRING,sl,rq,0)
+      rq
+    end
+    def request_int(par)
+      rq=Array.new(8)
+	    set_int(par,rq,4)
+	    set_hdr(DT_INT,4,rq,0)
+      rq
     end
   end
 end

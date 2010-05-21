@@ -224,6 +224,11 @@ module Rserve
 end
 
 require 'rserve/rexp/vector'
+require 'rserve/rexp/genericvector'
 require 'rserve/rexp/integer'
 require 'rserve/rexp/double'
 require 'rserve/rexp/list'
+require 'rserve/rexp/logical'
+require 'rserve/rexp/string'
+require 'rserve/rexp/symbol'
+

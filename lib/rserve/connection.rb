@@ -32,6 +32,7 @@ module Rserve
       @port_number=6311
       @tries=0
       @max_tries=5
+      @connected=false
       begin 
         #puts "Tryin to connect..."
         connect
@@ -64,8 +65,8 @@ module Rserve
         # Accept first input
         input=@s.recv(32).unpack("a4a4a4a20")
         raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received #{input[0]}" unless input[0]=="Rsrv"
-        @rsrv_version=input[1]
-        raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>"0103"
+        @rsrv_version=input[1].to_i
+        raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
         @protocol=input[2]
         raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
         @extra=input[4]
@@ -77,13 +78,9 @@ module Rserve
       @connected
     end
     def close
-      begin
-        s.shutdown if !s.nil? and !@s.closed?
+        @s.shutdown if !@s.nil? and !@s.closed?
         @connected=false
         return true
-      rescue =>e
-        return false
-      end
     end
     def get_server_version
       @rsrv_version
@@ -94,7 +91,6 @@ module Rserve
     def void_eval(cmd) 
       raise NotConnected if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_voidEval, :cont=>cmd+"\n")
-      
       if !rp.nil? and rp.ok?
         true
       else
@@ -104,30 +100,39 @@ module Rserve
     end
     
     
-    
-    
-    
-    
-    
-    # Raw send of data
-    def __send(com, data)
-      bcom=command com, data
-      @s.write(bcom)
-      input=@s.recv(4)
-      input=input.unpack("I")[0]
-      raise "Incorrect response" unless input & CMD_RESP>0
-      response=input & 0x00FFFFFF
-      code= input >> 24
-      if response == Rserve::RESP_OK
-        if com==Rserve::CMD_eval # read response
-          header=@s.recv(3).unpack("CCC")
-          length=header[0]+header[1]*256+header[2]*(256*256)
-          p @s.recv(length)
-        elsif command==Rserve::CMD_readFile
-          raise "Not implemented"
-        end
+  # evaluates the given command and retrieves the result
+  # * @param cmd command/expression string
+  # * @return R-xpression or <code>null</code> if an error occured */
+  def eval(cmd) 
+		raise NotConnected if !connected? or rt.nil?
+    rp=rt.request(:cmd=>Rserve::Protocol::CMD_eval, :cont=>cmd+"\n")
+    if !rp.nil? and rp.ok?
+      parse_eval_response(rp)
+    else
+      raise EvalError, "voidEval failed: #{rp.to_s}"
+    end
+  end
+  def parse_eval_response(rp)
+    rxo=0
+    pc=rp.cont
+    if (rsrv_version>100) # /* since 0101 eval responds correctly by using DT_SEXP type/len header which is 4 bytes long */
+			rxo=4
+			# we should check parameter type (should be DT_SEXP) and fail if it's not
+			if (pc[0]!=Rserve::Protocol::DT_SEXP && pc[0]!=(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
+				raise "Error while processing eval output: SEXP (type "+Rserve::Protocol::DT_SEXP+") expected but found result type "+pc[0].to_s+"."
       end
-      {:response=>response,:code=>code}
+			if (pc[0]==(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
+				rxo=8; # large data need skip of 8 bytes
+      end
+			# warning: we are not checking or using the length - we assume that only the one SEXP is returned. This is true for the current CMD_eval implementation, but may not be in the future. */
+    end
+    if pc.length>rxo 
+        rx=REXPFactory.new;
+				rx.parse_REXP(pc, rxo);
+				return rx.get_REXP();
+      else
+        return nil
+    end
   end
 end
 end

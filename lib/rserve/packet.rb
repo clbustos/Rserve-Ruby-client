@@ -20,7 +20,12 @@ module Rserve
       (@cmd>>24)&127
     end
     def to_s
-      "Packet[cmd=#{@cmd},len="+((cont.nil?)?"<nil>":(""+cont.length.to_s))+", con='"+(cont.nil?  ? "<nil>" : cont.pack("C*"))+"', status="+(ok? ? "ok":"error")+"]"
+      if error?
+        status="status=error - #{stat}"
+      else
+        status="status=ok"
+      end
+      "Packet[cmd=#{@cmd},len="+((cont.nil?)?"<nil>":(""+cont.length.to_s))+", con='"+(cont.nil?  ? "<nil>" : cont.pack("C*"))+"', status=#{status}]"
     end
   end
 end

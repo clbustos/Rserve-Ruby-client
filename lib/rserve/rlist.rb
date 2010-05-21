@@ -3,8 +3,8 @@ module Rserve
     include Enumerable
     attr_reader :names
     attr_reader :data
-    def initialize(data=nil,names=nil)
-      @names=nil
+    def initialize(data=nil,n=nil)
+       @names=nil
        @data=[]
        if data
          @data=case data
@@ -16,9 +16,9 @@ module Rserve
                     raise ArgumentError
                 end
         end
-       if names
+        if n
         @names=Array.new(@data.size)
-         names.each_index {|i| @names[i]=names[i]} if names.respond_to? :each_index
+         n.each_index {|i| @names[i]=n[i]} if n.respond_to? :each_index
         end
       end
     def named?
@@ -35,19 +35,25 @@ module Rserve
         raise ArgumentError,"Should be String or Integer"
       end
     end
-    alias :[] :at
+    
+    def at(v)
+      @data[v]
+    end
+    
     def key_at(v)
-      return nil @names.nil?
+      return nil if @names.nil?
       @names[v]
     end
     def size
       @data.size
     end
+    
     def each
       @data.each do |v|
         yield v
       end
     end
+    
     def set_key_at(i,value)
       if @names.nil?
         @names=Array.new
@@ -55,14 +61,41 @@ module Rserve
       if @names.size<size
         (size-@names.size).times {@names.push(nil)}
       end
+      
       @names[i]=value if i < size
+      
     end
+    
     def keys
       @names
     end
+    
+    def put(key,value)
+      if key.nil?
+        add(value)
+        return nil
+      end
+      if !names.nil?
+        p=names.index(key)
+        if !p.nil?
+          return @names[p]=value
+        end
+      end
+      i=size
+      add(value)
+      if(@names.nil?)
+        @names=Array.new(i+1)
+        while(@names.size<i) do
+          @names.push(nil)
+        end
+        @names.push(key)
+      end
+      
+    end
     def add(a,b=nil)
-     if b.nil? 
+     if b.nil?
        @data.push(a)
+       @names=Array.new(@data.size-1) if @names.nil?
        @names.push(nil)
       else
         @data.insert(a,b)

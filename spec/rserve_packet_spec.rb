@@ -13,7 +13,7 @@ describe Rserve::Packet do
   end
   it "method to_s should return coherent to_s" do
     packet=Rserve::Packet.new(Rserve::Protocol::RESP_OK,[1,2,3,4])
-    packet.to_s.should match /Packet\[cmd=\d+,len=\d,con='.+'\]/
+    packet.to_s.should match /Packet\[cmd=\d+,\s*len=\d,\s*con='.+',\s*status=.+\]/
   end
 
 end

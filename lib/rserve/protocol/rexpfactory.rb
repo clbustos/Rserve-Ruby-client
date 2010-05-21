@@ -1,7 +1,7 @@
 module Rserve
   module Protocol
     #  representation of R-eXpressions in Ruby
-    module REXPFactory
+    class REXPFactory
         include Rserve::Protocol
         # xpression type: NULL 
         XT_NULL=0;
@@ -79,7 +79,7 @@ module Rserve
           if args.size==0
             
           elsif
-              r=args[0]
+            r=args[0]
             r=Rserve::REXP::Null if r.nil?
             a=r.attr
             @attr=Factory.new(a) if !a.nil?
@@ -114,6 +114,7 @@ module Rserve
         end
         def parse_REXP(buf,o)
           xl=get_len(buf,o)
+          #p "buffer:#{buf.to_s}"
           has_at  = (buf[o]&128)!=0
           is_long = (buf[o]&64 )!=0
           xt = buf[o]&63
@@ -121,16 +122,19 @@ module Rserve
           o+=4
           eox=o+xl
           @type=xt
-          @attr=Factory.new()
+          
+          @attr=REXPFactory.new()
           @cont=nil
-          o=attr.parse_REXP(buf,o) if has_at 
+          
+          o=attr.parse_REXP(buf,o) if has_at
+          
           if xt==XT_NULL
             @cont=REXP::Null(get_attr)
             return o
           end
           if xt==XT_DOUBLE
             lr=get_long(buf,o)
-            d=[lr]
+            d=[longBitsToDouble(lr)]
             o+=8
             if(o!=eox)
               $STDERR.puts("Warning: double SEXP size mismatch\n");
@@ -144,7 +148,7 @@ module Rserve
             i=0
             d=Array.new(as)
             while(o<eox)
-              d[i]=get_long(buf,o)
+              d[i]=longBitsToDouble(get_long(buf,o))
               o+=8
               i+=1
             end
@@ -183,7 +187,7 @@ module Rserve
             o+=4
             d=Array.new(as)
             as.times {|i| d[i]=buf[o+i]}
-            d.length.each {|j| 
+            d.length.times {|j| 
               if d[j]!=0 && d[j]!=1 
                 d[j]==REXP::Logical::NA
               end
@@ -226,7 +230,7 @@ module Rserve
           if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
             lc=REXPFactory.new
             nf=REXPFactory.new
-            l=RList.new
+            l=Rlist.new
             while(o<eox)
               name=nil
               o=lc.parse_REXP(buf,o)
@@ -240,19 +244,26 @@ module Rserve
                 l.put(name,lc.cont)
               end
             end
-            @cont=(xt==XT_LANG_NOTAG or xt==XT_LANG_TAG) ? REXP::Language.new(l,get_attr) : REXP::List.new(l, get_attr)
+            
+            @cont=(xt==XT_LANG_NOTAG or xt==XT_LANG_TAG) ? 
+            REXP::Language.new(l,get_attr) : REXP::List.new(l, get_attr)
+            
             if(o!=eox)
               $STDERR.puts "Mismatch"
               o=eox
             end
+            
             return o
+          
           end
+          
+          
           # XT_LIST and XT_LANG not implemented yet
           
           if xt==XT_VECTOR or xt==XT_VECTOR_EXP
             v=Array.new
             while(o<eox)
-              xx=new REXPFactory.new()
+              xx=REXPFactory.new()
               o = xx.parse_REXP(buf,o);
               v.push(xx.cont);
             end
@@ -274,8 +285,8 @@ module Rserve
               l=RList.new(v,names)
               @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(l,get_attr) : REXP::GenericVector.new(l,get_attr)
             else
-              @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(RList.new(v), get_attr) : REXP::GenericVector(RList.new(v), get_attr)
               
+              @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(Rlist.new(v), get_attr) : REXP::GenericVector.new(Rlist.new(v), get_attr)
             end
             return o
           end
@@ -283,16 +294,16 @@ module Rserve
             c=0
             i=o
             while(i<eox) 
-              c+=1 if buf(i)==0
+              c+=1 if buf[i]==0
               i+=1
             end
             s=Array.new(c)
             if c>0
               c=0; i=o;
               while(o < eox)
-                if buf[0]==0
+                if buf[o]==0
                   begin
-                    s[c]=buf[i..(o-i)].join("")
+                    s[c]=buf[i,o-i].pack("C*")
                   rescue
                     s[c]=""
                   end
@@ -303,7 +314,7 @@ module Rserve
               end
               
             end
-            @cont=REXP::String.new(s,get_attr)
+            @cont=REXP::String.new(s, get_attr)
             return o
           end
           if xt==XT_VECTOR_STR
@@ -322,10 +333,26 @@ module Rserve
             @cont=REXP::String.new(sa,get_attr)
             return o
           end
-          #not implemented XT_STR, XT_SYMNANE, XT_SYM, XT_CLOSS, XT_UNKNOWN, XT_S4
+          
+     if (xt==XT_STR||xt==XT_SYMNAME) 
+			i = o;
+			while (buf[i]!=0 && i<eox) do
+        i+=1
+      end
+				if (xt==XT_STR)
+					@cont = REXP::String.new(buf[o,i-o].pack("C*"), get_attr);
+				else
+					@cont = REXP::Symbol.new(buf[o,i-o].pack("C*"))
+        end
+      
+			o = eox;
+			return o;
+    end
+          
+          #not implemented  XT_SYM, XT_CLOSS, XT_UNKNOWN, XT_S4
           @cont=nil
           o=eox
-          $STDERR.puts "Unhandled type:#{xt}"
+          raise "Unhandled type:#{xt}"
           return o
         end # def 
     end # Factory

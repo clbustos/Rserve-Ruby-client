@@ -165,10 +165,19 @@ module Rserve
       hi<<=32; hi|=low;
       hi
     end
-    
+    def longBitsToDouble(bits)
+       s = ((bits >> 63) == 0) ? 1 : -1;
+       e = ((bits >> 52) & 0x7ff)
+       m = (e == 0) ?
+                 (bits & 0xfffffffffffff) << 1 :
+                 (bits & 0xfffffffffffff) | 0x10000000000000;
+       s*m*2**(e-1075)
+    end
     def set_long(l, buf, o) 
       set_int((l&0xffffffff),buf,o)
       set_int((l>>32),buf,o+4)
     end
   end
 end
+
+require 'rserve/protocol/rexpfactory'

@@ -1,0 +1,29 @@
+module Rserve
+  class REXP
+    class GenericVector < REXP::Vector
+      attr_reader :payload
+      def initialize(list,attr=nil)
+        super(attr)
+        @payload=list.nil? ? Rlist.new() : list
+        
+        if (payload.named?)
+          @attr = REXP::List.new(
+          Rlist.new([REXP::String.new(payload.keys())],
+						  ["names"]));
+        end
+      end
+      def length
+        @payload.size
+      end
+      def list?
+        true
+      end
+      def recursive?
+        true
+      end
+      def as_list
+        @payload
+      end
+    end
+  end
+end
