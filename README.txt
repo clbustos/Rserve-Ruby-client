@@ -20,10 +20,8 @@ Follows closely the new Java client API, but maintains all Ruby conventions when
 
   require 'rserve'
   con=Rserve::Connection.new
-  con.eval("x<-renorm(1)")
-  => #<Rserve::REXP::Double:0x000000011a13c8 
-        @payload=[(5339785585931699/2251799813685248)], 
-	@attr=nil>
+  con.eval("x<-rnorm(1)").as_double.to_f
+  => => -1.71032693764757
 
 == REQUIREMENTS:
 
