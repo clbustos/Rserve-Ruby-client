@@ -37,7 +37,7 @@ module Rserve
     end
     
     def at(v)
-      @data[v]
+      self.[](v)
     end
     
     def key_at(v)
@@ -71,25 +71,22 @@ module Rserve
     end
     
     def put(key,value)
-      if key.nil?
-        add(value)
-        return nil
-      end
-      if !names.nil?
-        p=names.index(key)
-        if !p.nil?
-          return @names[p]=value
+        puts "rlist.put(#{key},#{value})" if $DEBUG
+        if key.nil?
+          add(value)
+          return nil
         end
-      end
-      i=size
-      add(value)
-      if(@names.nil?)
-        @names=Array.new(i+1)
-        while(@names.size<i) do
-          @names.push(nil)
+        if !@names.nil?
+          p=names.index(key)
+          if !p.nil?
+            return @names[p]=value
+          end
         end
+        puts "add key and value" if $DEBUG
+        i=size      
+        @names=Array.new(i) if(@names.nil?)
+        @data.push(value)
         @names.push(key)
-      end
       
     end
     def add(a,b=nil)

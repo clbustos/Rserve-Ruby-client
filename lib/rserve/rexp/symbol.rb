@@ -4,7 +4,7 @@ module Rserve
       attr_reader :name
       def initialize(name)
         super()
-        @name== name.nil? ? "":name
+        @name= (name.nil?) ? "" : name
       end
       def symbol?
         true

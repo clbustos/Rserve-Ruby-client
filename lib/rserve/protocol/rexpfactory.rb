@@ -75,6 +75,9 @@ module Rserve
         def get_attr
           attr.nil? ? nil : attr.cont
         end
+        def sexp_mismatch(type)
+          STDERR.puts("Warning: #{type} SEXP size mismatch") 
+        end
         def initialize(*args)
           if args.size==0
             
@@ -129,7 +132,7 @@ module Rserve
           o=attr.parse_REXP(buf,o) if has_at
           
           if xt==XT_NULL
-            @cont=REXP::Null(get_attr)
+            @cont=REXP::Null.new(get_attr)
             return o
           end
           if xt==XT_DOUBLE
@@ -137,7 +140,7 @@ module Rserve
             d=[longBitsToDouble(lr)]
             o+=8
             if(o!=eox)
-              $STDERR.puts("Warning: double SEXP size mismatch\n");
+              sexp_mismatch("double")
               o=eox
             end
             @cont=REXP::Double.new(d,get_attr)
@@ -153,7 +156,7 @@ module Rserve
               i+=1
             end
             if(o!=eox)
-              $STDERR.puts("Warning: double SEXP size mismatch\n");
+              sexp_mismatch("double")
               o=eox
             end
             @cont=REXP::Double.new(d,get_attr)
@@ -220,13 +223,29 @@ module Rserve
               $STDERR.puts "int SEXP size mismatch"
               o=eox
             end
-          # hack for list. Not implemented yet!
-            @cont=nil
-            @cont=REXP::Integer(d,get_attr)
+            
+            # hack for factors
+              if (!get_attr.nil?)
+                ca = get_attr().as_list().at("class");
+                ls = get_attr().as_list().at("levels");
+                if (!ca.nil? and !ls.nil? and  ca.as_string=="factor") 
+                  # R uses 1-based index, Java (and Ruby) uses 0-based one
+                  @cont = REXP::Factor.new(d, ls.as_strings(), get_attr)
+                  xt = XT_FACTOR;
+                end
+              end
+            
+            
+            
+              if @cont.nil?
+                @cont=REXP::Integer.new(d,get_attr)
+              end
             return o
           end
           
           # RAW not implemented yet
+          
+          
           if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
             lc=REXPFactory.new
             nf=REXPFactory.new
@@ -236,9 +255,11 @@ module Rserve
               o=lc.parse_REXP(buf,o)
               if(xt==XT_LIST_TAG or xt==XT_LANG_TAG)
                 o=nf.parse_REXP(buf,o)
-                name=nf.cont.as_strings if(nf.cont.symbol? or nf.cont.string?)
+                
+                name=nf.cont.as_string if(nf.cont.symbol? or nf.cont.string?)
               end
               if name.nil?
+                
                 l.add(lc.cont) 
               else
                 l.put(name,lc.cont)
@@ -268,7 +289,7 @@ module Rserve
               v.push(xx.cont);
             end
             if (o!=eox) 
-              $STDERR.puts("Warning: int vector SEXP size mismatch\n");
+              sexp_mismatch("int")
               o=eox;
             end
             # fixup for lists since they're stored as attributes of vectors
@@ -282,7 +303,7 @@ module Rserve
                 names=Array.new(aa.length)
                 aa.length.times {|i| names[i]=aa[i].as_string}
               end
-              l=RList.new(v,names)
+              l=Rlist.new(v,names)
               @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(l,get_attr) : REXP::GenericVector.new(l,get_attr)
             else
               
@@ -341,6 +362,7 @@ module Rserve
       end
 				if (xt==XT_STR)
 					@cont = REXP::String.new(buf[o,i-o].pack("C*"), get_attr);
+          
 				else
 					@cont = REXP::Symbol.new(buf[o,i-o].pack("C*"))
         end
@@ -348,8 +370,27 @@ module Rserve
 			o = eox;
 			return o;
     end
+    
+    #not implemented  XT_SYM, 
+    
+    
+    if (xt==XT_CLOS) 
+			o=eox;
+			return o;
+    end
+		
+		if (xt==XT_UNKNOWN) 
+			@cont = REXP::Unknown.new(get_int(buf,o), get_attr)
+			o=eox;
+			return o;
+    end
+		
+		if (xt==XT_S4) 
+			@cont = new REXP::S4(get_attr)
+			o=eox
+			return o;
+    end
           
-          #not implemented  XT_SYM, XT_CLOSS, XT_UNKNOWN, XT_S4
           @cont=nil
           o=eox
           raise "Unhandled type:#{xt}"

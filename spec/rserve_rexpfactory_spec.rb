@@ -37,7 +37,7 @@ describe Rserve::Protocol::REXPFactory do
   end
   it "should process list" do
     require 'pp'
-    la=@r.eval("list(name='Fred', wife='Mary', no.children=3, child.ages=c(4,7,9))")
+    la=@r.eval("list(name='Fred',age=30,10,20,kids=c(1,2,3))")
     pp la
   end
 
