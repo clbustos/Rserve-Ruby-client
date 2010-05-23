@@ -73,7 +73,6 @@ Spec
 
   require 'rserve'
   con=Rserve::Connection.new
-  
   con.eval("x<-rnorm(1)")
   => #<Rserve::REXP::Double:0x000000011a13c8 
         @payload=[(5339785585931699/2251799813685248)], 
@@ -81,7 +80,6 @@ Spec
   con.eval("list(name='Fred')").as_list
   
   => #<Rserve::Rlist:0x00000001bf82a8 @names=["name"], @data=[#<Rserve::REXP::String:0x00000001bf8548 @payload=["Fred"], @attr=nil>]>
-
 
 == REQUIREMENTS:
 
