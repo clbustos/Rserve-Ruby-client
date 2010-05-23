@@ -11,19 +11,77 @@ Follows closely the new Java client API, but maintains all Ruby conventions when
 
 == FEATURES / LIMITATIONS
 
-* Easy way to connect to R from Ruby
-* Doesn't need any extension, so works on Windows
-* Very fast (uses TCP)
-* Basic implementation compared to Java Client. You should use only eval and void_eval for now.
+* 100% ruby
+* Uses TCP/IP sockets to interchange data and commands
+* Requires Rserve installed on the server machine. On debian /  ubuntu, you should use <tt>sudo apt-get install r-cran-rserve</tt>
+Pros:
+  * Work with Ruby 1.8, 1.9 and JRuby 1.5
+  * Implements almost completely R's datatypes: integer, doubles, chars, logical vectors, lists and raw data.
+  * Follows closely the Java API, so any change on the server could be adopted without much problem
+  * Fast
+Cons:
+  * Requires Rserve
+  * No seamless integration with Ruby. You obtain data with an interface closer to R than Ruby.
+ 
+== RELATED LIBRARIES (Ruby / R)
+
+* Rinruby [http://rinruby.ddahl.org/]
+  * 100% ruby 
+  * Uses pipes to send commands and evals
+  * Uses TCP/IP Sockets to send and retrieve data
+  * Pros:
+    * Doesn't requires anything but R
+    * Work with Ruby 1.8, 1.9 and JRuby 1.5
+    * All API tested
+  * Cons:
+    * VERY SLOW
+    * Very limited datatypes: Only vector and Matrix
+* RSRuby
+  * C Extension for Ruby, linked to R's shared library
+  * Pros:
+    * Very fast data access
+    * Seamless integration with ruby. Every method and object is treated like a Ruby one
+  * Cons:
+    * Transformation between R and Ruby types aren't trivial
+    * Dependent of operating system, Ruby implementation and R version
+    * Not available for alternative implementations of Ruby (JRuby, IronRuby and Rubinius)
+    
+    
+== TODO
+
+Implements
+
+* REXPs
+  * Enviroment
+  * ExpressionVector
+  * Factor
+  * Raw
+  * Reference
+  * S4
+  * Wrapper
+* Sessions
+* Authentification
+* Original test
+
+Spec
+
+* Test suite on Rserve Java new API
+* First tutorial on R
+
 
 == SYNOPSIS:
 
   require 'rserve'
   con=Rserve::Connection.new
-  con.eval("x<-renorm(1)")
+  
+  con.eval("x<-rnorm(1)")
   => #<Rserve::REXP::Double:0x000000011a13c8 
         @payload=[(5339785585931699/2251799813685248)], 
 	@attr=nil>
+  con.eval("list(name='Fred')").as_list
+  
+  => #<Rserve::Rlist:0x00000001bf82a8 @names=["name"], @data=[#<Rserve::REXP::String:0x00000001bf8548 @payload=["Fred"], @attr=nil>]>
+
 
 == REQUIREMENTS:
 
