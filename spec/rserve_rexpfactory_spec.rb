@@ -16,6 +16,11 @@ describe Rserve::Protocol::REXPFactory do
     la.should be_instance_of(Rserve::REXP::Logical)
     la.true?.should==[true,false,true]
   end
+  it "should process logical vectors with NA" do
+    la=@r.eval("c(TRUE,NA)")
+    la.should be_instance_of(Rserve::REXP::Logical)
+    la.na?.should==[false,true]    
+  end
   it "should process single double" do
     la=@r.eval("1.5")
     la.should be_instance_of(Rserve::REXP::Double)
@@ -30,10 +35,37 @@ describe Rserve::Protocol::REXPFactory do
       v.should be_close(a[i],1e-10)
     }
   end
-  it "should process char" do
+  it "should process double vector with NA" do
+    la=@r.eval("c(1,NA)")
+    la.should be_instance_of(Rserve::REXP::Double)
+    la.na?.should==[false,true]
+    
+  end
+  it "should process string vector" do
     la=@r.eval("c('abc','def','ghi')")
     la.should be_instance_of(Rserve::REXP::String)
     la.as_strings.should==['abc','def','ghi']
+  end
+  it "should process string vector with NA" do
+    la=@r.eval("c('abc','def',NA)")
+    la.should be_instance_of(Rserve::REXP::String)
+    la.na?.should==[false,false,true]
+
+  end
+  it "should process factor" do
+    la=@r.eval <<-EOF
+    state <- c("tas", "sa",  "qld", "nsw", "nsw", "nt",  "wa",  "wa",
+                  "qld", "vic", "nsw", "vic", "qld", "qld", "sa",  "tas",
+                  "sa",  "nt",  "wa",  "vic", "qld", "nsw", "nsw", "wa",
+                  "sa",  "act", "nsw", "vic", "vic", "act");
+    statef <- factor(state)
+    EOF
+    la.should be_factor
+    la.as_factor.levels.sort.should==%w{act nsw nt  qld sa tas vic wa}.sort
+
+    la.as_factor.contains?("tas").should be_true
+    la.as_factor.contains?("nn").should be_false
+
   end
   it "should process list" do
     require 'pp'

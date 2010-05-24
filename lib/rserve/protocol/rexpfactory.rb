@@ -177,8 +177,9 @@ module Rserve
             d=Array.new(as)
             (eox-i).times {|i| d[i]=buf[o+i]}
             o=eox
+
             d.length.each {|j| 
-              if d[j]!=0 && d[j]!=1 
+              if d[j]!=0 and d[j]!=1
                 d[j]==REXP::Logical::NA
               end
             }
@@ -190,9 +191,11 @@ module Rserve
             o+=4
             d=Array.new(as)
             as.times {|i| d[i]=buf[o+i]}
-            d.length.times {|j| 
-              if d[j]!=0 && d[j]!=1 
-                d[j]==REXP::Logical::NA
+            d.collect! {|v| 
+              if v!=0 and v!=1
+                REXP::Logical::NA
+              else
+                v
               end
             }
             o=eox

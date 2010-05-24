@@ -12,3 +12,5 @@ require 'rserve/rexp'
 require 'rserve/engine'
 require 'rserve/connection'
 require 'rserve/rlist'
+require 'rserve/rfactor'
+

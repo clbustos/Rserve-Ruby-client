@@ -22,7 +22,7 @@ module Rserve
       end
       
       def na?
-        @payload.map {|v| v.nil}
+        @payload.map {|v| v=='NA'}
       end
       def to_debug_string
         t=super

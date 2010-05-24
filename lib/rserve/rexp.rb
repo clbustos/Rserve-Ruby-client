@@ -227,9 +227,10 @@ end
 
 require 'rserve/rexp/vector'
 require 'rserve/rexp/null'
-
 require 'rserve/rexp/genericvector'
 require 'rserve/rexp/integer'
+require 'rserve/rexp/factor'
+
 require 'rserve/rexp/double'
 require 'rserve/rexp/list'
 require 'rserve/rexp/language'

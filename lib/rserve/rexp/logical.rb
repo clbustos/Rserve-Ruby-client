@@ -13,12 +13,13 @@ module Rserve
           @payload.map {|v| v==NA}
         end
       end
+      # l should be a value or array of 0 and 1.
       def initialize(l,attr=nil)
         super(attr)
         if l.is_a? Array
-          @payload=l.map {|l| l==1 ? TRUE : FALSE}
+          @payload= l 
         else
-          @payload = [ l==1 ? TRUE : FALSE ]
+          @payload = [ l==NA ? NA : (l==1 ? TRUE : FALSE) ]
         end
       end
       def length
@@ -26,6 +27,9 @@ module Rserve
       end
       def logical?
         true
+      end
+      def as_bytes
+        @payload
       end
       def as_integers
         @payload.map {|v| v==NA ? REXP::Integer::NA : ( v == FALSE ? 0 : 1 )} 
@@ -41,7 +45,6 @@ module Rserve
       end
       def false?
         @payload.map {|v| v==FALSE}
-        
       end
     end
   end
