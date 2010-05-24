@@ -1,4 +1,4 @@
-=== 0.1.4 / 2010-05-24
+=== 0.1.5 / 2010-05-24
 * Bug fix: Incorrect NA for Logical, String and Double Vector
 * Factors implemented
 

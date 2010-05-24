@@ -43,7 +43,7 @@ Cons:
     * Seamless integration with ruby. Every method and object is treated like a Ruby one
   * Cons:
     * Transformation between R and Ruby types aren't trivial
-    * Dependent of operating system, Ruby implementation and R version
+    * Dependent on operating system, Ruby implementation and R version
     * Not available for alternative implementations of Ruby (JRuby, IronRuby and Rubinius)
     
     
