@@ -29,6 +29,7 @@ spec/rserve_double_spec.rb
 spec/rserve_integer_spec.rb
 spec/rserve_packet_spec.rb
 spec/rserve_protocol_spec.rb
+spec/rserve_rexp_spec.rb
 spec/rserve_rexpfactory_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb

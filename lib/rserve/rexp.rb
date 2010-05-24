@@ -121,7 +121,7 @@ module Rserve
 	# * @return attribute value or <code>null</code> if the attribute does not exist */
   
   def get_attribute(name)
-    nil if @attr.nil? or !@attr.is_list?
+    nil if @attr.nil? or !@attr.list?
     @attr.as_list[name]
   end
 	
@@ -129,7 +129,7 @@ module Rserve
   # * @param name attribute name
   # * @return <code>true</code> if the attribute exists, <code>false</code> otherwise */
   def has_attribute? (name) 
-    return (!@attr.nil? and @attr.is_list and !@attr.as_list[name].nil?);
+    return (!@attr.nil? and @attr.list? and !@attr.as_list[name].nil?);
   end
 
 
@@ -165,37 +165,39 @@ module Rserve
 	
     # returns a string description of the object
     # @return string describing the object - it can be of an arbitrary form and used only for debugging (do not confuse with {@link #asString()} for accessing string REXPs) */
-    #def to_s
-    #return super+((!@attr.nil?) ? "+" : "");
-    # end
+    def to_s
+    return (!@attr.nil?) ? "+" : ""
+    end
 
     # returns representation that it useful for debugging (e.g. it includes attributes and may include vector values -- see {@link #maxDebugItems})
     # @return extended description of the obejct -- it may include vector values
-    #def inspect {
-    #     (!@attr.nil?) ? (("<"+@attr.inspect()+">")+to_s()) : to_s;
-    #}
-
+    def to_debug_string 
+      (!@attr.nil?) ? (("<"+@attr.to_debug_string()+">")+to_s()) : to_s
+    end
+    
+    
+    
     #//======= complex convenience methods
     # returns the content of the REXP as a ruby matrix of doubles (2D-array: m[rows][cols]). You could use Matrix.rows(result) to create
-    # a ruby dfeault library matrix.
-    # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").asDoubleMatrix());</code>
+    # a ruby matrix.
+    # Matrix(c.eval("matrix(c(1,2,3,4,5,6),2,3)").as_double_matrix());</code>
+    #
     # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles */
     def as_double_matrix()  
       ct = as_doubles()
-      dim =get_attribute "dim"
+      dim = get_attribute "dim"
       raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
       ds = dim.as_integers
       raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
-      m = ds[0], n = ds[1]
+      m,n = ds[0], ds[1]
       # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
       # we need to copy everything, since we create 2d array from 1d array
       r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
     end
-    def to_s
-      (@attr.nil? ? "" : "+")
-    end
-    def to_debug_string
-      (@attr.nil? ? "" : "<"+@attr.to_debug_string+">")
+    # Returns a standard library's matrix
+    def as_matrix
+      require 'matrix'
+      Matrix.rows(as_double_matrix)
     end
     
     # :section: tools

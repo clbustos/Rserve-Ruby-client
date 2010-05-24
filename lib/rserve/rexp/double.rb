@@ -30,7 +30,7 @@ module Rserve
         @payload
       end
       def as_strings
-        @payload.map(&:to_s)
+        @payload.map {|v| v.to_f.to_s}
       end
       
       def na?(value=nil)
