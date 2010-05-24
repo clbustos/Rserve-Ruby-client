@@ -21,6 +21,9 @@ module Rserve
       def to_debug_string
         super+"["+name+"]"
       end
+      def to_ruby
+        @name
+      end
     end
   end
 end

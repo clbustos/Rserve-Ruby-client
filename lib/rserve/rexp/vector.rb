@@ -19,7 +19,7 @@ module Rserve
         @payload.map {|v| na?(v) ? nil : v }
       end
       def to_ruby
-        if @payload.size==0
+        if @payload.nil? or @payload.size==0
           nil
         elsif @payload.size==1
           @payload[0]

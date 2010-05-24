@@ -125,12 +125,12 @@ module Rserve
       }
     end
     def to_ruby
-      if names.nil?
+      if names.nil? or names.all? {|v| v.nil?}
         to_a
       else
         h=Hash.new
         names.each_with_index {|name,i|
-          key= name=="" ? i : name
+          key= (name=="" or name.nil?) ? i : name
           h[key]=@data[i].to_ruby
         }
         h

@@ -12,6 +12,9 @@ module Rserve
    def as_list
      Rlist.new
    end
+   def to_ruby
+     nil
+   end
  end
 end
 end

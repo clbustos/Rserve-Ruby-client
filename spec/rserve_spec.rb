@@ -20,8 +20,11 @@ severity <- as.data.frame(cbind(diseasesev,temperature))
 severity.lm <- lm(diseasesev~temperature,data=severity)
 EOF
 @r.void_eval(script)
-@r.eval('severity.lm').should be_true
+@r.eval('severity.lm').should be_instance_of(Rserve::REXP::GenericVector)
+@r.eval('severity.lm').to_ruby.should be_true
 @r.eval('summary(severity.lm)').should be_true
+@r.eval('summary(severity.lm)').to_ruby.should be_true
+
 
 
   end
