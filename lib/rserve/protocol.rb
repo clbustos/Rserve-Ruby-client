@@ -11,13 +11,15 @@ module Rserve
     CMD_RESP=0x010000 # all responses have this flag set
     RESP_OK=(CMD_RESP|0x0001) # command succeeded; returned parameters depend on the command issued 
     RESP_ERR=(CMD_RESP|0x0002) # command failed, check stats code attached string may describe the error
-    
     ERR_auth_failed=0x41 # auth.failed or auth.requested but no login came. in case of authentification failure due to name/pwd mismatch, server may send CMD_accessDenied instead
     ERR_conn_broken=0x42 #  connection closed or broken packet killed it */
+
     ERR_inv_cmd=0x43 #  unsupported/invalid command */
     ERR_inv_par=0x44 #  some parameters are invalid */
     ERR_Rerror=0x45 #  R-error occured, usually followed by connection shutdown */
     ERR_IOerror=0x46 #  I/O error */
+
+
     ERR_notOpen=0x47 #  attempt to perform fileRead/Write  on closed file */
     ERR_accessDenied=0x48 #  this answer is also valid on CMD_login; otherwise it's sent if the server deosn;t allow the user to issue the specified command. (e.g. some server admins may block file I/O operations for some users) 
     ERR_unsupportedCmd=0x49 #  unsupported command */
@@ -27,7 +29,7 @@ module Rserve
     ERR_out_of_mem=0x4d #  out of memory. the connection is usually closed after this error was sent 
     ERR_ctrl_closed=0x4e #  control pipe to the master process is closed or broken 
     ERR_session_busy=0x50 #  session is still busy */
-    ERR_detach_failed=0x51 #  unable to detach seesion (cannot determine peer IP or problems creating a listening socket for resume) */
+    ERR_detach_failed=0x51 #  unable to detach session (cannot determine peer IP or problems creating a listening socket for resume) */
     
     
     CMD_login=0x001 #  "name\npwd" : - */
@@ -89,6 +91,26 @@ module Rserve
     DT_SEXP=10 #  encoded SEXP */
     DT_ARRAY=11 #  array of objects (i.e. first 4 bytes specify how many subsequent objects are part of the array; 0 is legitimate) */
     DT_LARGE=64 #  new in 0102: if this flag is set then the length of the object is coded as 56-bit integer enlarging the header by 4 bytes */
+
+    ERROR_DESCRIPTIONS={
+      ERR_auth_failed=>'auth.failed or auth.requested but no login came',
+      ERR_conn_broken=>'connection closed or broken packet killed it',
+      ERR_inv_cmd=>"unsupported/invalid command",
+      ERR_inv_par=>"some parameters are invalid",
+      ERR_Rerror=>"R-error",
+      ERR_IOerror=>"I/O error",
+      ERR_notOpen=>"attempt to perform fileRead/Write  on closed file",
+      ERR_accessDenied=>"Access denied",
+      ERR_unsupportedCmd=>"unsupported command",
+      ERR_unknownCmd=>"unknown command",
+      ERR_data_overflow=>"data overflow",
+      ERR_object_too_big=>"requested object is too big",
+      ERR_out_of_mem=>"out of memory",
+      ERR_ctrl_closed=>"control pipe to the master process is closed or broken",
+      ERR_session_busy=>"session still busy",
+      ERR_detach_failed=>"unable to detach seesion"
+    } # error descriptions
+    
     
     # writes bit-wise int to a byte buffer at specified position in Intel-endian form
     # Internal: byte buffer will be the result of unpack("CCCC") an integer.

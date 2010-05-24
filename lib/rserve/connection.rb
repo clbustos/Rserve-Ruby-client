@@ -1,12 +1,23 @@
 module Rserve
   class Connection < Rserve::Engine
     include Rserve::Protocol
-    ServerNotInstalled=Class.new(Exception)
+    
+    # :section: Exceptions
+    RserveNotStarted=Class.new(Exception)
+    ServerNotAvailable=Class.new(Exception)
     IncorrectServer=Class.new(Exception)
     IncorrectServerVersion=Class.new(Exception)
     IncorrectProtocol=Class.new(Exception)
     NotConnected=Class.new(Exception)
-    EvalError=Class.new(Exception)
+    # Eval error
+    class EvalError < RuntimeError
+      attr_accessor :request_packet
+      def initialize(rp)
+        @request_packet=rp
+      end
+    end
+    attr_reader :hostname
+    attr_reader :port_number
     attr_reader :protocol 
     attr_reader :last_error
     attr_reader :connected
@@ -21,41 +32,43 @@ module Rserve
     AT_plain=0
     AT_crypt=1
     
-    def host
-      @hostname
-    end
     def initialize(opts=Hash.new)
-      @auth_req=false
-      @transfer_charset="UTF-8"
-      @auth_type=AT_plain
-      @hostname="127.0.0.1"
-      @port_number=6311
-      @tries=0
-      @max_tries=5
+      @auth_req         = opts.delete(:auth_req)          || false
+      @transfer_charset = opts.delete(:transfer_charset)  || "UTF-8"
+      @auth_type        = opts.delete(:auth_type)         || AT_plain
+      @hostname         = opts.delete(:hostname)          || "127.0.0.1"
+      @port_number      = opts.delete(:port_number)       || 6311
+      @max_tries        = opts.delete(:max_tries)         || 5
+
+      @tries            = 0
       @connected=false
+      
+      
       begin 
         #puts "Tryin to connect..."
         connect
       rescue Errno::ECONNREFUSED
         if @tries<@max_tries
+           @tries+=1
+           # Rserve is available?
+           if system "killall -s 0 Rserve"
+             # Rserve is available. Incorrect host and/or portname
+             raise ServerNotAvailable, "Rserve started, but not available on #{hostname}:#{port_number}"
+           # Rserve not available. We should instanciate it first
+           else 
+             if system "R CMD Rserve"
+             #puts "Ok"
+             retry
+              else
+                raise RserveNotStarted, "Can't start Rserve"
+              end
+           end
           #puts "Init RServe"
-          if system "R CMD Rserve"
-          #puts "Ok"
-            retry
-	  else
-	    raise ServerNotInstalled, "Rserve not installed"
-	  end
+          
         else
           raise
         end
       end
-      
-    end
-    def is
-      @s
-    end
-    def os
-      @s
     end
     def connect
         close if @connected
@@ -64,7 +77,7 @@ module Rserve
         #puts "Connected"
         # Accept first input
         input=@s.recv(32).unpack("a4a4a4a20")
-        raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received #{input[0]}" unless input[0]=="Rsrv"
+        raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
         @rsrv_version=input[1].to_i
         raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
         @protocol=input[2]
@@ -78,9 +91,13 @@ module Rserve
       @connected
     end
     def close
-        @s.shutdown if !@s.nil? and !@s.closed?
-        @connected=false
-        return true
+      if !@s.nil? and !@s.closed?
+        @s.close_write
+        @s.close_read
+      end
+      raise "Can't close socket" unless @s.closed?
+      @connected=false
+      true
     end
     def get_server_version
       @rsrv_version
@@ -94,7 +111,7 @@ module Rserve
       if !rp.nil? and rp.ok?
         true
       else
-        raise EvalError, "voidEval failed: #{rp.to_s}"
+        raise EvalError.new(rp), "voidEval failed: #{rp.to_s}"
       end
       
     end
@@ -109,7 +126,7 @@ module Rserve
     if !rp.nil? and rp.ok?
       parse_eval_response(rp)
     else
-      raise EvalError, "voidEval failed: #{rp.to_s}"
+      raise EvalError.new(rp), "voidEval failed: #{rp.to_s}"
     end
   end
   def parse_eval_response(rp)
