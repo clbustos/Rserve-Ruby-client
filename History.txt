@@ -1,5 +1,18 @@
-=== 0.1.1 / 2010-05-21
+=== 0.1.3 / 2010-05-24
+* Better README.txt
+* Implemented hash of options on Connection.new
+* Better implementation of errors on connections
+* REXP::Double#as_strings returns values as floats, not Rationals
+* Bug fix on REXP#as_double_matrix. 
+* Added REXP#as_matrix, which return a standard library matrix from a R matrix
+* New spec: REXP
+
+=== 0.1.2 / 2010-05-21
 * List names works now
+
+=== 0.1.1 / 2010-05-21
+
+YANKED
 
 === 0.1.0 / 2010-05-21
 
