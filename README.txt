@@ -54,7 +54,6 @@ Implements
 * REXPs
   * Enviroment
   * ExpressionVector
-  * Factor
   * Raw
   * Reference
   * S4
