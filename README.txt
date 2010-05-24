@@ -15,13 +15,17 @@ Follows closely the new Java client API, but maintains all Ruby conventions when
 * Uses TCP/IP sockets to interchange data and commands
 * Requires Rserve installed on the server machine. On debian /  ubuntu, you should use <tt>sudo apt-get install r-cran-rserve</tt>
 Pros:
-  * Work with Ruby 1.8, 1.9 and JRuby 1.5
+  * Work with Ruby 1.8, 1.9 and JRuby 1.5.
+  * Should work on Windows (not tested yet)
   * Implements almost completely R's datatypes: integer, doubles, chars, logical vectors, lists and raw data.
-  * Follows closely the Java API, so any change on the server could be adopted without much problem
+  * Follows closely the Java API, so any change on the server API could be adopted without much problem
   * Fast
+  * Easy management of differences between R and Ruby, or "You can have your cake and eat it, too!"
+    *  From R side: The evaluation of expression retrieves REXP object, with a lot of information from original variables on R. You can construct your REXP objects and assign they to variables on R fast using binary TCP/IP port or send complex expression without lost of time using <tt>void_eval</tt> 
+    * Between R and Ruby: Every REXP object implements methods to convert to specific Ruby type: as_integers, as_doubles, as_strings
+    * From Ruby side: Every REXP objects has a <tt>to_ruby</tt> method, which automagicly converts every R type on equivalen Ruby type. So, a vector of size 1 is converted to an integer or double, a vector of size>1 returns an array, a named list returns a hash and so on. If you need to create a complex expression, you could always use method <tt>eval</tt> without problem
 Cons:
   * Requires Rserve
-  * No seamless integration with Ruby. You obtain data with an interface closer to R than Ruby.
  
 == RELATED LIBRARIES (Ruby / R)
 
