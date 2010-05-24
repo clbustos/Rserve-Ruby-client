@@ -160,7 +160,7 @@ module Rserve
     # make sure that the buffer is big enough 
     
     def get_int(buf, o) 
-      return buf.slice(o,4).pack("C*").unpack("I")[0]
+      return buf.slice(o,4).pack("C*").unpack("i")[0]
       #return ((buf[o]&255)|((buf[o+1]&255)<<8)|((buf[o+2]&255)<<16)|((buf[o+3]&255)<<24));
     end
     

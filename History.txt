@@ -1,11 +1,12 @@
 === 0.1.5 / 2010-05-24
 * Bug fix: Incorrect NA for Logical, String and Double Vector
 * Factors implemented
+* Correct Manifest.txt
 
 === 0.1.3 / 2010-05-24
 * Better README.txt
-* Implemented hash of options on Connection.new
-* Better implementation of errors on connections
+* Implemented options hash on Connection.new
+* Better implementation of errors on connection
 * REXP::Double#as_strings returns values as floats, not Rationals
 * Bug fix on REXP#as_double_matrix. 
 * Added REXP#as_matrix, which return a standard library matrix from a R matrix

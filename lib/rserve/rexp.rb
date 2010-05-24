@@ -222,6 +222,10 @@ module Rserve
       )
       )
     end
+    # Retrieves the best Ruby representation of data
+    def to_ruby
+      raise "You should implement this!"
+    end
   end
 end
 

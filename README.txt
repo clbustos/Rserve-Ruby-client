@@ -70,15 +70,29 @@ Spec
 
 == SYNOPSIS:
 
-  require 'rserve'
-  con=Rserve::Connection.new
-  con.eval("x<-rnorm(1)")
-  => #<Rserve::REXP::Double:0x000000011a13c8 
-        @payload=[(5339785585931699/2251799813685248)], 
-	@attr=nil>
-  con.eval("list(name='Fred')").as_list
-  
-  => #<Rserve::Rlist:0x00000001bf82a8 @names=["name"], @data=[#<Rserve::REXP::String:0x00000001bf8548 @payload=["Fred"], @attr=nil>]>
+    require 'rserve'
+    con=Rserve::Connection.new
+    
+    # Evaluation retrieves a <tt>Rserve::REXP</tt> object
+    
+    x=con.eval('x<-rnorm(1)')
+    => #<Rserve::REXP::Double:0x00000000ea9c38 @payload=[(-7727373431742323/4503599627370496)], @attr=nil>
+    
+    # Every Rserve::REXP could be converted to Ruby objects using
+    # method <tt>to_ruby</tt>
+    x.to_ruby
+    
+    => [(-7727373431742323/4503599627370496)]
+    
+    # The API could manage complex recursive list
+    
+    x=con.eval('list(l1=list(c(2,3)),l2=c(1,2,3))')
+    => #<Rserve::REXP::GenericVector:0x000000015fcdc8 @attr=#<Rserve::REXP::List:0x000000015fc888 @payload=#<Rserve::Rlist:0x000000015fc9a0 @names=["names"], @data=[#<Rserve::REXP::String:0x000000015fccb0 @payload=["l1", "l2"], @attr=nil>]>, @attr=nil>, @payload=#<Rserve::Rlist:0x000000015fcff8 @names=["l1", "l2"], @data=[#<Rserve::REXP::GenericVector:0x000000015fe4f8 @attr=nil, @payload=#<Rserve::Rlist:0x000000015fe568 @names=nil, @data=[#<Rserve::REXP::Double:0x000000015fe5a0 @payload=[(2/1), (3/1)], @attr=nil>]>>, #<Rserve::REXP::Double:0x000000015fd2d0 @payload=[(1/1), (2/1), (3/1)], @attr=nil>]>>
+    
+    # Again, method <tt>to_ruby</tt> provides an easy way to convert from R
+    
+    irb(main):014:0> x.to_ruby
+    => {"l1"=>[[(2/1), (3/1)]], "l2"=>[(1/1), (2/1), (3/1)]}
 
 == REQUIREMENTS:
 

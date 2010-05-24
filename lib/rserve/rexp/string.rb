@@ -28,6 +28,7 @@ module Rserve
         t=super
         t << "{"  << @payload.map(&:to_s).join(",") << "}"
       end
+      
     end
   end
 end

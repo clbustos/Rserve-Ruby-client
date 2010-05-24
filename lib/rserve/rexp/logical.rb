@@ -31,6 +31,19 @@ module Rserve
       def as_bytes
         @payload
       end
+      
+      # Retrieves values as Ruby array of true and false values
+      # NA will be replaced with nils
+      def to_a
+        @payload.map {|v| 
+          case v
+          when NA then nil
+          when TRUE then true
+          when FALSE then false
+          end
+        }
+      end
+      
       def as_integers
         @payload.map {|v| v==NA ? REXP::Integer::NA : ( v == FALSE ? 0 : 1 )} 
       end

@@ -24,6 +24,9 @@ module Rserve
       def as_list
         @payload
       end
+      def to_ruby
+        @payload.to_ruby
+      end
     end
   end
 end

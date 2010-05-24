@@ -24,13 +24,14 @@ module Rserve
     def named?
       !@names.nil?
     end
+    # Return element with name x or 0-index x 
     def [](v)
       if v.is_a? String
-        return nil if @names.nil?
+        return nil if @names.nil? or v==""
         i=@names.index(v)
         return i.nil? ? nil : @data[i]
       elsif v.is_a? Integer
-        return @data[i]
+        return @data[v]
       else
         raise ArgumentError,"Should be String or Integer"
       end
@@ -116,6 +117,24 @@ module Rserve
       @data.delete_at(i)
       @names.delete_at(i) unless @names.nil?
       @names=nil if size==0
+    end
+    # Returns data with appropiate ruby representation
+    def to_a
+      @data.map {|d|
+        d.to_ruby
+      }
+    end
+    def to_ruby
+      if names.nil?
+        to_a
+      else
+        h=Hash.new
+        names.each_with_index {|name,i|
+          key= name=="" ? i : name
+          h[key]=@data[i].to_ruby
+        }
+        h
+      end
     end
   end
 end

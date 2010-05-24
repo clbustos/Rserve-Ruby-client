@@ -23,7 +23,7 @@ module Rserve
       end
       def numeric?
         true
-      end
+      end      
       def as_integers
         @payload.map(&:to_i)
       end

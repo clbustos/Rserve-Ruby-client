@@ -33,6 +33,9 @@ module Rserve
         end
         t+inner
       end
+      def to_ruby
+        as_list.to_ruby
+      end
     end
   end
 end
