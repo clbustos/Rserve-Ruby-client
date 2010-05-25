@@ -2,7 +2,7 @@ module Rserve
   class REXP
     class GenericVector < REXP::Vector
       attr_reader :payload
-      def initialize(list,attr=nil)
+      def initialize(list, attr=nil)
         super(attr)
         @payload=list.nil? ? Rlist.new() : list
         if (payload.named?)

@@ -169,8 +169,10 @@ module Rserve
     # @param o offset of the header (length is at o+1)
     # @return length */
     def get_len(buf, o) 
-# // "long" format; still - we support 32-bit only
+      # // "long" format; still - we support 32-bit only
       if  ((buf[o]&64)>0)
+        #p "buf:#{buf} --- o: #{o} -- [#{buf[o+4]}]"
+        raise "Buffer without enough values" if buf[o+4].nil?
         (buf[o+1]&255)|((buf[o+2]&255)<<8)|((buf[o+3]&255)<<16)|((buf[o+4]&255)<<24)
       else
         (buf[o+1]&255)|((buf[o+2]&255)<<8)|((buf[o+3]&255)<<16)

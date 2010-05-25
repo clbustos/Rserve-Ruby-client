@@ -67,6 +67,18 @@ module Rserve
         XT_FACTOR=127; 
         # used for transport only - has attribute 
         XT_HAS_ATTR=128;
+        NAMES_XT={
+        0=>'NULL',
+        1=>'INT',
+        6=>'BOOL',
+        16=>'XT_VECTOR',
+        19=>'SYMNAME',
+        21=>'LIST TAG',
+        32=>'ARRAY INT',
+        33=>'ARRAY DOUBLE',
+        34=>'ARRAY STR',
+        36=>'ARRAY BOOL'
+        }
         
         attr_reader :type, :attr, :cont, :root_list
         def get_REXP
@@ -116,8 +128,9 @@ module Rserve
           end
         end
         def parse_REXP(buf,o)
+          puts "buffer:#{buf.to_s} | o= #{o}" if $DEBUG
+
           xl=get_len(buf,o)
-          #p "buffer:#{buf.to_s}"
           has_at  = (buf[o]&128)!=0
           is_long = (buf[o]&64 )!=0
           xt = buf[o]&63
@@ -128,8 +141,10 @@ module Rserve
           
           @attr=REXPFactory.new()
           @cont=nil
+          o = attr.parse_REXP(buf,o) if has_at
           
-          o=attr.parse_REXP(buf,o) if has_at
+          puts "REXP: #{NAMES_XT[@type]}(#{@type})[#{xl}], attr?:#{has_at}, attr=[#{get_attr}]" if $DEBUG
+          
           
           if xt==XT_NULL
             @cont=REXP::Null.new(get_attr)
@@ -164,11 +179,13 @@ module Rserve
           end
           if xt==XT_BOOL
             b=[buf[o]]
-            if (b[0]!=0 && b[0]!=1) 
-              b[0]=REXP::Logical::NA
-            end
+            b[0]=REXP::Logical::NA if (b[0]!=0 && b[0]!=1) 
             @cont=REXP::Logical.new(b,get_attr)
             o+=1
+            if(o!=eox)
+              sexp_mismatch("Warning: bool SEXP size mismatch\n") if (eox!=o+3) # o+3 could happen if the result was aligned (1 byte data + 3 bytes padding)
+                o=eox
+            end
             return o
           end
           if xt==XT_ARRAY_BOOL_UA
@@ -246,8 +263,14 @@ module Rserve
             return o
           end
           
-          # RAW not implemented yet
-          
+          if (xt==XT_RAW) 
+            as=get_int(buf,o);
+            o+=4
+            d=buf[o,as]
+            o = eox;
+            @cont = new REXP::Raw.new(d, get_attr);
+            return o;
+          end
           
           if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
             lc=REXPFactory.new
@@ -282,7 +305,41 @@ module Rserve
           end
           
           
-          # XT_LIST and XT_LANG not implemented yet
+          # old-style lists, for comaptibility with older Rserve versions - rather inefficient since we have to convert the recusively stored structures into a flat structure
+          # NOT TESTED YET
+          if (xt==XT_LIST or xt==XT_LANG)  #
+            is_root= false
+            if (root_list.nil?)
+                root_list = Rlist.new();
+                is_root= true;
+            end
+            headf = REXPFactory.new();
+            tagf = REXPFactory.new();
+            o = headf.parse_REXP(buf, o);
+            el_index = root_list.size();
+            root_list.add(headf.cont);
+            #System.out.println("HEAD="+headf.cont);
+            o = parse_REXP(buf, o); # we use ourselves recursively for the body
+            if (o < eox) 
+              o = tagf.parseREXP(buf, o);
+              #//System.out.println("TAG="+tagf.cont);
+              if (!tagf.cont.nil? and (tagf.cont.string? or tagf.cont.symbol?))
+                
+                root_list.set_key_at(el_index, tagf.cont.as_string);
+              end
+            end
+            if (is_root) 
+              @cont = (xt==XT_LIST)?
+              REXP::List.new(root_list, get_attr):
+                REXP::Language.new(root_list, get_attr)
+                root_list = nil;
+              #System.out.println("result="+cont);
+            end
+            return o;
+          end
+          
+          
+          
           
           if xt==XT_VECTOR or xt==XT_VECTOR_EXP
             v=Array.new
@@ -344,7 +401,7 @@ module Rserve
           if xt==XT_VECTOR_STR
             v=Array.new
             while(o<eox)
-              xx=REXP::Factory.new
+              xx=REXPFactory.new
               o=xx.parse_REXP(buf,o)
               v.push(xx.cont.as_string)
             end
@@ -374,7 +431,13 @@ module Rserve
 			return o;
     end
     
-    #not implemented  XT_SYM, 
+    if (xt==XT_SYM) 
+			sym = REXPFactory.new
+			o = sym.parse_REXP(buf, o); # PRINTNAME that's all we will use
+			@cont = REXP::Symbol.new(sym.get__REXP().as_string) # content of a symbol is its printname string (so far)
+			o=eox;
+			return o;
+		end
     
     
     if (xt==XT_CLOS) 

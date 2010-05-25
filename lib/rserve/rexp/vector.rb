@@ -3,7 +3,8 @@ module Rserve
     class Vector < REXP
       attr_reader :payload
       def ==(o)
-        self.payload==o.payload and self.attr==o.attr
+        #p "Comparing #{self.inspect} with #{o.inspect} gives #{self.payload==o.payload and self.attr==o.attr}"
+        self.class==o.class and self.payload==o.payload and self.attr==o.attr
       end
 
       # returns the length of the vector (i.e. the number of elements)
@@ -29,7 +30,7 @@ module Rserve
         elsif @payload.size==1
           @payload[0]
         else
-          @payload
+          @payload.map {|v| na?(v) ? nil : v}
         end
       end
       def to_s

@@ -6,6 +6,7 @@ describe Rserve::Protocol::REXPFactory do
   before do
     @r=Rserve::Connection.new
   end
+
   it "should process null" do
     la=@r.eval("NULL")
     la.should be_instance_of(Rserve::REXP::Null)
@@ -84,13 +85,23 @@ describe Rserve::Protocol::REXPFactory do
       la.as_factor.levels.sort.should==['a','b']
     end
   end
-  it "should process list" do
-    require 'pp'
-    la=@r.eval("list(name='Fred',age=30,10,20,kids=c(1,2,3))")
+  it "should process basic list" do
+    la=@r.eval("list(first.name='Fred')")
     la.should be_list
     la.should be_recursive
-    la.as_list.names.should==['name','age','','','kids']
-
+    la.should==Rserve::REXP::GenericVector.new(
+      Rserve::Rlist.new([Rserve::REXP::String.new('Fred')], ["first.name"]),
+      Rserve::REXP::List.new(
+        Rserve::Rlist.new([Rserve::REXP::String.new('first.name')],['names'])
+      )
+    )
+    la.as_list.names.should==['first.name']
   end
 
+  it "should process list with booleans and NA" do
+    la=@r.eval("list(TRUE)")
+    la.should be_true
+    la=@r.eval("list(2,NA)")
+    la.should be_true
+  end
 end

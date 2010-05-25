@@ -8,13 +8,13 @@ module Rserve
        @data=[]
        if data
          @data=case data
-                    when Array
-                    data
-                    when Numeric
-                    Array.new(data)
-                    else
-                    raise ArgumentError
-                end
+            when Array
+              data
+            when Numeric
+              Array.new(data)
+            else
+            raise ArgumentError
+          end
         end
         if n
         @names=Array.new(@data.size)
@@ -25,6 +25,7 @@ module Rserve
       !@names.nil?
     end
     def ==(o)
+      #p "Comparing #{self.inspect} with #{o.inspect} gives #{o.is_a? Rlist and self.data==o.data and self.names==o.names}"
       o.is_a? Rlist and self.data==o.data and self.names==o.names
     end
     # Return element with name x or 0-index x 

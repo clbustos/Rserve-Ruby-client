@@ -20,7 +20,6 @@ describe Rserve::REXP::Double do
     before do
       @payload=[3,5,Rserve::REXP::Double::NA, 10,20]
       @a=Rserve::REXP::Double.new(@payload)
-
     end
     
     it "method na? should return coherent answer" do
@@ -30,6 +29,9 @@ describe Rserve::REXP::Double do
     end
     it "to_a should return correct values with NA" do
       @a.to_a.should==[3,5, nil, 10, 20]
+    end
+    it "to_ruby should return correct values with NA" do
+      @a.to_ruby.should==[3,5, nil, 10, 20]
     end
   end
   describe "common methods" do

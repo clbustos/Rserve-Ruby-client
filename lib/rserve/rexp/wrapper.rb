@@ -46,7 +46,7 @@ module Rserve
           REXP::Logical.new(o.map{|v| v.nil? ? REXP::Logical::NA : (v ? 1 : 0)})
             # mixed values. We must return a LIST!
         else 
-          REXP::List.new(
+          REXP::GenericVector.new(
             Rlist.new(
               o.map{|v| wrap(v)}
             )

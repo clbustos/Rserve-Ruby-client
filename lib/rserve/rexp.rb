@@ -10,7 +10,7 @@ module Rserve
     attr_reader :attr
     def initialize(attr=nil)
       # Sorry for this, but I think is necessary to maintain sanity of attributes
-      raise ArgumentError, "Attribute should be a REXP::List" unless attr.nil? or attr.is_a? REXP::List
+      raise ArgumentError, "Attribute should be a REXP::List, #{attr.class} provided" unless attr.nil? or attr.is_a? REXP::List
       @attr=attr
     end
     # specifies how many items of a vector or list will be displayed in {@link #toDebugString} 
@@ -182,8 +182,7 @@ module Rserve
     def to_debug_string 
       (!@attr.nil?) ? (("<"+@attr.to_debug_string()+">")+to_s()) : to_s
     end
-    
-    
+        
     
     #//======= complex convenience methods
     # returns the content of the REXP as a ruby matrix of doubles (2D-array: m[rows][cols]). You could use Matrix.rows(result) to create

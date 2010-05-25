@@ -14,7 +14,9 @@ describe Rserve::REXP::Wrapper do
     Rserve::REXP::Wrapper.wrap(["a","b"]).should==Rserve::REXP::String.new(["a","b"])
   end
   it "should wrap on a list mixed values" do
-   Rserve::REXP::Wrapper.wrap([1,2.0,false,"a"]).should  == Rserve::REXP::List.new(
+    r=Rserve::Connection.new
+   Rserve::REXP::Wrapper.wrap([1,2.0,false,"a"]).should==
+   Rserve::REXP::GenericVector.new(
       Rserve::Rlist.new([
         Rserve::REXP::Integer.new(1),
         Rserve::REXP::Double.new(2.0),
@@ -22,7 +24,7 @@ describe Rserve::REXP::Wrapper do
         Rserve::REXP::String.new("a"),
         
       ])
-    )
+     )
   end
   it "should wrap arrays with nil values using NA values of specific type" do
     Rserve::REXP::Wrapper.wrap([1,nil]).should==Rserve::REXP::Integer.new([1,Rserve::REXP::Integer::NA])
