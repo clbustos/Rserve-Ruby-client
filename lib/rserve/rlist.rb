@@ -24,6 +24,9 @@ module Rserve
     def named?
       !@names.nil?
     end
+    def ==(o)
+      o.is_a? Rlist and self.data==o.data and self.names==o.names
+    end
     # Return element with name x or 0-index x 
     def [](v)
       if v.is_a? String

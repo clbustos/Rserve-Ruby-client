@@ -1,6 +1,11 @@
 module Rserve
   class REXP
     class Vector < REXP
+      attr_reader :payload
+      def ==(o)
+        self.payload==o.payload and self.attr==o.attr
+      end
+
       # returns the length of the vector (i.e. the number of elements)
       # @return length of the vector 
       def length;

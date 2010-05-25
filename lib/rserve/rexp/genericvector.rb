@@ -5,7 +5,6 @@ module Rserve
       def initialize(list,attr=nil)
         super(attr)
         @payload=list.nil? ? Rlist.new() : list
-        
         if (payload.named?)
           @attr = REXP::List.new(
           Rlist.new([REXP::String.new(payload.keys())],

@@ -2,6 +2,7 @@ module Rserve
   class REXP
     class String < REXP::Vector
       attr_reader :payload
+      NA="NA"
       def initialize(data, attrs=nil)
         @payload=case data
         when Array

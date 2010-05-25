@@ -55,13 +55,6 @@ Cons:
 
 Implements
 
-* REXPs
-  * Enviroment
-  * ExpressionVector
-  * Raw
-  * Reference
-  * S4
-  * Wrapper
 * Sessions
 * Authentification
 * Original test

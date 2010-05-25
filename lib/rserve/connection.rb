@@ -57,7 +57,8 @@ module Rserve
            # Rserve not available. We should instanciate it first
            else 
              if system "R CMD Rserve"
-             #puts "Ok"
+               # Wait a moment please
+               sleep(0.25)
              retry
               else
                 raise RserveNotStarted, "Can't start Rserve"
