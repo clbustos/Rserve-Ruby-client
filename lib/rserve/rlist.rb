@@ -124,13 +124,19 @@ module Rserve
         d.to_ruby
       }
     end
+    # Returns recursively a hash or array:
+    # * Unnamed list: returns an Array
+    # * Named List: returns a Hash. Every element without explicit name receive 
+    #   as key the number of element, 1-based
+    # 
+    
     def to_ruby
       if names.nil? or names.all? {|v| v.nil?}
         to_a
       else
         h=Hash.new
         names.each_with_index {|name,i|
-          key= (name=="" or name.nil?) ? i : name
+          key= (name=="" or name.nil?) ? i+1 : name
           h[key]=@data[i].to_ruby
         }
         h
