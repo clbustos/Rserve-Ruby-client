@@ -81,7 +81,9 @@ module Rserve
     def as_doubles; raise MismatchException,"double";end;
     
     # On Ruby, Float are stored in double precision
-    alias :as_floats :as_doubles
+    def as_floats
+      as_doubles
+    end
     
     # returns the contents as an array of bytes (if supported by the represented object)
     def as_bytes; raise MismatchException , "byte";end;
@@ -115,8 +117,9 @@ module Rserve
     def as_double
     as_doubles[0]
     end
-    
-    alias  :as_float :as_double
+    def as_float
+      as_double
+    end
     # convenience method corresponding to <code>asStrings()[0]</code>
     # @return first entry returned by {@link #asStrings}
     def as_string

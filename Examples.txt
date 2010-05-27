@@ -1,0 +1,48 @@
+= Examples for Rserve
+
+<em>Based on original Java version [http://www.rforge.net/Rserve/example.html]</em>
+
+Rserve itself is provided as a regular R package and can be installed as such. The actual use is not performed by the library command, but by starting the Rserve executable (Windows) or typing R CMD Rserve on the command line (all others). By default Rserve runs in local mode with no enforced authentication. Once the Rserve is running any applications can use its services.
+
+We will show examples using the Ruby client for Rserve. The principles are identical when using other Rserve clients. Before plunging into real examples, let us consider the minimal ``hello world'' example:
+
+  require 'rserve'
+  include Rserve
+  c = Connection.new
+  x = c.eval("R.version.string");
+  puts x.as_string
+
+The code has the same effect as typing R.version.string in R. In the first line a connection to the local Rserve is established. Then the R command is evaluated and the result stored in a special object of the class REXP. This class encapsulates any objects received or sent to Rserve. If the type of the returned objects is known in advance, accessor methods can be called to obtain the Ruby object corresponding to the R value, in our case a regular String. Finally this string is printed on the standard output.
+
+The following code fragment illustrates the use of slightly more complex native Ruby types:
+
+  d = c.eval("rnorm(100)").as_doubles
+
+
+The single line in Ruby provides an array of 100 doubles representing random numbers from the standard normal distribution. The numeric vector in R is automatically converted into an array of floats. In cases where no native Ruby type exists, Rserve Ruby client defines its own classes such as Rlist or Logical (Ruby's boolean type has no support for NA missing values, therefore it cannot be used to directly represent logical type in R). This approach makes the use of Rserve very easy. As a first more practical example we want to calculate a Lowess smoother through a given set of points. The Ruby application lets the user specify the data allowing interactive changes of the points, displays a regular scatter plot and needs coordinates of the smoother to be obtained from R. One way of obtaining such a result would be to construct a long string command of the form lowes(c(0.2,0.4,...), c(2.5,4.8,...)) and using the eval method to obtain the result. This is somewhat clumsy, because the points usually already exist in an array in the Ruby application and the command string must be constructed from these. An alternative involves constructing objects in R directly. The following code shows the full Lowess example:
+
+    require 'rserve'
+    
+    data_x=Rserve::REXP::Wrapper.wrap(10.times.map{|i| rand(i)})
+    data_y=Rserve::REXP::Wrapper.wrap(10.times.map{|i| rand(i)})
+    c = Rserve::Connection.new();
+    c.assign("x", data_x);
+    c.assign("y", data_y);
+    l = c.eval("lowess(x,y)").as_list
+    lx = l.at("x").as_floats
+    ly = l.at("y").as_floats
+
+First the Ruby application defines the arrays for the data points data_x and data_y. The application is responsible for filling these arrays with the desired content (in this case, random data). Then we assign the contents of these arrays to R variables x and y. The assign command transfers the contents in binary form to Rserve and assigns this content to the specified symbol. This is far more efficient than constructing a string representation of the content.
+
+Once the variables are set in R we are ready to use the lowess function. It returns a list consisting of two vectors x and y which contain the smoother points. The Rlist object provides the method at for extraction of named entries of a list. Since lists may contain entries of different types, the object returned by the at method is of the class REXP whose content can be cast into floats in our case. The result can now be used by the Ruby application.
+
+More complex computations can be performed even without transmission of resulting objects. This is useful when defining functions or constructing complex models. Model objects are usually large, because they contain original data points, residuals and other meta data. Although they can be transferred to the client, it is more efficient to retain such objects in R and extract relevant information only. This can be done by using the void_eval method which does not transfer the result of the evaluation back to the client:
+
+  c.assign(y, ...) ...
+  c.void_eval("m<-lm(y~a+b+c)");
+  coeff = c.eval("coefficients(m)").as_floats
+
+In the above example a linear model is fitted, but its content is not passed back to the client. It is stored in an object in R for later use. Finally the coefficients are extracted from the model and passed back to the Ruby application.
+
+So far we used Rserve in local mode only. Extension to remote Rserve connections is possible without code changes, except for additional parameters to the Rserve::Connection constructor, specifying the remote computer running the \Rs. For details about the use of remote authentication, error handling and file transfer, consult the source code documentation.
+
