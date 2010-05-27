@@ -257,6 +257,7 @@ require 'rserve/rexp/expressionvector'
 
 require 'rserve/rexp/list'
 require 'rserve/rexp/language'
+require 'rserve/rexp/s4'
 
 require 'rserve/rexp/reference'
 

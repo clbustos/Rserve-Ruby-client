@@ -67,18 +67,7 @@ module Rserve
         XT_FACTOR=127; 
         # used for transport only - has attribute 
         XT_HAS_ATTR=128;
-        NAMES_XT={
-        0=>'NULL',
-        1=>'INT',
-        6=>'BOOL',
-        16=>'XT_VECTOR',
-        19=>'SYMNAME',
-        21=>'LIST TAG',
-        32=>'ARRAY INT',
-        33=>'ARRAY DOUBLE',
-        34=>'ARRAY STR',
-        36=>'ARRAY BOOL'
-        }
+        
         
         attr_reader :type, :attr, :cont, :root_list
         def get_REXP
@@ -97,7 +86,8 @@ module Rserve
             r=args[0]
             r=Rserve::REXP::Null if r.nil?
             a=r.attr
-            @attr=Factory.new(a) if !a.nil?
+            @cont=r
+            @attr=REXPFactory.new(a) if !a.nil?
             if r.is_a? REXP::Null
               @type=XT_NULL
             elsif r.is_a? REXP::List
@@ -143,7 +133,7 @@ module Rserve
           @cont=nil
           o = attr.parse_REXP(buf,o) if has_at
           
-          puts "REXP: #{NAMES_XT[@type]}(#{@type})[#{xl}], attr?:#{has_at}, attr=[#{get_attr}]" if $DEBUG
+          puts "REXP: #{xt_name(@type)}(#{@type})[#{xl}], attr?:#{has_at}, attr=[#{get_attr}]" if $DEBUG
           
           
           if xt==XT_NULL
@@ -416,51 +406,184 @@ module Rserve
           end
           
      if (xt==XT_STR||xt==XT_SYMNAME) 
-			i = o;
-			while (buf[i]!=0 && i<eox) do
+        i = o;
+        while (buf[i]!=0 && i<eox) 
         i+=1
-      end
-				if (xt==XT_STR)
-					@cont = REXP::String.new(buf[o,i-o].pack("C*"), get_attr);
-          
-				else
-					@cont = REXP::Symbol.new(buf[o,i-o].pack("C*"))
         end
-      
-			o = eox;
-			return o;
-    end
+        if (xt==XT_STR)
+          @cont = REXP::String.new(buf[o,i-o].pack("C*"), get_attr);
+        else
+          @cont = REXP::Symbol.new(buf[o,i-o].pack("C*"))
+        end
+        o = eox;
+        return o;
+        end
     
-    if (xt==XT_SYM) 
-			sym = REXPFactory.new
-			o = sym.parse_REXP(buf, o); # PRINTNAME that's all we will use
-			@cont = REXP::Symbol.new(sym.get__REXP().as_string) # content of a symbol is its printname string (so far)
-			o=eox;
-			return o;
-		end
-    
+      if (xt==XT_SYM) 
+        sym = REXPFactory.new
+        o = sym.parse_REXP(buf, o); # PRINTNAME that's all we will use
+        @cont = REXP::Symbol.new(sym.get__REXP().as_string) # content of a symbol is its printname string (so far)
+        o=eox;
+        return o;
+      end
     
     if (xt==XT_CLOS) 
-			o=eox;
-			return o;
+      o=eox;
+      return o;
     end
-		
-		if (xt==XT_UNKNOWN) 
-			@cont = REXP::Unknown.new(get_int(buf,o), get_attr)
-			o=eox;
-			return o;
-    end
-		
-		if (xt==XT_S4) 
-			@cont = new REXP::S4.new(get_attr)
-			o=eox
-			return o;
-    end
+
+        if (xt==XT_UNKNOWN) 
+          @cont = REXP::Unknown.new(get_int(buf,o), get_attr)
+          o=eox;
+          return o;
+        end
+
+        if (xt==XT_S4) 
+          @cont = new REXP::S4.new(get_attr)
+          o=eox
+          return o;
+        end
           @cont=nil
           o=eox
           raise "Unhandled type:#{xt}"
           return o
-        end # def 
+        end # def
+        
+        
+        
+        # Calculates the length of the binary representation of the REXP including all headers. 
+        # This is the amount of memory necessary to store the REXP via do@link #getBinaryRepresentationend.
+        # Please note that currently only XT_[ARRAY_]INT, XT_[ARRAY_]DOUBLE and XT_[ARRAY_]STR are supported! All other types will return 4 
+        # which is the size of the header.
+        # @return length of the REXP including headers (4 or 8 bytes)*/
+        def get_binary_length
+          l=0
+          rxt = type
+          if (type==XT_LIST or type==XT_LIST_TAG or type==XT_LIST_NOTAG)
+            rxt=(!cont.as_list.nil? and cont.as_list.named?) ? XT_LIST_TAG : XT_LIST_NOTAG;
+          end
+        #System.out.print("len["+xtName(type)+"/"+xtName(rxt)+"] ");
+        rxt=XT_ARRAY_STR if (type==XT_VECTOR_STR) ; # VECTOR_STR is broken right now
+
+
+        has_attr= false;
+        a = get_attr;
+        al = nil;
+        al = a.as_list if (!a.nil?) 
+        has_attr=true if (!al.nil? and al.size()>0)
+        l+=attr.get_binary_length if has_attr
+        
+        if (rxt==XT_NULL or rxt==XT_S4)
+        nil
+        elsif (rxt==XT_INT)
+          l+=4
+        elsif (rxt==XT_DOUBLE)
+          l+=8
+        elsif (rxt==XT_RAW)
+          l+=4 + cont.as_bytes.length
+          l=l-(l&3)+4 if ((l&3)>0)
+        elsif (rxt==XT_STR or rxt==XT_SYMNAME)
+          l+=(cont.nil?)?1:(cont.as_string.length()+1);
+          l=l-(l&3)+4 if ((l&3)>0)
+        elsif (rxt==XT_ARRAY_INT)
+          l+=cont.as_integers().length*4
+        elsif (rxt==XT_ARRAY_DOUBLE)
+          l+=cont.as_doubles().length*8
+        elsif (rxt==XT_ARRAY_CPLX)
+          l+=cont.as_doubles().length*8
+        elsif (rxt==XT_ARRAY_BOOL)
+          l += cont.as_bytes().length + 4 
+          l = l - (l & 3) + 4 if ((l & 3) > 0)
+        elsif ([XT_LIST_TAG, XT_LIST_NOTAG, XT_LANG_TAG, XT_LANG_NOTAG, XT_LIST, XT_VECTOR].include? rxt)
+            lst = cont.as_list
+            i=0
+            while (i<lst.size)
+              x=lst.at[i]
+              l+=(x.nil?)?4:(REXPFactory.new(x).get_binary_length)
+              if(rxt==XT_LIST_TAG)
+                pl=l
+                s=lst.key_at[i]
+                l+=4
+                l+=(s.nil?) ? 1:(s.length+1)
+                l=l-(l&3)+4 if ((l&3)>0) 
+              end
+              i+=1
+            end
+            l=l-(l&3)+4 if ((l&3)>0)
+          elsif rxt==XT_ARRAY_STR
+            sa=cont.as_string
+            i=0
+            while(i<sa.length)
+              if(!sa[i].nil?)
+                b=sa[i].unpack("C*")
+                l+=b.length
+                b=nil
+              end
+              l+=1
+              i+=1
+            end
+            l=l-(l&3)+4 if ((l&3)>0)
+          else
+            raise "NOT IMPLEMENTED"    
+          end
+          l+=4 if (l>0xfffff0) 
+          l+4
+       end
+        def get_binary_representation(buf,off)
+          myl=get_binary_length;
+          is_large=(myl>0xfffff0);
+          a = get_attr;
+          al = nil;
+          al = a.as_list if (!a.nil?) 
+          has_attr=(!al.nil? and al.size()>0)
+          rxt=type
+          ooff=off
+          if(rxt==XT_ARRAY_DOUBLE)
+              da=cont.as_doubles
+              io=off
+              da.length.times do |i|
+                set_long(doubleToRawLongBits(da[i]),buf,io)
+                io+=8
+              end
+          end
+        end
+        def xt_name(xt) 
+          case xt
+            when XT_NULL then  "NULL";
+            when XT_INT then  "INT";
+            when XT_STR then  "STRING";
+            when XT_DOUBLE then  "REAL";
+            when XT_BOOL then  "BOOL";
+            when XT_ARRAY_INT then  "INT*";
+            when XT_ARRAY_STR then  "STRING*";
+            when XT_ARRAY_DOUBLE then  "REAL*";
+            when XT_ARRAY_BOOL then  "BOOL*";
+            when XT_ARRAY_CPLX then  "COMPLEX*";
+            when XT_SYM then  "SYMBOL";
+            when XT_SYMNAME then  "SYMNAME";
+            when XT_LANG then  "LANG";
+            when XT_LIST then  "LIST";
+            when XT_LIST_TAG then  "LIST+T";
+            when XT_LIST_NOTAG then  "LIST/T";
+            when XT_LANG_TAG then  "LANG+T";
+            when XT_LANG_NOTAG then  "LANG/T";
+            when XT_CLOS then  "CLOS";
+            when XT_RAW then  "RAW";
+            when XT_S4 then  "S4";
+            when XT_VECTOR then  "VECTOR";
+            when XT_VECTOR_STR then  "STRING[]";
+            when XT_VECTOR_EXP then  "EXPR[]";
+            when XT_FACTOR then  "FACTOR";
+            when XT_UNKNOWN then  "UNKNOWN";
+            else 
+              "<unknown #{xt}"
+          end
+    end
+        
+        
+        
+        
+        
     end # Factory
   end # end Protocol
 end # end Rserve

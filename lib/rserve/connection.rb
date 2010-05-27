@@ -122,7 +122,7 @@ module Rserve
   # * @param cmd command/expression string
   # * @return R-xpression or <code>null</code> if an error occured */
   def eval(cmd) 
-		raise NotConnected if !connected? or rt.nil?
+    raise NotConnected if !connected? or rt.nil?
     rp=rt.request(:cmd=>Rserve::Protocol::CMD_eval, :cont=>cmd+"\n")
     if !rp.nil? and rp.ok?
       parse_eval_response(rp)
@@ -130,26 +130,95 @@ module Rserve
       raise EvalError.new(rp), "voidEval failed: #{rp.to_s}"
     end
   end
+  
+  # NOT TESTED
   def parse_eval_response(rp)
     rxo=0
     pc=rp.cont
     if (rsrv_version>100) # /* since 0101 eval responds correctly by using DT_SEXP type/len header which is 4 bytes long */
-			rxo=4
-			# we should check parameter type (should be DT_SEXP) and fail if it's not
-			if (pc[0]!=Rserve::Protocol::DT_SEXP && pc[0]!=(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
-				raise "Error while processing eval output: SEXP (type "+Rserve::Protocol::DT_SEXP+") expected but found result type "+pc[0].to_s+"."
+      rxo=4
+      # we should check parameter type (should be DT_SEXP) and fail if it's not
+	if (pc[0]!=Rserve::Protocol::DT_SEXP && pc[0]!=(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
+	raise "Error while processing eval output: SEXP (type "+Rserve::Protocol::DT_SEXP+") expected but found result type "+pc[0].to_s+"."
       end
-			if (pc[0]==(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
-				rxo=8; # large data need skip of 8 bytes
+	if (pc[0]==(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
+	rxo=8; # large data need skip of 8 bytes
       end
-			# warning: we are not checking or using the length - we assume that only the one SEXP is returned. This is true for the current CMD_eval implementation, but may not be in the future. */
+    # warning: we are not checking or using the length - we assume that only the one SEXP is returned. This is true for the current CMD_eval implementation, but may not be in the future. */
     end
     if pc.length>rxo 
-        rx=REXPFactory.new;
-				rx.parse_REXP(pc, rxo);
-				return rx.get_REXP();
-      else
+      rx=REXPFactory.new;
+      rx.parse_REXP(pc, rxo);
+      return rx.get_REXP();
+    else
         return nil
+    end
+  end
+  
+  #assign a string value to a symbol in R. The symbol is created if it doesn't exist already.
+  # @param sym symbol name. Currently assign uses CMD_setSEXP command of Rserve, i.e. the symbol value is NOT parsed. It is the responsibility of the user to make sure that the symbol name is valid in R (recall the difference between a symbol and an expression!). In fact R will always create the symbol, but it may not be accessible (examples: "bar\nfoo" or "bar$foo").
+  # @param ct contents
+    def assign(sym, ct) 
+    raise NotConnected if !connected? or rt.nil?
+    case ct
+      when String
+        assign_string(sym,ct)
+      when REXP
+        assign_rexp(sym,ct)
+      else
+        raise "Should be String or REXP"
+      end
+    end
+  def assign_string(sym,ct)
+    symn = sym.unpack("C*")
+    ctn  = ct.unpack("C*")
+    sl=symn.length+1
+    cl=ctn.length+1
+    sl=(sl&0xfffffc)+4 if ((sl&3)>0)  # make sure the symbol length is divisible by 4
+    cl=(cl&0xfffffc)+4 if ((cl&3)>0)  # make sure the content length is divisible by 4
+    rq=Array.new(sl+4+cl+4)
+    symn.length.times {|i| rq[i+4]=symn[i]}
+    ic=symn.length
+    while (ic<sl) 
+      rq[ic+4]=0
+      ic+=1
+    end
+    ctn.length.times {|i| rq[i+sl+8]=ctn[i]}
+    ic=ctn.length
+    while (ic<cl) 
+      rq[ic+sl+8]=0
+      ic+=1
+    end
+    set_hdr(Rserve::Protocol::DT_STRING,sl,rq,0)
+    set_hdr(Rserve::Protocol::DT_STRING,cl,rq,sl+4)   
+    rp=rt.request(:cmd=>Rserve::Protocol::CMD_setSEXP,:cont=>rq)
+    if (!rp.nil? and rp.ok?) 
+      rp
+    else
+      raise "Assign Failed"
+    end
+  end
+  def assign_rexp(sym, rexp)
+    r = REXPFactory.new(rexp);
+    rl=r.get_binary_length();
+    symn=sym.unpack("C*");
+    sl=symn.length+1;
+    sl=(sl&0xfffffc)+4 if ((sl&3)>0) # make sure the symbol length is divisible by 4
+    rq=Array.new(sl+rl+((rl>0xfffff0)?12:8));
+    symn.length.times {|i| rq[i+4]=symn[i]}
+    ic=symn.length
+    while(ic<sl) 
+    rq[ic+4]=0;
+    ic+=1; 
+    end # pad with 0
+    set_hdr(Rserve::Protocol::DT_STRING,sl,rq,0)
+    set_hdr(Rserve::Protocol::DT_SEXP,rl,rq,sl+4);
+    r.get_binary_representation(rq, sl+((rl>0xfffff0)?12:8));
+    rp=rt.request(:cmd=>Rserve::Protocol::CMD_setSEXP, :cont=>rq)
+    if (!rp.nil? and rp.ok?) 
+      rp
+    else
+      raise "Assign Failed"
     end
   end
 end

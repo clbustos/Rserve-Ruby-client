@@ -20,7 +20,19 @@ module Rserve
     # @param :len number of bytes in cont to send (it is clipped to the length of cont if necessary)
     # @return returned packet or <code>null</code> if something went wrong */
     def request(params=Hash.new)
-       
+       if params.is_a? Array
+           cmd=params.shift
+          if params.size==1
+           cont=params.shift
+          elsif params.size==4
+            prefix=params.shift
+            cont=params.shift
+            offset=params.shift
+            len=params.shift
+          else
+            raise ArgumentError("Expected Hash or Array with size 2 or 5")
+          end
+        end
         cmd     = params.delete :cmd
         prefix  = params.delete :prefix
         cont    = params.delete :cont

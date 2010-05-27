@@ -59,5 +59,14 @@ describe Rserve::Connection do
       la.should be_instance_of(Rserve::REXP::Logical)
       la.true?.should==[true,false]      
     end
+    it "should assign a string" do
+      @r.assign("x","a string")
+      @r.eval("x").to_ruby.should=="a string"
+    end
+    it "should assign a rexp" do
+      @r.assign("x",Rserve::REXP::Double.new([1,2,3]))
+      @r.eval("x").to_ruby.should==[1.0,2.0,3.0]
+      
+    end
   end
 end
