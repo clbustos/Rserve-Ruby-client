@@ -21,9 +21,9 @@ Pros:
   * Follows closely the Java API, so any change on the server API could be adopted without much problem
   * Fast
   * Easy management of differences between R and Ruby, or "You can have your cake and eat it, too!"
-    *  From R side: The evaluation of expression retrieves REXP object, with a lot of information from original variables on R. You can construct your REXP objects and assign they to variables on R fast using binary TCP/IP port or send complex expression without lost of time using <tt>void_eval</tt> 
+    *  From R side: The evaluation of expression retrieves REXP object, with a lot of information from original variables on R. You can construct your REXP objects and <tt>assign</tt> them to variables on R fast using binary TCP/IP port or send complex expression without lost of time using <tt>void_eval</tt> 
     * Between R and Ruby: Every REXP object implements methods to convert to specific Ruby type: as_integers, as_doubles, as_strings
-    * From Ruby side: Every REXP objects has a <tt>to_ruby</tt> method, which automagicly converts every R type on equivalen Ruby type. So, a vector of size 1 is converted to an integer or double, a vector of size>1 returns an array, a named list returns a hash and so on. If you need to create a complex expression, you could always use method <tt>eval</tt> without problem
+    * From Ruby side: Every REXP objects has a <tt>to_ruby</tt> method, which automagicly converts every R type on equivalent Ruby type. So, a vector of size 1 is converted to an integer or double, a vector of size>1 returns an array, a named list returns a hash and so on. If you need to create a complex expression, you could always use method <tt>eval</tt> without problem
 Cons:
   * Requires Rserve
  
@@ -73,24 +73,35 @@ Spec
     # Evaluation retrieves a <tt>Rserve::REXP</tt> object
     
     x=con.eval('x<-rnorm(1)')
-    => #<Rserve::REXP::Double:0x00000000ea9c38 @payload=[(-7727373431742323/4503599627370496)], @attr=nil>
+    => #<Rserve::REXP::Double:0x000000010a81f0 @payload=[(4807469545488851/9007199254740992)], @attr=nil>
+
+    # You could use specific methods to retrieve ruby objects
+    x.as_doubles => [0.533736337958596]
+    x.as_strings => ["0.533736337958596"]
     
     # Every Rserve::REXP could be converted to Ruby objects using
     # method <tt>to_ruby</tt>
-    x.to_ruby
-    
-    => [(-7727373431742323/4503599627370496)]
+    x.to_ruby => (4807469545488851/9007199254740992)
     
     # The API could manage complex recursive list
     
-    x=con.eval('list(l1=list(c(2,3)),l2=c(1,2,3))')
-    => #<Rserve::REXP::GenericVector:0x000000015fcdc8 @attr=#<Rserve::REXP::List:0x000000015fc888 @payload=#<Rserve::Rlist:0x000000015fc9a0 @names=["names"], @data=[#<Rserve::REXP::String:0x000000015fccb0 @payload=["l1", "l2"], @attr=nil>]>, @attr=nil>, @payload=#<Rserve::Rlist:0x000000015fcff8 @names=["l1", "l2"], @data=[#<Rserve::REXP::GenericVector:0x000000015fe4f8 @attr=nil, @payload=#<Rserve::Rlist:0x000000015fe568 @names=nil, @data=[#<Rserve::REXP::Double:0x000000015fe5a0 @payload=[(2/1), (3/1)], @attr=nil>]>>, #<Rserve::REXP::Double:0x000000015fd2d0 @payload=[(1/1), (2/1), (3/1)], @attr=nil>]>>
-    
-    # Again, method <tt>to_ruby</tt> provides an easy way to convert from R
-    
-    irb(main):014:0> x.to_ruby
+    x=con.eval('list(l1=list(c(2,3)),l2=c(1,2,3))').to_ruby
     => {"l1"=>[[(2/1), (3/1)]], "l2"=>[(1/1), (2/1), (3/1)]}
+    
+    # You could assign a REXP to R variables
 
+    con.assign("x", Rserve::REXP::Double.new([1.5,2.3,5]))
+    => #<Rserve::Packet:0x0000000136b068 @cmd=65537, @cont=nil>
+    con.eval("x")
+    => #<Rserve::REXP::Double:0x0000000134e770 @payload=[(3/2), (2589569785738035/1125899906842624), (5/1)], @attr=nil>
+    
+    # Rserve::REXP::Wrapper.wrap allows you to transform Ruby object to 
+    # REXP, could be assigned to R variables
+    
+    Rserve::REXP::Wrapper.wrap(["a","b",["c","d"]])
+    
+    => #<Rserve::REXP::GenericVector:0x000000010c81d0 @attr=nil, @payload=#<Rserve::Rlist:0x000000010c8278 @names=nil, @data=[#<Rserve::REXP::String:0x000000010c86d8 @payload=["a"], @attr=nil>, #<Rserve::REXP::String:0x000000010c85c0 @payload=["b"], @attr=nil>, #<Rserve::REXP::String:0x000000010c82e8 @payload=["c", "d"], @attr=nil>]>>
+    
 == REQUIREMENTS:
 
 * R

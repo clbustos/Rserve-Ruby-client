@@ -12,6 +12,8 @@ lib/rserve/protocol.rb
 lib/rserve/protocol/rexpfactory.rb
 lib/rserve/rexp.rb
 lib/rserve/rexp/double.rb
+lib/rserve/rexp/environment.rb
+lib/rserve/rexp/expressionvector.rb
 lib/rserve/rexp/factor.rb
 lib/rserve/rexp/genericvector.rb
 lib/rserve/rexp/integer.rb
@@ -19,10 +21,14 @@ lib/rserve/rexp/language.rb
 lib/rserve/rexp/list.rb
 lib/rserve/rexp/logical.rb
 lib/rserve/rexp/null.rb
+lib/rserve/rexp/raw.rb
+lib/rserve/rexp/reference.rb
+lib/rserve/rexp/s4.rb
 lib/rserve/rexp/string.rb
 lib/rserve/rexp/symbol.rb
 lib/rserve/rexp/unknown.rb
 lib/rserve/rexp/vector.rb
+lib/rserve/rexp/wrapper.rb
 lib/rserve/rfactor.rb
 lib/rserve/rlist.rb
 lib/rserve/talk.rb
@@ -33,8 +39,10 @@ spec/rserve_logical_spec.rb
 spec/rserve_packet_spec.rb
 spec/rserve_protocol_spec.rb
 spec/rserve_rexp_spec.rb
+spec/rserve_rexp_wrapper_spec.rb
 spec/rserve_rexpfactory_spec.rb
 spec/rserve_rfactor_spec.rb
+spec/rserve_rlist_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb
 spec/spec.opts

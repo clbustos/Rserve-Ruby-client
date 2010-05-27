@@ -35,7 +35,7 @@ module Rserve
       @payload.map(&:to_i)
     end
     def as_doubles
-      @payload
+      @payload.map(&:to_f)
     end
     def as_strings
       @payload.map {|v| v.to_f.to_s}

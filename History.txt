@@ -1,3 +1,15 @@
+=== 0.1.6 / 2010-05-27
+* Assign complete for all commons REXPs
+* Added Connection#shutdown
+* Added arch dependent  for Double NA
+* Bug fix: list with booleans and NA raise an error
+* Added support for all types of REXP. 
+* REXP::Wrapper provides a method to convert ruby types to R types. 
+* Added spec for Rlist and REXP::Wrapper
+* Added generic to_ruby method. Ex.: Rlist#to_ruby returns an array
+* README.txt updated
+
+
 === 0.1.5 / 2010-05-24
 * Bug fix: Incorrect NA for Logical, String and Double Vector
 * Factors implemented
