@@ -104,4 +104,29 @@ describe Rserve::Protocol::REXPFactory do
     la=@r.eval("list(2,NA)")
     la.should be_true
   end
+  it "should retrieve correct lenght for string" do
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("a")).get_binary_length.should==8
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["a","b"])).get_binary_length.should==8
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["aaaa"])).get_binary_length.should==12
+    
+  end
+  it "should retrieve correct representation for string" do
+    buf=[nil]*8
+    off=0
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("a")).get_binary_representation(buf,off)
+    buf[4,4].should==[97,0,1,1]
+    buf.size.should==8
+    buf=[nil]*8
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["a","b"])).get_binary_representation(buf,off)
+    buf[4,8].should==[97,0,98,0]
+    buf.size.should==8
+
+buf=[nil]*12
+
+
+  Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("aaaa")).get_binary_representation(buf,off)
+    buf[4,8].should==[97,97,97,97,0,1,1,1]
+    buf.size.should==12
+  end
+
 end

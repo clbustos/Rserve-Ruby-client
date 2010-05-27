@@ -63,10 +63,51 @@ describe Rserve::Connection do
       @r.assign("x","a string")
       @r.eval("x").to_ruby.should=="a string"
     end
-    it "should assign a rexp" do
-      @r.assign("x",Rserve::REXP::Double.new([1,2,3]))
-      @r.eval("x").to_ruby.should==[1.0,2.0,3.0]
-      
-    end
+    
   end
+  describe "assign using REXPs" do
+    before do
+      @r=Rserve::Connection.new
+    
+    end
+      it "should assign double" 
+      it "should assign a null" do
+        rexp=Rserve::REXP::Null.new
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a int vector" do
+        rexp=Rserve::REXP::Integer.new([1,2,3])
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a bool vector" do
+        rexp=Rserve::REXP::Logical.new([1,0,1])
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a string vector" do
+        rexp=Rserve::REXP::String.new(%w{a b c})
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a list without names" do
+        rexp=Rserve::REXP::GenericVector.new(Rserve::Rlist.new([Rserve::REXP::String.new("a")]))
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a list without names and nulls" do
+        rexp=Rserve::REXP::GenericVector.new(Rserve::Rlist.new([Rserve::REXP::Null.new]))
+        @r.assign("x", rexp)
+        @r.eval("x").should==rexp
+      end
+      it "should assign a list with names" do
+        x=@r.eval("list(a=TRUE)")
+        @r.assign("x",x)
+        @r.eval("x").should=x
+      end
+      after do
+        @r.void_eval("rm(x)")
+      end
+    end
 end

@@ -93,7 +93,7 @@ module Rserve
             elsif r.is_a? REXP::List
               l=r.as_list
               @type=l.named? ? XT_LIST_TAG : XT_LIST_NOTAG
-              if r.is_a? REXPLanguage
+              if r.is_a? REXP::Language
                 @type = (@type==XT_LIST_TAG) ? XT_LANG_TAG : XT_LANG_NOTAG;
               end
             elsif r.is_a? REXP::GenericVector
@@ -105,7 +105,7 @@ module Rserve
             elsif r.is_a? REXP::Double
               @type = XT_ARRAY_DOUBLE
             elsif  r.is_a? REXP::String
-              @type = XT_ARRAY_STRING
+              @type = XT_ARRAY_STR
             elsif r.is_a? REXP::Symbol
               @type = XT_SYMNAME
             elsif r.is_a? REXP::Raw
@@ -474,7 +474,6 @@ module Rserve
         l+=attr.get_binary_length if has_attr
         
         if (rxt==XT_NULL or rxt==XT_S4)
-        nil
         elsif (rxt==XT_INT)
           l+=4
         elsif (rxt==XT_DOUBLE)
@@ -498,11 +497,11 @@ module Rserve
             lst = cont.as_list
             i=0
             while (i<lst.size)
-              x=lst.at[i]
+              x=lst.at(i)
               l+=(x.nil?)?4:(REXPFactory.new(x).get_binary_length)
               if(rxt==XT_LIST_TAG)
                 pl=l
-                s=lst.key_at[i]
+                s=lst.key_at(i)
                 l+=4
                 l+=(s.nil?) ? 1:(s.length+1)
                 l=l-(l&3)+4 if ((l&3)>0) 
@@ -511,17 +510,16 @@ module Rserve
             end
             l=l-(l&3)+4 if ((l&3)>0)
           elsif rxt==XT_ARRAY_STR
-            sa=cont.as_string
+            sa=cont.as_strings
             i=0
-            while(i<sa.length)
-              if(!sa[i].nil?)
-                b=sa[i].unpack("C*")
+            sa.each do |v|
+              if(!v.nil?)
+                b=v.unpack("C*")
                 l+=b.length
-                b=nil
               end
               l+=1
-              i+=1
             end
+            
             l=l-(l&3)+4 if ((l&3)>0)
           else
             raise "NOT IMPLEMENTED"    
@@ -538,14 +536,118 @@ module Rserve
           has_attr=(!al.nil? and al.size()>0)
           rxt=type
           ooff=off
-          if(rxt==XT_ARRAY_DOUBLE)
+          rxt==XT_ARRAY_STR if(type==XT_VECTOR_STR) #  VECTOR_STR is broken right now
+          if (type==XT_LIST || type==XT_LIST_TAG || type==XT_LIST_NOTAG)
+            rxt=(!cont.as_list.nil? and cont.as_list.named?) ? XT_LIST_TAG : XT_LIST_NOTAG
+          end
+          set_hdr(rxt|(has_attr ? XT_HAS_ATTR : 0), myl - (is_large ? 8 : 4 ),buf,off);
+          off+=(is_large ? 8 : 4);
+          if has_attr
+            puts "REXP BIN ATTR: #{attr.inspect}"
+            off=attr.get_binary_representation(buf, off)
+            puts "BUFFER POST ATTR: #{buf}"
+          end
+          
+          
+          puts "REXP BIN: #{xt_name(rxt)}(#{rxt})[#{myl}], '#{cont.to_s}' attr?:#{has_attr}" if $DEBUG
+
+          
+          
+          if(rxt==XT_S4 or rxt==XT_NULL)
+          elsif(rxt==XT_INT)
+            set_int(cont.as_integer, buf, off)
+          elsif(rxt==XT_DOUBLE)
+            set_long(doubleToRawLongBits(cont.as_double), buf, off)
+          elsif(rxt==XT_ARRAY_INT)
+            ia=cont.as_integers
+            io=off
+            ia.each{|v| set_int(v,buf,io); io+=4}
+          elsif(rxt==XT_ARRAY_BOOL)
+            ba=cont.as_bytes
+            io=off
+            set_int(ba.length,buf,io)
+            io+=4
+            if(ba.length>0)
+              ba.each {|v|
+                buf[io] = ( (v == REXP::Logical::NA) ? 2 : ((v == REXP::Logical::FALSE) ? 0 : 1) );
+                io+=1
+              }
+              while ((io & 3) != 0) 
+                buf[io] = 3
+                io+=1
+              end
+            end
+            
+          elsif(rxt==XT_ARRAY_DOUBLE)
               da=cont.as_doubles
               io=off
-              da.length.times do |i|
-                set_long(doubleToRawLongBits(da[i]),buf,io)
+              da.each do |v|
+                set_long(doubleToRawLongBits(v),buf,io)
                 io+=8
               end
+          elsif(rxt==XT_RAW)
+            by=cont.as_bytes
+            set_int(by.length,buf,off);
+            off+=4
+            by.each_with_index {|v,i| buf[off+i]=v}
+          elsif(rxt==XT_ARRAY_STR)
+            sa=cont.as_strings
+            io=off
+            sa.each do |v|  
+              if !v.nil?
+                b=v.unpack("C*")
+                b.each_with_index{|v,index| buf[io+index]=v}
+                io+=b.length
+              end
+              buf[io]=0
+              io+=1
+            end
+            i=io-off
+            while ((i&3)!=0) 
+              buf[io]=1;
+              io+=1              
+              i+=1              # padding if necessary..
+            end
+              
+          elsif ([XT_LIST_TAG, XT_LIST_NOTAG, XT_LANG_TAG, XT_LANG_NOTAG, XT_LIST, XT_VECTOR,XT_VECTOR_EXP].include? rxt)
+            io=off
+            lst=cont.as_list
+            if !lst.nil?
+              lst.size.times do |i|
+                x=lst.at(i)
+                x==REXP::Null if x.nil?
+                io=REXPFactory.new(x).get_binary_representation(buf,io)
+                if(rxt==XT_LIST_TAG or rxt==XT_LANG_TAG)
+                  io=REXPFactory.new(REXP::Symbol.new(lst.key_at(i))).get_binary_representation(buf, io)
+                  
+                end
+              end #times 
+            end #end if
+            
+          elsif (rxt==XT_SYMNAME or rxt==XT_STR)
+            get_string_binary_representation(buf,off,cont.as_string)
+          else
+            raise "Can't represent on binary #{xt_name{rxt}}"
           end
+
+# end def
+          puts "END BUFFER:#{buf}" if $DEBUG
+          off+myl
+        end
+        def get_string_binary_representation(buf,off,s)
+          s||=""
+          io=off
+          b=s.unpack("C*")
+          puts "STRING REPRESENTATION: #{b}"
+          b.each_with_index {|v,i| buf[io+i]=v}
+          io+=b.length
+          buf[io]=0
+          io+=1
+	  while ((io&3)!=0) 
+            buf[io]=0; # padding if necessary..
+            io+=1
+          end
+          io
         end
         def xt_name(xt) 
           case xt

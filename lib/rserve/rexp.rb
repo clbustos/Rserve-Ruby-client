@@ -241,8 +241,10 @@ require 'rserve/rexp/environment'
 require 'rserve/rexp/null'
 require 'rserve/rexp/unknown'
 
+
 require 'rserve/rexp/vector'
 
+require 'rserve/rexp/raw'
 require 'rserve/rexp/symbol'
 require 'rserve/rexp/string'
 require 'rserve/rexp/double'

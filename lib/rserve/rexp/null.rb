@@ -6,6 +6,9 @@ module Rserve
    def null?
      true
    end
+   def ==(v)
+     v.is_a? self.class 
+    end
    def list?
      true
    end

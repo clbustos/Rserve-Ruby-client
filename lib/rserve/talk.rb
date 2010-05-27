@@ -45,7 +45,6 @@ module Rserve
           cont=request_int(cont)
         end
         raise ArgumentError, ":cont should be an Enumerable" if !cont.nil? and !cont.is_a? Enumerable
-        
         if len.nil? 
           len=(cont.nil?) ? 0 : cont.length
         end
@@ -54,6 +53,7 @@ module Rserve
         
       
       if (!cont.nil?) 
+        raise ":cont shouldn't contain anything but Fixnum" if cont.any? {|v| !v.is_a? Fixnum}        
         if (offset>=cont.length) 
           cont=nil;len=0
         elsif (len>cont.length-offset)
@@ -75,12 +75,12 @@ module Rserve
           io.write(prefix.pack("C*"))
           puts "SEND PREFIX #{prefix}" if $DEBUG
         end
-        if (!cont.nil? && cont.length>0)
+        if (!cont.nil? and cont.length>0)
+          puts "SEND CONTENT #{cont.slice(offset, len)} (#{offset},#{len})" if $DEBUG
           io.write(cont.slice(offset, len).pack("C*")) 
-          puts "SEND CONTENT '#{cont.slice(offset, len).pack("C*")}'" if $DEBUG
         end
       end
-        
+        puts "Expecting 16 bytes..." if $DEBUG
         ih=io.recv(16).unpack("C*")
         
         return nil if (ih.length!=16)

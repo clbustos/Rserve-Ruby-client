@@ -204,16 +204,18 @@ module Rserve
     symn=sym.unpack("C*");
     sl=symn.length+1;
     sl=(sl&0xfffffc)+4 if ((sl&3)>0) # make sure the symbol length is divisible by 4
-    rq=Array.new(sl+rl+((rl>0xfffff0)?12:8));
+    rq=Array.new(sl+rl+((rl>0xfffff0) ? 12 : 8));
     symn.length.times {|i| rq[i+4]=symn[i]}
     ic=symn.length
     while(ic<sl) 
-    rq[ic+4]=0;
-    ic+=1; 
+      rq[ic+4]=0;
+      ic+=1; 
     end # pad with 0
+    
     set_hdr(Rserve::Protocol::DT_STRING,sl,rq,0)
     set_hdr(Rserve::Protocol::DT_SEXP,rl,rq,sl+4);
-    r.get_binary_representation(rq, sl+((rl>0xfffff0)?12:8));
+    r.get_binary_representation(rq, sl+((rl>0xfffff0) ? 12 : 8));
+    # puts "ASSIGN RQ: #{rq}" if $DEBUG
     rp=rt.request(:cmd=>Rserve::Protocol::CMD_setSEXP, :cont=>rq)
     if (!rp.nil? and rp.ok?) 
       rp
