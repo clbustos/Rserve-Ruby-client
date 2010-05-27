@@ -12,16 +12,16 @@ describe Rserve::REXP::Double do
       a=Rserve::REXP::Double.new(payload)
       a.payload.should==[1.1]
     end
-    
-    
-    
+
+
+
   end
   describe "NA management" do
     before do
       @payload=[3,5,Rserve::REXP::Double::NA, 10,20]
       @a=Rserve::REXP::Double.new(@payload)
     end
-    
+
     it "method na? should return coherent answer" do
       @a.na?(@a.as_integers[0]).should be_false
       @a.na?(@a.as_integers[2]).should be_true
@@ -55,14 +55,14 @@ describe Rserve::REXP::Double do
     it "method as_strings should return strings" do
       @a.as_strings.should==@payload.map(&:to_s)
     end
-    
-    
+
+
     it "method to_debug_string and to_s returns a coherent response" do
       @a.to_debug_string.size.should>0
       @a.to_s.size.should>0
-      
+
     end
-    end
-  
-  
+  end
+
+
 end

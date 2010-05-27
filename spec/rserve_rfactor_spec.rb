@@ -16,7 +16,7 @@ describe Rserve::RFactor do
       @factor[1].should=='a'
       @factor[3].should=='b'
       @factor[5].should=='c'
-      
+
     }
   end
   it "methods contains? should work with integers and strings" do
@@ -41,5 +41,5 @@ describe Rserve::RFactor do
   it "method as_strings should return correct values" do
     @factor.as_strings==%w{a a b b c c d}
   end
-  
+
 end

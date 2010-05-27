@@ -7,9 +7,9 @@ module Rserve
         @payload=case data
         when Array
           data.map {|v| v.to_s}
-          else
-            [data.to_s]
-          end
+        else
+          [data.to_s]
+        end
         super(attrs)
       end
       def length

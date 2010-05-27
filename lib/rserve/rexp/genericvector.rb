@@ -8,7 +8,7 @@ module Rserve
         if (payload.named?)
           @attr = REXP::List.new(
           Rlist.new([REXP::String.new(payload.keys())],
-						  ["names"]));
+          ["names"]));
         end
       end
       def length

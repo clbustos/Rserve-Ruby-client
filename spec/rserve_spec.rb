@@ -2,7 +2,7 @@ require File.dirname(__FILE__)+"/spec_helper.rb"
 
 describe Rserve do
   before do
-     @r=Rserve::Connection.new()
+    @r=Rserve::Connection.new()
   end
   it "should calcule a basic LR without hazzle" do
     script=<<-EOF
@@ -18,12 +18,12 @@ severity <- as.data.frame(cbind(diseasesev,temperature))
 
 ## Fit a linear model for the data and summarize the output from function lm()
 severity.lm <- lm(diseasesev~temperature,data=severity)
-EOF
-@r.void_eval(script)
-@r.eval('severity.lm').should be_instance_of(Rserve::REXP::GenericVector)
-@r.eval('severity.lm').to_ruby.should be_true
-@r.eval('summary(severity.lm)').should be_true
-@r.eval('summary(severity.lm)').to_ruby.should be_true
+    EOF
+    @r.void_eval(script)
+    @r.eval('severity.lm').should be_instance_of(Rserve::REXP::GenericVector)
+    @r.eval('severity.lm').to_ruby.should be_true
+    @r.eval('summary(severity.lm)').should be_true
+    @r.eval('summary(severity.lm)').to_ruby.should be_true
 
 
 

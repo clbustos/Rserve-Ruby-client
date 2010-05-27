@@ -46,7 +46,7 @@ describe Rserve::REXP do
     it "method get_attribute should return correct value for attribute" do
       @l.get_attribute('names').as_strings.should==['at']
     end
-    
+
   end
-  
+
 end

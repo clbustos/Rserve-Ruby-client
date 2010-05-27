@@ -14,27 +14,27 @@ module Rserve
       evaluate(p,where,resolve)
     end
     def close;
-      false
+    false
     end
     def supports_references?
-      false
+    false
     end
     def supports_enviroments?
-      false
+    false
     end
     def supports_REPL?
-      false
+    false
     end
     def suuports_locking?
-      false
+    false
     end
     def try_lock
-      0
+    0
     end
     def lock
-      0
+    0
     end
     def unlock;end;
-    
+  
   end
 end

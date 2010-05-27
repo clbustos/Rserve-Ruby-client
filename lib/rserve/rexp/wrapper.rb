@@ -1,36 +1,36 @@
 module Rserve
   class REXP
-    # 
-    #  Utility module to wrap an Ruby Object into a REXP object. 
-    # 
-    # This facilitates wrapping native ruby objects and arrays 
+    #
+    #  Utility module to wrap an Ruby Object into a REXP object.
+    #
+    # This facilitates wrapping native ruby objects and arrays
     # into REXP objects that can be pushed to R
-    # 
+    #
     # @author Romain Francois <francoisromain@free.fr>
-    # 
+    #
     module Wrapper
       def self.wrap(o)
         return o if o.is_a? REXP
         case o
-          when TrueClass
-            REXP::Logical.new(1)
-          when FalseClass
-            REXP::Logical.new(0)
-          when NilClass
-            REXP::Null.new()
-          when ::String
-            REXP::String.new(o)
-          when Integer
-            REXP::Integer.new(o)
-          when Fixnum
-            REXP::Integer.new(o)
-          when Float
-            REXP::Double.new(o)
-          when Array
-            find_type_of_array(o)
-          else
-            puts "Clase:#{o.class}"
-            nil
+        when TrueClass
+          REXP::Logical.new(1)
+        when FalseClass
+          REXP::Logical.new(0)
+        when NilClass
+          REXP::Null.new()
+        when ::String
+          REXP::String.new(o)
+        when Integer
+          REXP::Integer.new(o)
+        when Fixnum
+          REXP::Integer.new(o)
+        when Float
+          REXP::Double.new(o)
+        when Array
+          find_type_of_array(o)
+        else
+          puts "Clase:#{o.class}"
+          nil
         end
       end
       def self.find_type_of_array(o)
@@ -44,12 +44,12 @@ module Rserve
           REXP::String.new(o.map {|v| v.nil? ? REXP::String::NA : v})
         elsif o.all? {|v| v.is_a? TrueClass or v.is_a? FalseClass or v.nil?}
           REXP::Logical.new(o.map{|v| v.nil? ? REXP::Logical::NA : (v ? 1 : 0)})
-            # mixed values. We must return a LIST!
-        else 
+          # mixed values. We must return a LIST!
+        else
           REXP::GenericVector.new(
-            Rlist.new(
-              o.map{|v| wrap(v)}
-            )
+          Rlist.new(
+          o.map{|v| wrap(v)}
+          )
           )
         end
       end

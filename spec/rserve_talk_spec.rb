@@ -17,7 +17,7 @@ describe Rserve::Talk do
     lambda {
       @talk.request(:cmd=>ty, :cont=>"no")
     }.should raise_exception()
-      
+
   end
   it "should behave correctly with cmd as only argument" do
     ty=Rserve::Protocol::CMD_shutdown
@@ -29,7 +29,7 @@ describe Rserve::Talk do
     cl=cont.length
     server_response_1=[rep,cl,0,0].pack("IIII")
     server_response_2=cont
-    
+
     @iomock.should_receive(:write).once.with(buf.pack("C*"))
     @iomock.should_receive(:recv).once.with(16).and_return(server_response_1)
     @iomock.should_receive(:recv).once.with(cl).and_return(server_response_2)
@@ -41,11 +41,11 @@ describe Rserve::Talk do
     ret.cont.should==cont.unpack("C*")
   end
   it "should behave correctly with cmd and cont as arguments" do
-    
+
 
     ty=Rserve::Protocol::CMD_eval
     buf=[0]*16
-    
+
     es="x<-1020"
     es_proc=@talk.request_string(es).pack("C*")
     es_len=es_proc.size
@@ -58,12 +58,12 @@ describe Rserve::Talk do
     server_response_2=cont
     @iomock.should_receive(:write).once.with(buf.pack("C*"))
     @iomock.should_receive(:write).once.with(es_proc)
-    
+
     @iomock.should_receive(:recv).once.with(16).and_return(server_response_1)
     @iomock.should_receive(:recv).once.with(cl).and_return(server_response_2)
-    
+
     ret=@talk.request(:cmd=>ty,:cont=>es)
-    
+
     ret.should be_instance_of(Rserve::Packet)
     ret.cmd.should==rep
     ret.cont_len.should==cl

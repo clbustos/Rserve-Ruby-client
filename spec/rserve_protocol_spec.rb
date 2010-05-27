@@ -24,15 +24,15 @@ describe Rserve::Protocol do
   end
   it "set_hdr method should set correctly the header for len>0xFFFFFF" do
     bytes=[0]*8
-    cmd=Rserve::Protocol::CMD_login    
+    cmd=Rserve::Protocol::CMD_login
     len=0x12345678
     offset=0
     expected=[cmd|Rserve::Protocol::DT_LARGE,0x78,0x56,0x34,0x12,0,0,0]
     @t.set_hdr(cmd,len,bytes,offset)
     bytes.should==expected
-  end 
+  end
   it "new_hdr method should return a correct header for different lengths" do
-    cmd=Rserve::Protocol::CMD_login    
+    cmd=Rserve::Protocol::CMD_login
     len=0x123456
     expected=[cmd,0x56,0x34,0x12]
     @t.new_hdr(cmd,len).should==expected
@@ -44,15 +44,15 @@ describe Rserve::Protocol do
     buffer=[0xFF,0x78,0x56,0x34,0x12]
     expected=0x12345678
     @t.get_int(buffer,1).should==expected
-    
+
     # Version with errors
-    
+
     buffer=[0xFF,0xFF78,0xFF56,0xFF34,0xFF12]
     expected=0x12345678
     @t.get_int(buffer,1).should==expected
   end
   it "get_len method should return correct length from a header" do
-     cmd=Rserve::Protocol::CMD_login    
+    cmd=Rserve::Protocol::CMD_login
     len=0x12345678
     header=@t.new_hdr(cmd,len)
     @t.get_len(header,0).should==len
@@ -71,5 +71,5 @@ describe Rserve::Protocol do
     expected=[0x45,0xDF,0xBC,0x9A,0x78,0x56,0x34,0x12]
     buffer.slice(1,8).should==expected
   end
-  
+
 end

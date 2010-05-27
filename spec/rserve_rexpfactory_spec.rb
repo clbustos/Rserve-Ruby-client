@@ -6,7 +6,6 @@ describe Rserve::Protocol::REXPFactory do
   before do
     @r=Rserve::Connection.new
   end
-
   it "should process null" do
     la=@r.eval("NULL")
     la.should be_instance_of(Rserve::REXP::Null)
@@ -29,7 +28,7 @@ describe Rserve::Protocol::REXPFactory do
   it "should process logical vectors with NA" do
     la=@r.eval("c(TRUE,NA)")
     la.should be_instance_of(Rserve::REXP::Logical)
-    la.na?.should==[false,true]    
+    la.na?.should==[false,true]
   end
   it "should process single double" do
     la=@r.eval("1.5")
@@ -49,7 +48,7 @@ describe Rserve::Protocol::REXPFactory do
     la=@r.eval("c(1,NA)")
     la.should be_instance_of(Rserve::REXP::Double)
     la.na?.should==[false,true]
-    
+
   end
   it "should process string vector" do
     la=@r.eval("c('abc','def','ghi')")
@@ -66,14 +65,14 @@ describe Rserve::Protocol::REXPFactory do
     it "should process factor without NA" do
       la=@r.eval <<-EOF
       state <- c("tas", "sa",  "qld", "nsw", "nsw", "nt",  "wa",  "wa",
-                    "qld", "vic", "nsw", "vic", "qld", "qld", "sa",  "tas",
-                    "sa",  "nt",  "wa",  "vic", "qld", "nsw", "nsw", "wa",
-                    "sa",  "act", "nsw", "vic", "vic", "act");
+      "qld", "vic", "nsw", "vic", "qld", "qld", "sa",  "tas",
+      "sa",  "nt",  "wa",  "vic", "qld", "nsw", "nsw", "wa",
+      "sa",  "act", "nsw", "vic", "vic", "act");
       statef <- factor(state)
       EOF
       la.should be_factor
       la.as_factor.levels.sort.should==%w{act nsw nt  qld sa tas vic wa}.sort
-  
+
       la.as_factor.contains?("tas").should be_true
       la.as_factor.contains?("nn").should be_false
       @r.void_eval("rm(state, statef)")
@@ -90,10 +89,10 @@ describe Rserve::Protocol::REXPFactory do
     la.should be_list
     la.should be_recursive
     la.should==Rserve::REXP::GenericVector.new(
-      Rserve::Rlist.new([Rserve::REXP::String.new('Fred')], ["first.name"]),
-      Rserve::REXP::List.new(
-        Rserve::Rlist.new([Rserve::REXP::String.new('first.name')],['names'])
-      )
+    Rserve::Rlist.new([Rserve::REXP::String.new('Fred')], ["first.name"]),
+    Rserve::REXP::List.new(
+    Rserve::Rlist.new([Rserve::REXP::String.new('first.name')],['names'])
+    )
     )
     la.as_list.names.should==['first.name']
   end
@@ -108,7 +107,7 @@ describe Rserve::Protocol::REXPFactory do
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("a")).get_binary_length.should==8
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["a","b"])).get_binary_length.should==8
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["aaaa"])).get_binary_length.should==12
-    
+
   end
   it "should retrieve correct representation for string" do
     buf=[nil]*8
@@ -121,12 +120,25 @@ describe Rserve::Protocol::REXPFactory do
     buf[4,8].should==[97,0,98,0]
     buf.size.should==8
 
-buf=[nil]*12
-
-
-  Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("aaaa")).get_binary_representation(buf,off)
+    buf=[nil]*12
+    Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("aaaa")).get_binary_representation(buf,off)
     buf[4,8].should==[97,97,97,97,0,1,1,1]
     buf.size.should==12
+  end
+  it "should retrieve correct binary representation for Symbol" do
+    rexp=Rserve::REXP::Symbol.new('names')
+    buf=Array.new(Rserve::Protocol::REXPFactory.new(rexp).get_binary_length)
+    Rserve::Protocol::REXPFactory.new(rexp).get_binary_representation(buf,0)
+    buf.should_not include(nil)
+  end
+
+  it "should retrieve correct binary representation for List" do
+    
+    rexp=Rserve::REXP::List.new(Rserve::Rlist.new([Rserve::REXP::String.new("a")], ["names"]));
+    buf=Array.new(Rserve::Protocol::REXPFactory.new(rexp).get_binary_length)
+    
+    Rserve::Protocol::REXPFactory.new(rexp).get_binary_representation(buf,0)
+    buf.should_not include(nil)
   end
 
 end

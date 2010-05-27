@@ -12,9 +12,9 @@ describe Rserve::REXP::Integer do
       a=Rserve::REXP::Integer.new(payload)
       a.payload.should==[1]
     end
-    
-    
-    
+
+
+
   end
   describe "NA management" do
     before do
@@ -27,11 +27,11 @@ describe Rserve::REXP::Integer do
       @a.na?(@a.as_integers[2]).should be_true
       @a.na?.should==[false,false,true,false,false]
     end
-     it "to_a should return correct values with NA" do
+    it "to_a should return correct values with NA" do
       @a.to_a.should==[3,5, nil, 10, 20]
     end
   end
-    describe "common methods" do
+  describe "common methods" do
     before do
       @n=rand(10)+10
       @payload=@n.times.map {rand(10)}
@@ -52,13 +52,13 @@ describe Rserve::REXP::Integer do
     it "method as_string should return string" do
       @a.as_strings.should==@payload.map(&:to_s)
     end
-    
+
     it "method to_debug_string and to_s returns a coherent response" do
       @a.to_debug_string.size.should>0
       @a.to_s.size.should>0
-      
+
     end
-    end
-  
-  
+  end
+
+
 end

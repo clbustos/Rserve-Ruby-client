@@ -3,7 +3,7 @@ module Rserve
   #
   # I separated the 'abstract' aspect of the protocol on
   # Protocol module, for better testing
-  # 
+  #
   class Talk
     include Rserve::Protocol
     attr_reader :io
@@ -20,41 +20,29 @@ module Rserve
     # @param :len number of bytes in cont to send (it is clipped to the length of cont if necessary)
     # @return returned packet or <code>null</code> if something went wrong */
     def request(params=Hash.new)
-       if params.is_a? Array
-           cmd=params.shift
-          if params.size==1
-           cont=params.shift
-          elsif params.size==4
-            prefix=params.shift
-            cont=params.shift
-            offset=params.shift
-            len=params.shift
-          else
-            raise ArgumentError("Expected Hash or Array with size 2 or 5")
-          end
-        end
-        cmd     = params.delete :cmd
-        prefix  = params.delete :prefix
-        cont    = params.delete :cont
-        offset  = params.delete :offset
-        len     = params.delete :len
-        
-        if cont.is_a? String
-          cont=request_string(cont)
-        elsif cont.is_a? Integer
-          cont=request_int(cont)
-        end
-        raise ArgumentError, ":cont should be an Enumerable" if !cont.nil? and !cont.is_a? Enumerable
-        if len.nil? 
-          len=(cont.nil?) ? 0 : cont.length
-        end
-        
-        offset||=0
-        
-      
-      if (!cont.nil?) 
-        raise ":cont shouldn't contain anything but Fixnum" if cont.any? {|v| !v.is_a? Fixnum}        
-        if (offset>=cont.length) 
+
+      cmd     = params.delete :cmd
+      prefix  = params.delete :prefix
+      cont    = params.delete :cont
+      offset  = params.delete :offset
+      len     = params.delete :len
+
+      if cont.is_a? String
+        cont=request_string(cont)
+      elsif cont.is_a? Integer
+        cont=request_int(cont)
+      end
+      raise ArgumentError, ":cont should be an Enumerable" if !cont.nil? and !cont.is_a? Enumerable
+      if len.nil?
+        len=(cont.nil?) ? 0 : cont.length
+      end
+
+      offset||=0
+
+
+      if (!cont.nil?)
+        raise ":cont shouldn't contain anything but Fixnum" if cont.any? {|v| !v.is_a? Fixnum}
+        if (offset>=cont.length)
           cont=nil;len=0
         elsif (len>cont.length-offset)
           len=cont.length-offset
@@ -63,8 +51,8 @@ module Rserve
       offset=0 if offset<0
       len=0 if len<0
       contlen=(cont.nil?) ? 0 : len
-      contlen+=prefix.length if (!prefix.nil? and prefix.length>0) 
-      
+      contlen+=prefix.length if (!prefix.nil? and prefix.length>0)
+
       hdr=Array.new(16)
       set_int(cmd,hdr,0)
       set_int(contlen,hdr,4);
@@ -77,46 +65,46 @@ module Rserve
         end
         if (!cont.nil? and cont.length>0)
           puts "SEND CONTENT #{cont.slice(offset, len)} (#{offset},#{len})" if $DEBUG
-          io.write(cont.slice(offset, len).pack("C*")) 
+          io.write(cont.slice(offset, len).pack("C*"))
         end
       end
-        puts "Expecting 16 bytes..." if $DEBUG
-        ih=io.recv(16).unpack("C*")
-        
-        return nil if (ih.length!=16)
-        
-        puts "Answer: #{ih.to_s}" if $DEBUG
-        
-        rep=get_int(ih,0);
-        
-        rl =get_int(ih,4);
-        
-        if $DEBUG
-          puts "rep: #{rep} #{rep.class} #{rep & 0x00FFFFFF}"
-          puts "rl: #{rl} #{rl.class}"
+      puts "Expecting 16 bytes..." if $DEBUG
+      ih=io.recv(16).unpack("C*")
+
+      return nil if (ih.length!=16)
+
+      puts "Answer: #{ih.to_s}" if $DEBUG
+
+      rep=get_int(ih,0);
+
+      rl =get_int(ih,4);
+
+      if $DEBUG
+        puts "rep: #{rep} #{rep.class} #{rep & 0x00FFFFFF}"
+        puts "rl: #{rl} #{rl.class}"
+      end
+
+      if (rl>0)
+        ct=Array.new();
+        n=0;
+        while (n<rl) do
+          data=io.recv(rl-n).unpack("C*")
+          ct+=data
+          rd=data.length
+          n+=rd;
         end
-        
-        if (rl>0)
-          ct=Array.new();
-          n=0;
-          while (n<rl) do
-            data=io.recv(rl-n).unpack("C*")
-            ct+=data
-            rd=data.length
-            n+=rd;
-          end
-          
-          return Packet.new(rep,ct);
-        end
-        
-        return Packet.new(rep,nil);
+
+        return Packet.new(rep,ct);
+      end
+
+      return Packet.new(rep,nil);
     end
     def request_string(s)
       b=s.unpack("C*")
       sl=b.length+1;
       sl=(sl&0xfffffc)+4 if ((sl&3)>0)  # make sure the length is divisible by 4
       rq=Array.new(sl+5)
-      
+
       b.length.times {|i| rq[i+4]=b[i]}
       ((b.length)..sl).each {|i|
         rq[i+4]=0
@@ -126,8 +114,8 @@ module Rserve
     end
     def request_int(par)
       rq=Array.new(8)
-	    set_int(par,rq,4)
-	    set_hdr(DT_INT,4,rq,0)
+      set_int(par,rq,4)
+      set_hdr(DT_INT,4,rq,0)
       rq
     end
   end

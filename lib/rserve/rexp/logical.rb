@@ -17,7 +17,7 @@ module Rserve
       def initialize(l,attr=nil)
         super(attr)
         if l.is_a? Array
-          @payload= l 
+          @payload= l
         else
           @payload = [ l==NA ? NA : (l==1 ? TRUE : FALSE) ]
         end
@@ -31,11 +31,11 @@ module Rserve
       def as_bytes
         @payload
       end
-      
+
       # Retrieves values as Ruby array of true and false values
       # NA will be replaced with nils
       def to_a
-        @payload.map {|v| 
+        @payload.map {|v|
           case v
           when NA then nil
           when TRUE then true
@@ -43,15 +43,15 @@ module Rserve
           end
         }
       end
-      
+
       def as_integers
-        @payload.map {|v| v==NA ? REXP::Integer::NA : ( v == FALSE ? 0 : 1 )} 
+        @payload.map {|v| v==NA ? REXP::Integer::NA : ( v == FALSE ? 0 : 1 )}
       end
       def as_doubles
-        @payload.map {|v| v==NA ? REXP::Double::NA : ( v == FALSE ? 0.0 : 1.0 )} 
+        @payload.map {|v| v==NA ? REXP::Double::NA : ( v == FALSE ? 0.0 : 1.0 )}
       end
       def as_strings
-        @payload.map {|v| v==NA ? REXP::Double::NA : ( v == FALSE ? "FALSE" : "TRUE" )} 
+        @payload.map {|v| v==NA ? REXP::Double::NA : ( v == FALSE ? "FALSE" : "TRUE" )}
       end
       def true?
         @payload.map {|v| v==TRUE}

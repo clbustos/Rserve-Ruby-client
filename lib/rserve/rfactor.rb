@@ -16,8 +16,8 @@ module Rserve
       @index_base=index_base
     end
     # returns the level of a given case
-		# * @param i case number
-		# * @return name. may throw exception if out of range 
+    # * @param i case number
+    # * @return name. may throw exception if out of range
     def [](i)
       li = @ids[i]-index_base
       return (li<0 or li>levels.length) ? nil : levels[li]
@@ -26,16 +26,16 @@ module Rserve
       li=level_index(li) if li.is_a? String
       @ids.any? {|v| v==li}
     end
-    
-   # return the index of a given level name or -1 if it doesn't exist
+
+    # return the index of a given level name or -1 if it doesn't exist
     def level_index(name)
-        return nil if name.nil?
-        levels.length.times {|i|
-          return i+index_base if !levels[i].nil? and levels[i]==name
-        }
-        return nil
+      return nil if name.nil?
+      levels.length.times {|i|
+        return i+index_base if !levels[i].nil? and levels[i]==name
+      }
+      return nil
     end
-    def count(li) 
+    def count(li)
       li=level_index(li) if li.is_a? String
       @ids.inject(0) {|ac,v| ac+ ((v==li) ? 1 : 0 ) }
     end

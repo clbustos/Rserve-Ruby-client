@@ -18,7 +18,7 @@ describe Rserve::Rlist do
     a=Rserve::Rlist.new([1,2,3],%w{a b c})
     b=Rserve::Rlist.new([4,5,6],%w{c d e})
     (a==b).should be_false
-    
+
   end
   it "method [] return correct values for strings" do
     @l['name'].to_ruby.should=='Fred'
@@ -48,6 +48,6 @@ describe Rserve::Rlist do
     list=@r.eval("list(l1=list(l11=1,l22=2),l2=list(3,4))").as_list
     list['l1'].to_ruby.should=={'l11'=>1,'l22'=>2}
     list['l2'].to_ruby.should==[3,4]
-    
+
   end
 end

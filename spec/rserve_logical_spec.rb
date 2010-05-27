@@ -28,7 +28,7 @@ describe Rserve::REXP::Integer do
       @a.to_a.should==[true,nil,false]
     end
   end
-    describe "common methods" do
+  describe "common methods" do
     before do
       @n=rand(100)
       @payload=@n.times.map {rand(2)}
@@ -58,13 +58,13 @@ describe Rserve::REXP::Integer do
       @a.false?.should==@payload.map {|v| v==Rserve::REXP::Logical::FALSE ? true :false}
     end
 
-    
+
     it "method to_debug_string and to_s returns a coherent response" do
       @a.to_debug_string.size.should>0
       @a.to_s.size.should>0
-      
+
     end
-    end
-  
-  
+  end
+
+
 end

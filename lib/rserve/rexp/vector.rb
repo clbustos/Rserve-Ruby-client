@@ -8,7 +8,7 @@ module Rserve
       end
 
       # returns the length of the vector (i.e. the number of elements)
-      # @return length of the vector 
+      # @return length of the vector
       def length;
       end;
       def vector?;
@@ -18,7 +18,7 @@ module Rserve
       # @return a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values */
       def na?
       end
-      
+
       # Retrieves values as Ruby array
       # NA will be replaced with nils
       def to_a
@@ -32,12 +32,6 @@ module Rserve
         else
           @payload.map {|v| na?(v) ? nil : v}
         end
-      end
-      def to_s
-        super+"[#{length}]"
-      end
-      def to_debug_string
-          super+"[#{length}]"
       end
     end
   end

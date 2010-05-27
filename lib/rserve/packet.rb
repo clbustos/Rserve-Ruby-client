@@ -2,11 +2,11 @@ module Rserve
   class Packet
     attr_reader :cont
     attr_reader :cmd
-    
+
     ERROR_DESCRIPTIONS={
       2=>'Invalid expression',
     127=>'Unknown variable/method'}
-    
+
     def initialize(cmd, cont)
       raise "cont [#{cont.class} - #{cont.to_s}] should respond to :length" if !cont.nil? and !cont.respond_to? :length
       @cmd=cmd
