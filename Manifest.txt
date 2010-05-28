@@ -1,9 +1,12 @@
 .autotest
 .gitignore
+Examples.txt
 History.txt
 Manifest.txt
 README.txt
 Rakefile
+examples/hello_world.rb
+examples/lowless.rb
 lib/rserve.rb
 lib/rserve/connection.rb
 lib/rserve/engine.rb
@@ -32,6 +35,8 @@ lib/rserve/rexp/wrapper.rb
 lib/rserve/rfactor.rb
 lib/rserve/rlist.rb
 lib/rserve/talk.rb
+lib/rserve/withattributes.rb
+lib/rserve/withnames.rb
 spec/rserve_connection_spec.rb
 spec/rserve_double_spec.rb
 spec/rserve_integer_spec.rb
@@ -45,5 +50,6 @@ spec/rserve_rfactor_spec.rb
 spec/rserve_rlist_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb
+spec/rserve_withnames_spec.rb
 spec/spec.opts
 spec/spec_helper.rb

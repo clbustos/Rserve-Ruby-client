@@ -25,8 +25,7 @@ module Rserve
   def keys
     @names
   end
-  # Returns the data, as Ruby objects
-
+  # Returns the data without names, as Ruby objects
   def to_a
     self.map {|d| d.to_ruby} 
   end

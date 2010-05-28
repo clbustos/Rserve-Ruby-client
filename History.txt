@@ -1,3 +1,11 @@
+=== 0.1.7 / 2010-05-28
+
+* Reimplement Rlist as an Array with module WithNames included
+* Added modules WithAttributes and WithNames
+* Added examples of use
+
+
+
 === 0.1.6 / 2010-05-27
 * Assign complete for all commons REXPs
 * Added Connection#shutdown
