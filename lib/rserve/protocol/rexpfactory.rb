@@ -236,8 +236,8 @@ module Rserve
 
           # hack for factors
           if (!get_attr.nil?)
-            ca = get_attr().as_list().at("class");
-            ls = get_attr().as_list().at("levels");
+            ca = get_attr().as_list["class"]
+            ls = get_attr().as_list["levels"]
             if (!ca.nil? and !ls.nil? and  ca.as_string=="factor")
               # R uses 1-based index, Java (and Ruby) uses 0-based one
               @cont = REXP::Factor.new(d, ls.as_strings(), get_attr)
@@ -275,8 +275,7 @@ module Rserve
               name=nf.cont.as_string if(nf.cont.symbol? or nf.cont.string?)
             end
             if name.nil?
-
-              l.add(lc.cont)
+              l.push(lc.cont)
             else
               l.put(name,lc.cont)
             end

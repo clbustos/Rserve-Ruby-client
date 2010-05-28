@@ -5,6 +5,10 @@ module Rserve
 end
 
 
+require 'rserve/withnames'
+require 'rserve/withattributes'
+
+
 require 'rserve/protocol'
 require 'rserve/packet'
 require 'rserve/talk'
@@ -14,6 +18,4 @@ require 'rserve/connection'
 require 'rserve/rlist'
 require 'rserve/rfactor'
 
-require 'rserve/withnames'
-require 'rserve/withattributes'
 

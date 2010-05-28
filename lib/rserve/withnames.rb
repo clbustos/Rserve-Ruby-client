@@ -4,7 +4,7 @@ module Rserve
     attr_reader :names
     def names=(v)
       raise ArgumentError, "#size should be equal to object size" if !v.nil? and v.size!=self.size
-      raise ArgumentError, "element must be String or nil" unless v.all? {|v1| v1.nil? or v1.is_a? String}
+      raise ArgumentError, "element must be String or nil" unless v.nil? or v.all? {|v1| v1.nil? or v1.is_a? String}
       @names=v
     end
     def push(v,name=nil)
@@ -52,6 +52,42 @@ module Rserve
         sliced.names=@names.slice(*args)
       end
       sliced
+    end
+    def named?
+      !@names.nil?
+    end
+    def to_a
+      Array.new(self)
+    end
+    def key_at(v)
+      @names.nil? ?  nil : @names[v]
+    end
+    # Put a value on specific key
+    # If key exists, replaces element of apropiate index
+    # If key doesn't exists, works as push(value,key)
+    def put(key,value)
+      if key.nil?
+        add(value)
+        return nil
+      end
+      
+      if !@names.nil?
+        pos=@names.index(key)
+        if !pos.nil?
+          return @names[pos]=value
+        end
+      end      
+      push(value,key)      
+    end
+    def __add(a,b=nil)
+      if b.nil?
+        @data.push(a)
+        @names=Array.new(@data.size-1) if @names.nil?
+        @names.push(nil)
+      else
+        @data.insert(a,b)
+        @names.insert(a,nil)
+      end
     end
     def [](v)
       case v

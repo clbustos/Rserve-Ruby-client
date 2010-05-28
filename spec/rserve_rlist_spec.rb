@@ -32,21 +32,20 @@ describe Rserve::Rlist do
   it "method to_a return an array with best ruby representation of data" do
     @l.to_a.should==['Fred',30,10,20,[1,2,3]]
   end
-  it "method to_ruby returns a hash when all names are set" do
+  it "method to_ruby returns a named array when all names are set" do
     list=@r.eval("list(name='Fred', age=30)")
-    list.to_ruby.should=={'name'=>'Fred','age'=>30}
+    a=['Fred',30]
+    a.extend Rserve::WithNames
+    a.names=['name','age']
+    list.to_ruby.should==a
   end
-  it "method to_ruby returns a hash with numbers (1-based) replacing empty names" do
-    list=@r.eval("list(name='Fred', age=30,'aaaa')")
-    list.to_ruby.should=={'name'=>'Fred','age'=>30,3=>'aaaa'}
-  end
-  it "method to_ruby returns an array when no names are set" do
+  it "method to_ruby returns a simple array when no names are set" do
     list=@r.eval("list(10,20,30)")
     list.to_ruby.should==[10,20,30]
   end
   it "should allow recursive list" do
     list=@r.eval("list(l1=list(l11=1,l22=2),l2=list(3,4))").as_list
-    list['l1'].to_ruby.should=={'l11'=>1,'l22'=>2}
+    list['l1'].to_ruby.should==[1,2]
     list['l2'].to_ruby.should==[3,4]
 
   end
