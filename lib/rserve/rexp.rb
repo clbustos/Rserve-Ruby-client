@@ -150,8 +150,8 @@ module Rserve
     #  @return an array of integers with corresponding dimensions or <code>null</code> if the object has no dimension attribute
     def dim
     begin
-    return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
-    rescue MismatchException
+      return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
+      rescue MismatchException
     # nothing to do
     end
     nil
@@ -161,7 +161,7 @@ module Rserve
     # @param klass class name
     # @return <code>true</code> if this object is of the class <code>klass</code>, <code>false</code> otherwise
     def inherits?(klass)
-    return false if (!has_attribute? "class")
+      return false if (!has_attribute? "class")
     begin
     c = get_attribute("class").as_strings;
     if (!c.nil?)
@@ -230,35 +230,35 @@ module Rserve
     def to_ruby
     raise "You should implement this!"
     end
-    end
-    end
+  end
+end
     
     
-    require 'rserve/rexp/environment'
-    require 'rserve/rexp/null'
-    require 'rserve/rexp/unknown'
-    
-    
-    require 'rserve/rexp/vector'
-    
-    require 'rserve/rexp/raw'
-    require 'rserve/rexp/symbol'
-    require 'rserve/rexp/string'
-    require 'rserve/rexp/double'
-    require 'rserve/rexp/integer'
-    require 'rserve/rexp/logical'
-    
-    require 'rserve/rexp/factor'
-    
-    require 'rserve/rexp/genericvector'
-    require 'rserve/rexp/expressionvector'
-    
-    
-    require 'rserve/rexp/list'
-    require 'rserve/rexp/language'
-    require 'rserve/rexp/s4'
-    
-    require 'rserve/rexp/reference'
-    
-    require 'rserve/rexp/wrapper'
+require 'rserve/rexp/environment'
+require 'rserve/rexp/null'
+require 'rserve/rexp/unknown'
+
+
+require 'rserve/rexp/vector'
+
+require 'rserve/rexp/raw'
+require 'rserve/rexp/symbol'
+require 'rserve/rexp/string'
+require 'rserve/rexp/double'
+require 'rserve/rexp/integer'
+require 'rserve/rexp/logical'
+
+require 'rserve/rexp/factor'
+
+require 'rserve/rexp/genericvector'
+require 'rserve/rexp/expressionvector'
+
+
+require 'rserve/rexp/list'
+require 'rserve/rexp/language'
+require 'rserve/rexp/s4'
+
+require 'rserve/rexp/reference'
+
+require 'rserve/rexp/wrapper'
 

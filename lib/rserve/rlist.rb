@@ -8,14 +8,14 @@ module Rserve
       @data=[]
       if data
         @data=case data
-      when Array
-        data
-      when Numeric
-        Array.new(data)
-      else
-        raise ArgumentError
+        when Array
+          data
+        when Numeric
+          Array.new(data)
+        else
+          raise ArgumentError
+        end
       end
-    end
     if n
       @names=Array.new(@data.size)
       n.each_index {|i| @names[i]=n[i]} if n.respond_to? :each_index

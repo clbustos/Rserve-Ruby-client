@@ -14,3 +14,6 @@ require 'rserve/connection'
 require 'rserve/rlist'
 require 'rserve/rfactor'
 
+require 'rserve/withnames'
+require 'rserve/withattributes'
+
