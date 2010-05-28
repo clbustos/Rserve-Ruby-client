@@ -86,7 +86,8 @@ Spec
     # The API could manage complex recursive list
     
     x=con.eval('list(l1=list(c(2,3)),l2=c(1,2,3))').to_ruby
-    => {"l1"=>[[(2/1), (3/1)]], "l2"=>[(1/1), (2/1), (3/1)]}
+    => #<Array:19590368 [#<Array:19590116 [[(2/1), (3/1)]] names:nil>, [(1/1), (2/1), (3/1)]] names:["l1", "l2"]>
+
     
     # You could assign a REXP to R variables
 
