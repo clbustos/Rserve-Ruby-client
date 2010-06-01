@@ -37,7 +37,9 @@ module Rserve
     #p "Comparing #{self.inspect} with #{o.inspect} gives #{o.is_a? Rlist and self.data==o.data and self.names==o.names}"
     o.is_a? Rlist and self.data==o.data and self.names==o.names
   end
-
+  def to_s
+    super+"[#{size}]"
+  end
   
   # Returns an Array with module WithNames included
   # * Unnamed list: returns an Array

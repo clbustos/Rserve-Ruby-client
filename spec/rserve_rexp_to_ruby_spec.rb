@@ -1,6 +1,6 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
 
-describe Rserve::REXP do
+describe "Rserve::REXP#to_ruby" do
   describe "method to_ruby" do
     before do
       @r=Rserve::Connection.new
@@ -20,13 +20,7 @@ describe Rserve::REXP do
     it "should return a Ruby Matrix with R matrix" do
       @r.eval("matrix(c(1,2,3,4),2,2)").to_ruby.should==Matrix[[1,3],[2,4]]
     end
-    it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions" do
-      @r.void_eval("
-        a<-1:8;
-        attr(a,'dim')<-c(2,2,2);
-        ")
-      @r.eval("a").to_ruby.should==[Matrix[[1,3],[2,4]], Matrix[[5,7],[6,8]]]
-    end
+    it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions" 
     it "should return a boolean with a logical with one element" do
       @r.eval("TRUE").to_ruby.should be_true
     end
@@ -46,7 +40,5 @@ describe Rserve::REXP do
       expected.names=%w{a b c}
       @r.eval('list(a=1,b=2,c=3)').to_ruby.should==expected
     end
-    
-
   end
 end

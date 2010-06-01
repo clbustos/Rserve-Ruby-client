@@ -11,6 +11,9 @@ module Rserve
     def initialize(attr=nil)
       # Sorry for this, but I think is necessary to maintain sanity of attributes
       raise ArgumentError, "Attribute should be a REXP::List, #{attr.class} provided" unless attr.nil? or attr.is_a? REXP::List
+      
+
+      
       @attr=attr
     end
     # specifies how many items of a vector or list will be displayed in {@link #toDebugString}

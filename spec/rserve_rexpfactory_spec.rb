@@ -3,9 +3,11 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
 
 describe Rserve::Protocol::REXPFactory do
+
   before do
     @r=Rserve::Connection.new
   end
+  
   it "should process null" do
     la=@r.eval("NULL")
     la.should be_instance_of(Rserve::REXP::Null)
@@ -103,6 +105,15 @@ describe Rserve::Protocol::REXPFactory do
     la=@r.eval("list(2,NA)")
     la.should be_true
   end
+
+  it "should process data.frame" do
+    la=@r.eval("data.frame(a=1:10,b=1:10)")
+    la.should be_true
+    la.attr.as_list['names'].to_ruby.should==%w{a b}
+    la.attr.as_list['class'].to_ruby.should=="data.frame"
+    #la.attr.as_list['row.names'].to_ruby.should==[1,2,3,4,5,6,7,8,9,10]
+  end
+
   it "should retrieve correct lenght for string" do
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("a")).get_binary_length.should==8
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new(["a","b"])).get_binary_length.should==8
@@ -133,7 +144,6 @@ describe Rserve::Protocol::REXPFactory do
   end
 
   it "should retrieve correct binary representation for List" do
-    
     rexp=Rserve::REXP::List.new(Rserve::Rlist.new([Rserve::REXP::String.new("a")], ["names"]));
     buf=Array.new(Rserve::Protocol::REXPFactory.new(rexp).get_binary_length)
     

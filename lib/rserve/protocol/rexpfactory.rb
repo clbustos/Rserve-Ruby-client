@@ -74,7 +74,7 @@ module Rserve
         @cont
       end
       def get_attr
-        attr.nil? ? nil : attr.cont
+        @attr.nil? ? nil : @attr.cont
       end
       def sexp_mismatch(type)
         STDERR.puts("Warning: #{type} SEXP size mismatch")
@@ -118,10 +118,12 @@ module Rserve
         end
       end
       def parse_REXP(buf,o)
-        puts "buffer:#{buf.to_s} | o= #{o}" if $DEBUG
 
         xl=get_len(buf,o)
         has_at  = (buf[o]&128)!=0
+        
+        puts "content:#{buf.slice(o,xl+4)} '#{buf.slice(o+4,xl+4).pack("C*")}'" if $DEBUG
+        
         is_long = (buf[o]&64 )!=0
         xt = buf[o]&63
         o+=4 if is_long
@@ -131,9 +133,14 @@ module Rserve
 
         @attr=REXPFactory.new()
         @cont=nil
-        o = attr.parse_REXP(buf,o) if has_at
+        if has_at
+          puts "Processing attribs:" if $DEBUG
+          o = attr.parse_REXP(buf,o)
+          puts "FINAL ATTRIB:" if $DEBUG
+          pp get_attr.as_list if $DEBUG
+        end
+        puts "REXP: #{xt_name(@type)}(#{@type})[#{o},#{xl}], attr?:#{has_at}, attr=[#{get_attr}]" if $DEBUG
 
-        puts "REXP: #{xt_name(@type)}(#{@type})[#{xl}], attr?:#{has_at}, attr=[#{get_attr}]" if $DEBUG
 
 
         if xt==XT_NULL
@@ -233,7 +240,7 @@ module Rserve
             $STDERR.puts "int SEXP size mismatch"
             o=eox
           end
-
+          
           # hack for factors
           if (!get_attr.nil?)
             ca = get_attr().as_list["class"]
@@ -244,10 +251,9 @@ module Rserve
               xt = XT_FACTOR;
             end
           end
-
-
-
+          
           if @cont.nil?
+            
             @cont=REXP::Integer.new(d,get_attr)
           end
           return o
@@ -263,6 +269,7 @@ module Rserve
         end
 
         if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
+          
           lc=REXPFactory.new
           nf=REXPFactory.new
           l=Rlist.new
@@ -271,19 +278,21 @@ module Rserve
             o=lc.parse_REXP(buf,o)
             if(xt==XT_LIST_TAG or xt==XT_LANG_TAG)
               o=nf.parse_REXP(buf,o)
-
+              
               name=nf.cont.as_string if(nf.cont.symbol? or nf.cont.string?)
             end
+            puts "Agregando '#{name}'='#{lc.cont.inspect}'" if $DEBUG
             if name.nil?
               l.push(lc.cont)
             else
               l.put(name,lc.cont)
             end
           end
+          p l.inspect if $DEBUG
 
           @cont=(xt==XT_LANG_NOTAG or xt==XT_LANG_TAG) ?
-          REXP::Language.new(l,get_attr) : REXP::List.new(l, get_attr)
-
+          REXP::Language.new(l, get_attr) : REXP::List.new(l, get_attr)
+          pp @cont if $DEBUG
           if(o!=eox)
             $STDERR.puts "Mismatch"
             o=eox
@@ -343,14 +352,13 @@ module Rserve
           end
           # fixup for lists since they're stored as attributes of vectors
           if !get_attr.nil? and !get_attr.as_list['names'].nil?
+            puts "PROCESSING NAMES" if $DEBUG
             nam=get_attr.as_list['names']
             names=nil
             if nam.string?
               names=nam.as_strings
             elsif nam.vector?
-              l=nam.to_a
-              names=Array.new(aa.length)
-              aa.length.times {|i| names[i]=aa[i].as_string}
+              names=nam.as_list.map {|v| v.as_string}
             end
             l=Rlist.new(v,names)
             @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(l,get_attr) : REXP::GenericVector.new(l,get_attr)

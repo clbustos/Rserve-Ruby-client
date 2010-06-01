@@ -50,7 +50,7 @@ module Rserve
       t << "{"  << @payload.map(&:to_s).join(",") << "}"
     end
     def to_ruby
-      if !attr.nil? and attr.as_list['dim'].to_ruby.size==2
+      if !attr.nil? and !attr.as_list['dim'].nil? and attr.as_list['dim'].to_ruby.size==2
         as_matrix
       else
         super
