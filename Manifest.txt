@@ -1,5 +1,3 @@
-.autotest
-.gitignore
 Examples.txt
 History.txt
 Manifest.txt
@@ -39,11 +37,13 @@ lib/rserve/withattributes.rb
 lib/rserve/withnames.rb
 spec/rserve_connection_spec.rb
 spec/rserve_double_spec.rb
+spec/rserve_genericvector_spec.rb
 spec/rserve_integer_spec.rb
 spec/rserve_logical_spec.rb
 spec/rserve_packet_spec.rb
 spec/rserve_protocol_spec.rb
 spec/rserve_rexp_spec.rb
+spec/rserve_rexp_to_ruby_spec.rb
 spec/rserve_rexp_wrapper_spec.rb
 spec/rserve_rexpfactory_spec.rb
 spec/rserve_rfactor_spec.rb

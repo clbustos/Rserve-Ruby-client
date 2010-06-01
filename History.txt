@@ -1,3 +1,10 @@
+=== 0.1.8 / 2010-06-01
+
+* Bug fix: attributes for generic vectors (data.frames) stored correctly. A Double vector without attribute dim raises an error on #to_ruby
+* Almost complete REXP#to_ruby according to http://wiki.github.com/clbustos/Rserve-Ruby-client/to_ruby-worflow
+* Updated examples
+
+
 === 0.1.7 / 2010-05-28
 
 * Reimplement Rlist as an Array with module WithNames included
