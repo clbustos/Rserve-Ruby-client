@@ -167,7 +167,7 @@ module Rserve
       when REXP
         assign_rexp(sym,ct)
       else
-        raise "Should be String or REXP"
+        assign_rexp(sym, Rserve::REXP::Wrapper.wrap(ct))
       end
     end
     def assign_string(sym,ct)
