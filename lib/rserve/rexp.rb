@@ -188,20 +188,20 @@ module Rserve
     #
     # @return 2D array of doubles in the form double[rows][cols] or <code>null</code> if the contents is no 2-dimensional matrix of doubles
     def as_double_matrix()
-    ct = as_doubles()
-    dim = get_attribute "dim"
-    raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
-    ds = dim.as_integers
-    raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
-    m,n = ds[0], ds[1]
-    # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
-    # we need to copy everything, since we create 2d array from 1d array
-    r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
+      ct = as_doubles()
+      dim = get_attribute "dim"
+      raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
+      ds = dim.as_integers
+      raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
+      m,n = ds[0], ds[1]
+      # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
+      # we need to copy everything, since we create 2d array from 1d array
+      r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
     end
     # Returns a standard library's matrix
     def as_matrix
-    require 'matrix'
-    Matrix.rows(as_double_matrix)
+      require 'matrix'
+      Matrix.rows(as_double_matrix)
     end
     
     # :section: tools

@@ -22,8 +22,12 @@ module Rserve
         @payload
       end
       
-      def na?
-        @payload.map {|v| v=='NA'}
+      def na?(value=nil)
+        if value.nil?
+          @payload.map {|v| v==NA}
+        else
+          value==NA
+        end
       end
       def to_debug_string
         t=super

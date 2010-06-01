@@ -59,6 +59,17 @@ module Rserve
       def false?
         @payload.map {|v| v==FALSE}
       end
+      
+      def to_ruby
+        if @payload.nil? or @payload.size==0
+          nil
+        elsif @payload.size==1
+          @payload[0]==1 ? true : false
+        else
+          @payload.map {|v| na?(v) ? nil : (v==1 ? true : false)}
+        end
+      end
+      
     end
   end
 end
