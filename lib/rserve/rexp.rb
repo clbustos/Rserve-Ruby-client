@@ -196,6 +196,7 @@ module Rserve
       raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
       ds = dim.as_integers
       raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
+      # return as_nested_array
       m,n = ds[0], ds[1]
       # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
       # we need to copy everything, since we create 2d array from 1d array
@@ -205,6 +206,35 @@ module Rserve
     def as_matrix
       require 'matrix'
       Matrix.rows(as_double_matrix)
+    end
+    # Returns the content of the REXP as a serie of nested arrays of X dimensions
+    def as_nested_array
+      ct=as_doubles
+      dim = get_attribute "dim"
+      raise MismatchException, "array (dim attribute missing" if dim.nil?
+      ds = dim.as_integers.reverse
+      split_array(ct,ds)
+    end
+    
+    def split_array(ar, dims)
+      #puts "#{ar} - #{dims}"
+      if dims.size==1
+        raise "Improper size ar:#{ar} , dims=#{dims[0]}" if ar.size!=dims[0]
+        return ar 
+      elsif dims.size==2
+        # should rearrange values as R do
+        out=[]
+        ar.each_with_index {|v,i| r=(i/dims[0]).to_i;c=i%dims[0];out[c*dims[0]+r]=v}
+        ar=out
+      end
+      dims_c=dims.dup
+      current_dim=dims_c.shift
+      current_size=ar.size/current_dim
+      #puts "dims: #{dims_c} cs:#{current_size}, cd:#{current_dim}"
+      parts=current_dim.times.map do |i|
+        split_array(ar[i*current_size, current_size], dims_c)
+      end
+      parts
     end
     
     # :section: tools

@@ -113,6 +113,11 @@ describe Rserve::Protocol::REXPFactory do
     la.attr.as_list['class'].to_ruby.should=="data.frame"
     #la.attr.as_list['row.names'].to_ruby.should==[1,2,3,4,5,6,7,8,9,10]
   end
+  it "should process a nested array" do
+    @r.void_eval("c=1:8; attr(c,'dim')<-c(2,2,2)")
+    la=@r.eval("c")
+    la.attr.as_list['dim'].to_ruby.should==[2,2,2]
+  end
 
   it "should retrieve correct lenght for string" do
     Rserve::Protocol::REXPFactory.new(Rserve::REXP::String.new("a")).get_binary_length.should==8

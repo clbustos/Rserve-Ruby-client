@@ -20,7 +20,12 @@ describe "Rserve::REXP#to_ruby" do
     it "should return a Ruby Matrix with R matrix" do
       @r.eval("matrix(c(1,2,3,4),2,2)").to_ruby.should==Matrix[[1,3],[2,4]]
     end
-    it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions" 
+    it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions"  do
+      @r.void_eval("a<-1:16; attr(a,'dim')<-c(2,2,2,2)")
+      @r.eval("a").to_ruby.should==[[[[1.0, 3.0], [2.0, 4.0]], [[5.0, 7.0], [6.0, 8.0]]],
+ [[[9.0, 11.0], [10.0, 12.0]], [[13.0, 15.0], [14.0, 16.0]]]]
+      
+    end
     it "should return a boolean with a logical with one element" do
       @r.eval("TRUE").to_ruby.should be_true
     end

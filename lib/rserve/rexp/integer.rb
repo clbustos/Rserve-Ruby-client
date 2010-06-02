@@ -44,6 +44,18 @@ module Rserve
       t=super
       t << "{"  << @payload.map(&:to_s).join(",") << "}"
     end
+    def to_ruby
+      if !attr.nil? and !attr.as_list['dim'].nil? 
+        if attr.as_list['dim'].to_ruby.size==2
+          as_matrix
+        else
+          as_nested_array
+        end
+      else
+        super
+      end
+    end
+    
   end
 end
 end

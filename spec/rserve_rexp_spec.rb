@@ -19,6 +19,14 @@ describe Rserve::REXP do
       @m=@r.eval('matrix(c(1,2,3,4,5,6,7,8,9), 3,3)')
       @m.as_matrix.should==Matrix[[1,4,7],[2,5,8],[3,6,9]]
     end
+    it "method split_array returns a valid splitted array" do
+      @m.as_double_matrix.should==@m.as_nested_array
+      @r.void_eval("a=1:16; attr(a,'dim')<-c(2,2,2,2)")
+      a=@r.eval("a")
+      a.as_nested_array.should==[[[[1.0, 3.0], [2.0, 4.0]], [[5.0, 7.0], [6.0, 8.0]]],
+ [[[9.0, 11.0], [10.0, 12.0]], [[13.0, 15.0], [14.0, 16.0]]]]
+      
+    end
   end
   describe "common methods" do
     before do
