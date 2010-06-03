@@ -60,7 +60,7 @@ module Rserve
         @payload.map {|v| v==FALSE}
       end
       
-      def to_ruby
+      def to_ruby_internal
         if @payload.nil? or @payload.size==0
           nil
         elsif @payload.size==1

@@ -13,8 +13,34 @@ module Rserve
       @names.push(name)
       super(v)
     end
+    def pretty_print(q)
+      q.group(1,'[|WN|',']') {
+        q.seplist(self,nil,:each_with_index) {|v,i|
+         if (@names.nil? or @names[i].nil?) 
+           q.pp v
+          else
+            q.group {
+            q.pp @names[i]
+            q.text '='
+            q.group(1) { q.pp v } 
+            }
+          end
+        }
+      }
+    end
+    def to_s
+      out=[]
+      self.each_with_index { |v,i| 
+      if !@names.nil? and !@names[i].nil?
+        out.push("#{@names[i]}=#{v}")
+      else
+        out.push("#{v}")
+      end
+      }
+      "[#{out.join(", ")}]"
+    end
     def inspect
-      "#<#{self.class}:#{self.object_id} #{super} names:#{@names.inspect}>"
+      "#<#{self.class}:#{self.object_id} #{to_s}>"
     end
     def clear
       @names=nil
@@ -52,6 +78,9 @@ module Rserve
         sliced.names=@names.slice(*args)
       end
       sliced
+    end
+    def has_name?(v)
+      named? and @names.include? v
     end
     def named?
       !@names.nil?

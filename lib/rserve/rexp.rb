@@ -11,9 +11,6 @@ module Rserve
     def initialize(attr=nil)
       # Sorry for this, but I think is necessary to maintain sanity of attributes
       raise ArgumentError, "Attribute should be a REXP::List, #{attr.class} provided" unless attr.nil? or attr.is_a? REXP::List
-      
-
-      
       @attr=attr
     end
     # specifies how many items of a vector or list will be displayed in {@link #toDebugString}
@@ -22,111 +19,164 @@ module Rserve
     # check whether the <code>REXP</code> object is a character vector (string)
     # @return <code>true</code> if the receiver is a character vector, <code>false</code> otherwise
 
-    def string?;return false;end
+    def string?
+      false
+    end
 
       # # check whether the <code>REXP</code> object is a numeric vector
       # @return <code>true</code> if the receiver is a numeric vector, <code>false</code> otherwise
 
-    def numeric?;false;end
+    def numeric?
+      false
+    end
     # check whether the <code>REXP</code> object is an integer vector
     # @return <code>true</code> if the receiver is an integer vector, <code>false</code> otherwise
-    def integer?;false;end
+    def integer?
+      false
+    end
     # check whether the <code>REXP</code> object is NULL
     # @return <code>true</code> if the receiver is NULL, <code>false</code> otherwise
-    def null?;false;end
+    def null?
+      false
+    end
     # check whether the <code>REXP</code> object is a factor
     # @return <code>true</code> if the receiver is a factor, <code>false</code> otherwise
-    def factor?;false;end
+    def factor?
+      false
+    end
     # check whether the <code>REXP</code> object is a list (either generic vector or a pairlist - i.e. {@link #asList()} will succeed)
     # @return <code>true</code> if the receiver is a generic vector or a pair-list, <code>false</code> otherwise
-    def list?;false;end
+    def list?
+      false
+    end
     # check whether the <code>REXP</code> object is a pair-list
     # @return <code>true</code> if the receiver is a pair-list, <code>false</code> otherwise
-    def pair_list?;false;end
+    def pair_list?
+      false
+    end
     # check whether the <code>REXP</code> object is a logical vector
     # @return <code>true</code> if the receiver is a logical vector, <code>false</code> otherwise */
-    def logical?;false;end
+    def logical?
+      false
+    end
     #  check whether the <code>REXP</code> object is an environment
     # @return <code>true</code> if the receiver is an environment, <code>false</code> otherwise
-    def environment?;false;end
+    def environment?
+      false
+    end
     # check whether the <code>REXP</code> object is a language object
     # @return <code>true</code> if the receiver is a language object, <code>false</code> otherwise
-    def language?;false;end
+    def language?
+      false
+    end
     # check whether the <code>REXP</code> object is an expression vector
     # @return <code>true</code> if the receiver is an expression vector, <code>false</code> otherwise
-    def expression?;false;end
+    def expression?
+      false
+    end
     # check whether the <code>REXP</code> object is a symbol
     # @return <code>true</code> if the receiver is a symbol, <code>false</code> otherwise
-    def symbol?;false;end
+    def symbol?
+      false
+    end
     # check whether the <code>REXP</code> object is a vector
     # @return <code>true</code> if the receiver is a vector, <code>false</code> otherwise
-    def vector?;false;end
+    def vector?
+      false
+    end
     # check whether the <code>REXP</code> object is a raw vector
     # @return <code>true</code> if the receiver is a raw vector, <code>false</code> otherwise
-    def raw?;false;end
+    def raw?
+      false
+    end
     # check whether the <code>REXP</code> object is a complex vector
     # @return <code>true</code> if the receiver is a complex vector, <code>false</code> otherwise
-    def complex?;false;end
+    def complex?
+      false
+    end
     # check whether the <code>REXP</code> object is a recursive obejct
     # @return <code>true</code> if the receiver is a recursive object, <code>false</code> otherwise
-    def recursive?;false;end
+    def recursive?
+      false
+    end
     # check whether the <code>REXP</code> object is a reference to an R object
     # @return <code>true</code> if the receiver is a reference, <code>false</code> otherwise
-    def reference?;false;end
+    def reference?
+      false
+    end
     
     # :section: basic accessor methods
     # returns the contents as an array of Strings (if supported by the represented object)
-    def as_strings;raise MismatchException, "String";end
+    def as_strings
+      raise MismatchException, "String"
+    end
     # returns the contents as an array of integers (if supported by the represented object)
     
-    def as_integers; raise MismatchException, "int";end;
+    def as_integers
+      raise MismatchException, "int"
+    end
+
     # returns the contents as an array of doubles (if supported by the represented object)
-    def as_doubles; raise MismatchException,"double";end;
-    
+    def as_doubles
+       raise MismatchException,"double"
+    end
+
     # On Ruby, Float are stored in double precision
     def as_floats
       as_doubles
     end
     
     # returns the contents as an array of bytes (if supported by the represented object)
-    def as_bytes; raise MismatchException , "byte";end;
+    def as_bytes
+      raise MismatchException , "byte"
+    end
     # returns the contents as a (named) list (if supported by the represented object)
-    def as_list; raise MismatchException,"list";end;
+    def as_list
+      raise MismatchException,"list"
+    end
     # returns the contents as a factor (if supported by the represented object)
-    def as_factor; raise MismatchException,"factor";end;
+    def as_factor
+      raise MismatchException,"factor"
+    end
     
     # returns the length of a vector object. Note that we use R semantics here, i.e. a matrix will have a length of <i>m * n</i> since it is represented by a single vector (see {@link #dim} for retrieving matrix and multidimentional-array dimensions).
     # * @return length (number of elements) in a vector object
     # * @throws MismatchException if this is not a vector object
-    def length()
-    raise MismatchException, "vector";
+    def length
+      raise MismatchException, "vector"
     end
     
     # returns a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
     # *  @return a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
     # * @throws MismatchException if this is not a vector object
     def na?
-    raise MismatchException, "vector"
+      raise MismatchException, "vector"
     end
     
     # :section: convenience accessor methods
     # convenience method corresponding to <code>as_integer()[0]</code>
     # @return first entry returned by {@link #as_integer}
     def as_integer
-    as_integers[0]
+      as_integers[0]
+    end
+    def to_i
+      as_integers[0]
     end
     # convenience method corresponding to <code>asDoubles()[0]</code>
     # @return first entry returned by {@link #asDoubles}
     def as_double
-    as_doubles[0]
+      as_doubles[0]
     end
     def as_float
+      as_double
+    end
+    def to_f
       as_double
     end
     # convenience method corresponding to <code>asStrings()[0]</code>
     # @return first entry returned by {@link #asStrings}
     def as_string
-    as_strings[0]
+      as_strings[0]
     end
     # // methods common to all REXPs
     
@@ -135,15 +185,14 @@ module Rserve
     # * @return attribute value or <code>null</code> if the attribute does not exist
     
     def get_attribute(name)
-    nil if @attr.nil? or !@attr.list?
-    @attr.as_list[name]
+      has_attribute?(name)  ? @attr.as_list[name] : nil
     end
     
     # checks whether this obejct has a given attribute
     # * @param name attribute name
     # * @return <code>true</code> if the attribute exists, <code>false</code> otherwise
     def has_attribute? (name)
-    return (!@attr.nil? and @attr.list? and !@attr.as_list[name].nil?);
+      !@attr.nil? and @attr.list? and !@attr.as_list[name].nil?
     end
     
     
@@ -165,14 +214,14 @@ module Rserve
     # @return <code>true</code> if this object is of the class <code>klass</code>, <code>false</code> otherwise
     def inherits?(klass)
       return false if (!has_attribute? "class")
-    begin
-    c = get_attribute("class").as_strings;
-    if (!c.nil?)
-      return c.any? {|v| v.equals klass}
-    end
-    rescue MismatchException
-    end
-    return false;
+      begin
+        c = get_attribute("class").as_strings;
+        if (!c.nil?)
+          return c.any? {|v| v.equals klass}
+        end
+      rescue MismatchException
+      end
+      false
     end
     
 
@@ -180,7 +229,7 @@ module Rserve
     # returns representation that it useful for debugging (e.g. it includes attributes and may include vector values -- see {@link #maxDebugItems})
     # @return extended description of the obejct -- it may include vector values
     def to_debug_string
-    (!@attr.nil?) ? (("<"+@attr.to_debug_string()+">")+to_s()) : to_s
+      (!@attr.nil?) ? (("<"+@attr.to_debug_string()+">")+to_s()) : to_s
     end
     
     
@@ -196,11 +245,12 @@ module Rserve
       raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
       ds = dim.as_integers
       raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
-      # return as_nested_array
-      m,n = ds[0], ds[1]
+      as_nested_array
+      
+      #m,n = ds[0], ds[1]
       # R stores matrices as matrix(c(1,2,3,4),2,2) = col1:(1,2), col2:(3,4)
       # we need to copy everything, since we create 2d array from 1d array
-      r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
+      #r=m.times.map {|i| n.times.map {|j| ct[j*n+i]}}
     end
     # Returns a standard library's matrix
     def as_matrix
@@ -213,18 +263,25 @@ module Rserve
       dim = get_attribute "dim"
       raise MismatchException, "array (dim attribute missing" if dim.nil?
       ds = dim.as_integers.reverse
+      
       split_array(ct,ds)
     end
     
     def split_array(ar, dims)
-      #puts "#{ar} - #{dims}"
+#      puts "#{ar} - #{dims}"
       if dims.size==1
         raise "Improper size ar:#{ar} , dims=#{dims[0]}" if ar.size!=dims[0]
         return ar 
       elsif dims.size==2
         # should rearrange values as R do
         out=[]
-        ar.each_with_index {|v,i| r=(i/dims[0]).to_i;c=i%dims[0];out[c*dims[0]+r]=v}
+        ar.each_with_index {|v,i| 
+          r=(i/dims[1]).to_i;
+          c=i%dims[1];
+#          p "#{r} : #{c}";
+          out[c*dims[0]+r]=v
+        }
+        raise "out size should equal to ar size" if ar.size!=out.size
         ar=out
       end
       dims_c=dims.dup
@@ -260,8 +317,25 @@ module Rserve
     )
     end
     # Retrieves the best Ruby representation of data
+    #
+    # If R object has attributes, the Ruby object is extended with Rserve::WithAttributes.
+    # If R object is names, the Ruby object is extended with Rserve::WithNames and
+    # their elements can be accessed with [] using numbers and literals.
+    # 
     def to_ruby
-    raise "You should implement this!"
+      v=to_ruby_internal()
+      if !v.nil? and !v.is_a? Fixnum and !v.is_a? TrueClass and !v.is_a? FalseClass
+        v.extend Rserve::WithAttributes
+        v.attributes=attr.to_ruby unless attr.nil?
+        if !v.attributes.nil? and v.attributes.has_name? 'names' 
+          v.extend Rserve::WithNames
+          v.names=v.attributes['names']
+        end
+      end
+      v
+    end
+    def to_ruby_internal
+      raise "You should implement to_ruby_internal for #{self.class}"
     end
   end
 end

@@ -9,6 +9,9 @@ module Rserve
       def to_s
         super()+"[#{@type}]"
       end
+      def to_ruby_internal
+        @type.to_s
+      end
     end
   end
 end

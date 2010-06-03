@@ -33,7 +33,7 @@ module Rserve
         end
         t+inner
       end
-      def to_ruby
+      def to_ruby_internal
         as_list.to_ruby
       end
     end

@@ -23,7 +23,7 @@ module Rserve
       def as_list
         @payload
       end
-      def to_ruby
+      def to_ruby_internal
         @payload.to_ruby
       end
     end

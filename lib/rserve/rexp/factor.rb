@@ -18,6 +18,9 @@ module Rserve
       def to_s
         super+"[#{levels.length}]"
       end
+      def to_ruby_internal
+        as_strings
+      end
     end
   end
 end

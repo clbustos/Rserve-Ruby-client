@@ -9,10 +9,10 @@ module Rserve
 
       # returns the length of the vector (i.e. the number of elements)
       # @return length of the vector
-      def length;
-      end;
-      def vector?;
-        true;
+      def length
+      end
+      def vector?
+        true
       end
       # returns a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values
       # @return a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values */
@@ -24,7 +24,7 @@ module Rserve
       def to_a
         @payload.map {|v| na?(v) ? nil : v }
       end
-      def to_ruby
+      def to_ruby_internal
         if @payload.nil? or @payload.size==0
           nil
         elsif @payload.size==1

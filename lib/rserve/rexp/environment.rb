@@ -32,9 +32,6 @@ module Rserve
       def parent(resolve=true)
         @eng.get_parent_environment(self,resolve)
       end
-      def to_ruby
-        raise "No idea how to transform #{self.class}"
-      end
     end
   end
 end

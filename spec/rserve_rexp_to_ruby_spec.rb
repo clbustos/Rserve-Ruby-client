@@ -11,11 +11,28 @@ describe "Rserve::REXP#to_ruby" do
     it "should return an array of Fixnum and nils with vector with two or more elements" do
       @r.eval("c(1,2,3,NA)").to_ruby.should==[1,2,3,nil]
     end
+    
+    it "should return an array of Fixnum with an enumeration" do
+      @r.eval("1:10").to_ruby.should==[1,2,3,4,5,6,7,8,9,10]
+    end
+    it "should return an array of String with a factor" do
+      @r.eval("factor(c(NA,'a','b','b','c'))").to_ruby.should==[nil]+%w{a b b c}
+    end
+    it "should return an array of String and nils with a factor with NA" do
+      @r.eval("factor(c('a','a','b','b','c'))").to_ruby.should==%w{a a b b c}
+    end
+    
     it "should return a rational with vector with one element" do
       @r.eval("c(0.5)").to_ruby.should==1.quo(2)
     end
     it "should return an array of rationals with vector with more than one elements" do
       @r.eval("c(0.5,0.5,NA)").to_ruby.should==[1.quo(2), 1.quo(2),nil]
+    end
+    it "should return an object with module WithAttributes included, when attributes are set" do
+      @r.void_eval("a<-c(1,2,3);attr(a,'names')<-c('a','b','c');")
+      a=@r.eval("a").to_ruby
+      a.attributes.names.should==['names']
+      a.attributes['names'].should==%w{a b c}
     end
     it "should return a Ruby Matrix with R matrix" do
       @r.eval("matrix(c(1,2,3,4),2,2)").to_ruby.should==Matrix[[1,3],[2,4]]
@@ -29,7 +46,14 @@ describe "Rserve::REXP#to_ruby" do
     it "should return a boolean with a logical with one element" do
       @r.eval("TRUE").to_ruby.should be_true
     end
-    
+    it "should return an array extended with Rserve::WithNames if vector is named" do
+      @r.void_eval("a<-c(1,2,3);names(a)<-c('a','b','c')")
+      v=@r.eval('a').to_ruby
+      v.names.should==['a','b','c']
+      v[0].should==1
+      v['a'].should==1
+      
+    end
     it "should return an array of booleans with a logical with two or more elements" do
       @r.eval("c(TRUE,FALSE,NA)").to_ruby.should==[true,false,nil]
     end
@@ -40,10 +64,13 @@ describe "Rserve::REXP#to_ruby" do
     it "should return an array of strings with a vector with two or more strings" do
       @r.eval("c('a','b',NA)").to_ruby.should==['a','b',nil]
     end
-    it "should return an array extended with Rserve::WithNames for a list" do
+    it "should return an array extended with Rserve::WithNames and Rserve::WithAttributes for a list" do
       expected=[1,2,3].extend Rserve::WithNames
       expected.names=%w{a b c}
-      @r.eval('list(a=1,b=2,c=3)').to_ruby.should==expected
+      list=@r.eval('list(a=1,b=2,c=3)').to_ruby
+      list.names.should==expected.names
+      list.attributes['names'].should==%w{a b c}
+      
     end
   end
 end

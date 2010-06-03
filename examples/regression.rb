@@ -16,6 +16,9 @@ r.void_eval <<EOF
  pvalue <- summary(fit)$coefficients[2,4]
 EOF
 est=r.eval("est")
+require 'pp'
+pp r.eval("fit").to_ruby
+
 puts "E(y|x) ~= #{est.as_floats[0]} + #{est.as_floats[1]} * x"
 if r.eval("pvalue").to_ruby < alpha
  puts "Reject the null hypothesis and conclude that x and y are related."
