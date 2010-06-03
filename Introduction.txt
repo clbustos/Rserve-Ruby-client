@@ -1,5 +1,4 @@
-= Examples for Rserve
-
+= Introduction to Ruby Rserve Client
 <em>Based on original Java version [http://www.rforge.net/Rserve/example.html]</em>
 
 Rserve itself is provided as a regular R package and can be installed as such. The actual use is not performed by the library command, but by starting the Rserve executable (Windows) or typing R CMD Rserve on the command line (all others). By default Rserve runs in local mode with no enforced authentication. Once the Rserve is running any applications can use its services.
