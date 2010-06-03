@@ -15,15 +15,15 @@ The code has the same effect as typing R.version.string in R. In the first line 
 
 The following code fragment illustrates the use of slightly more complex native Ruby types:
 
-  d = c.eval("rnorm(100)").as_doubles
+  d = c.eval("rnorm(100)").as_floats
 
 
-The single line in Ruby provides an array of 100 doubles representing random numbers from the standard normal distribution. The numeric vector in R is automatically converted into an array of floats. In cases where no native Ruby type exists, Rserve Ruby client defines its own classes such as Rlist or Logical (Ruby's boolean type has no support for NA missing values, therefore it cannot be used to directly represent logical type in R). This approach makes the use of Rserve very easy. As a first more practical example we want to calculate a Lowess smoother through a given set of points. The Ruby application lets the user specify the data allowing interactive changes of the points, displays a regular scatter plot and needs coordinates of the smoother to be obtained from R. One way of obtaining such a result would be to construct a long string command of the form lowes(c(0.2,0.4,...), c(2.5,4.8,...)) and using the eval method to obtain the result. This is somewhat clumsy, because the points usually already exist in an array in the Ruby application and the command string must be constructed from these. An alternative involves constructing objects in R directly. The following code shows the full Lowess example:
+The single line in Ruby provides an array of 100 ruby floats (double precision, on C) representing random numbers from the standard normal distribution. The numeric vector in R is converted into an array of floats. In cases where no native Ruby type exists, Rserve Ruby client defines its own classes such as Rlist or Logical (Ruby's boolean type has no support for NA missing values, therefore it cannot be used to directly represent logical type in R). This approach makes the use of Rserve very easy. As a first more practical example we want to calculate a Lowess smoother through a given set of points. The Ruby application lets the user specify the data allowing interactive changes of the points, displays a regular scatter plot and needs coordinates of the smoother to be obtained from R. One way of obtaining such a result would be to construct a long string command of the form lowes(c(0.2,0.4,...), c(2.5,4.8,...)) and using the eval method to obtain the result. This is somewhat clumsy, because the points usually already exist in an array in the Ruby application and the command string must be constructed from these. An alternative involves constructing objects in R directly. The following code shows the full Lowess example:
 
     require 'rserve'
     
-    data_x=Rserve::REXP::Wrapper.wrap(10.times.map{|i| rand(i)})
-    data_y=Rserve::REXP::Wrapper.wrap(10.times.map{|i| rand(i)})
+    data_x=10.times.map{|i| rand(i)}
+    data_y=10.times.map{|i| rand(i)}
     c = Rserve::Connection.new();
     c.assign("x", data_x);
     c.assign("y", data_y);
