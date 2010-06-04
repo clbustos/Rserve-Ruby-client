@@ -1,3 +1,20 @@
+=== 0.1.9 / 2010-06-04
+
+* Documentation:
+ * Added commentaries on examples/regression.txt
+ * Examples.txt on main directory renamed to Introduction.txt
+ * Added examples extracted from RinRuby documentation, adapted to rserve-client. Modified Connection#assign to allow ruby objects
+ * Modified lowless example, omiting use of Rserve::REXP::Wrapper
+* Bug fixes:
+  * WithNames#put changes names, not values. 
+  * Negative integer conversion works on i686 and x86_64 
+* New features
+  * Added WithNames[]= method for key assign. 
+  * Correct handling of data.frames with to_ruby : row.names returned as a array of (1..x) value if [NA,-x] returned from Rserve
+  * REXP#to_ruby returns object extended with WithAttributes and WithNames when applicable
+  * REXP could process nested arrays properly
+
+
 === 0.1.8 / 2010-06-01
 
 * Bug fix: attributes for generic vectors (data.frames) stored correctly. A Double vector without attribute dim raises an error on #to_ruby

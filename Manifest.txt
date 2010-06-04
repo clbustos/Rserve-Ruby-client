@@ -1,5 +1,4 @@
 .autotest
-.gitignore
 History.txt
 Introduction.txt
 Manifest.txt
