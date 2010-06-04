@@ -300,21 +300,21 @@ module Rserve
     # *  @param l a (named) list of vectors ({@link REXPVector} subclasses), each element corresponds to a column and all elements must have the same length
     # *  @return a data frame object
     #  *  @throws MismatchException if the list is empty or any of the elements is not a vector
-    def create_data_frame(l)
-    raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
-    raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
-    fe = l[0]
-    return REXP::GenericVector.new(l,
-    REXP::List.new(
-    RList.new(
-    [
-    REXP::String.new("data.frame"),
-    REXP::String.new(l.keys()),
-    REXP::Integer.new([REXP::Integer.NA, -fe.length()])
-    ],
-    ["class", "names", "row.names" ])
-    )
-    )
+    def self.create_data_frame(l)
+      raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
+      raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
+      fe = l[0]
+      return REXP::GenericVector.new(l,
+      REXP::List.new(
+      Rlist.new(
+      [
+      REXP::String.new("data.frame"),
+      REXP::String.new(l.keys()),
+      REXP::Integer.new([REXP::Integer::NA, -fe.length()])
+      ],
+      ["class", "names", "row.names" ])
+      )
+      )
     end
     # Retrieves the best Ruby representation of data
     #

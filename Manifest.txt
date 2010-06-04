@@ -1,10 +1,15 @@
-Examples.txt
+.autotest
+.gitignore
 History.txt
+Introduction.txt
 Manifest.txt
 README.txt
 Rakefile
+data/gettysburg.txt
+examples/gettysburg.rb
 examples/hello_world.rb
 examples/lowless.rb
+examples/regression.rb
 lib/rserve.rb
 lib/rserve/connection.rb
 lib/rserve/engine.rb
