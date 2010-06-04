@@ -46,6 +46,11 @@ describe Rserve::Protocol::REXPFactory do
       v.should be_close(a[i],1e-10)
     }
   end
+  it "should process integer" do
+    la=@r.eval("-10:10")
+    la.should be_instance_of(Rserve::REXP::Integer)
+    la.as_integers.should==(-10..10).to_a
+  end
   it "should process double vector with NA" do
     la=@r.eval("c(1,NA)")
     la.should be_instance_of(Rserve::REXP::Double)
@@ -111,7 +116,7 @@ describe Rserve::Protocol::REXPFactory do
     la.should be_true
     la.attr.as_list['names'].to_ruby.should==%w{a b}
     la.attr.as_list['class'].to_ruby.should=="data.frame"
-    #la.attr.as_list['row.names'].to_ruby.should==[1,2,3,4,5,6,7,8,9,10]
+    la.attr.as_list['row.names'].to_ruby.should==[nil,-10]
   end
   it "should process a nested array" do
     @r.void_eval("c=1:8; attr(c,'dim')<-c(2,2,2)")
