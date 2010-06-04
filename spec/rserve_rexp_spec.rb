@@ -55,9 +55,13 @@ describe Rserve::REXP do
       @l.get_attribute('names').as_strings.should==['at']
     end
     it "method create_data_frame should create a valid data frame" do
-      a=@r.eval("data.frame(a=1:10)")
       l=Rserve::Rlist.new([Rserve::REXP::Integer.new([1,2,3,4,5,6,7,8,9,10])],['a'])
-      pp Rserve::REXP.create_data_frame(l)
+      @r.assign "b", Rserve::REXP.create_data_frame(l)
+      b=@r.eval("b")
+      b.attr.as_list['class'].as_string.should=='data.frame'
+      b.attr.as_list['row.names'].as_integers.should==[Rserve::REXP::Integer::NA, -10]
+      b.attr.as_list['names'].as_strings.should==['a']      
+      
     end
   end
 

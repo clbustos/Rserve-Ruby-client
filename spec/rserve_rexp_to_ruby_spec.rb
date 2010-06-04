@@ -70,6 +70,13 @@ describe "Rserve::REXP#to_ruby" do
       list=@r.eval('list(a=1,b=2,c=3)').to_ruby
       list.names.should==expected.names
       list.attributes['names'].should==%w{a b c}
+    end
+    it "should return a data.frame as an array with Rserve::WithNames and Rserve::WithAttributes" do
+      df=@r.eval('data.frame(a=1:10)').to_ruby
+      df['a'].should==[1,2,3,4,5,6,7,8,9,10]
+      df.attributes['names'].should==['a']
+      df.attributes['row.names'].should==[1,2,3,4,5,6,7,8,9,10]
+      df.attributes['class'].should=='data.frame'
       
     end
   end

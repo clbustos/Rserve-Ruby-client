@@ -3,7 +3,7 @@ module Rserve
   module WithNames
     attr_reader :names
     def names=(v)
-      raise ArgumentError, "#size should be equal to object size" if !v.nil? and v.size!=self.size
+      raise ArgumentError, "#{self}: names size #{v.size} should be equal to object size #{self.size}" if !v.nil? and v.size!=self.size
       raise ArgumentError, "element must be String or nil" unless v.nil? or v.all? {|v1| v1.nil? or v1.is_a? String}
       @names=v
     end
@@ -103,7 +103,7 @@ module Rserve
       if !@names.nil?
         pos=@names.index(key)
         if !pos.nil?
-          return @names[pos]=value
+          return self[pos]=value
         end
       end      
       push(value,key)      
@@ -116,6 +116,16 @@ module Rserve
       else
         @data.insert(a,b)
         @names.insert(a,nil)
+      end
+    end
+    def []=(i,v)
+      case i
+        when Integer
+          super(i,v)
+        when String
+          put(i,v)
+        else
+          raise "Should be Integer or String"
       end
     end
     def [](v)

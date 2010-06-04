@@ -36,6 +36,17 @@ describe Rserve::WithNames do
       @a['a'].should==1
       @a['b'].should==2
     end
+    it "should set values with numeric indexes" do
+      @a[0]=10
+      @a.should==[10,2,3,4]
+    end
+    it "should set values with string indexes" do
+      @a['a']=10
+      @a.should==[10,2,3,4]
+      @a.put('b',20)
+      @a.should==[10,20,3,4]
+    end
+
     it "should push with or without name" do
       @a.push(5)
       @a.names.should==['a','b','c',nil,nil]

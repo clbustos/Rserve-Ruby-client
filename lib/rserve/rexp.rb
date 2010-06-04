@@ -323,15 +323,27 @@ module Rserve
     # their elements can be accessed with [] using numbers and literals.
     # 
     def to_ruby
-      v=to_ruby_internal()
+      #pp self
+      v=to_ruby_internal
+      #p v
       if !v.nil? and !v.is_a? Fixnum and !v.is_a? TrueClass and !v.is_a? FalseClass
         v.extend Rserve::WithAttributes
         v.attributes=attr.to_ruby unless attr.nil?
-        if !v.attributes.nil? and v.attributes.has_name? 'names' 
+        if !v.attributes.nil? and v.attributes.has_name? 'names'
+          v.attributes['names']=[v.attributes['names']] unless v.attributes['names'].is_a? Array or v.attributes['names'].nil?
+          
           v.extend Rserve::WithNames
+          
           v.names=v.attributes['names']
         end
       end
+      
+      # Hack: change attribute row.names according to spec 
+      if !attr.nil? and attr.as_list.has_name? 'class' and attr.as_list['class'].as_string=='data.frame' and attr.as_list['row.names'].as_integers[0]==REXP::Integer::NA
+        v.attributes['row.names']=(1..(-attr.as_list['row.names'].as_integers[1])).to_a
+      end
+      
+      
       v
     end
     def to_ruby_internal
