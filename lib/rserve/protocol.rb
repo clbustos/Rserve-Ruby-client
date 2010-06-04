@@ -110,7 +110,9 @@ module Rserve
       ERR_session_busy=>"session still busy",
       ERR_detach_failed=>"unable to detach seesion"
     } # error descriptions
-
+    # I have to use to support different archs
+    MAX_LONG_SIGNED=2**31
+    MAX_LONG_UNSIGNED=2**32
 
     # writes bit-wise int to a byte buffer at specified position in Intel-endian form
     # Internal: byte buffer will be the result of unpack("CCCC") an integer.
@@ -160,10 +162,9 @@ module Rserve
     # make sure that the buffer is big enough
 
     def get_int(buf, o)
-      return buf.slice(o,4).pack("C*").unpack("l")[0]
-      #v=((buf[o]&255)|((buf[o+1]&255)<<8)|((buf[o+2]&255)<<16)|((buf[o+3]&255)<<24))
-      
-      
+      #return buf.slice(o,4).pack("C*").unpack("l")[0]
+      v=((buf[o]&255)|((buf[o+1]&255)<<8)|((buf[o+2]&255)<<16)|((buf[o+3]&255)<<24))
+      v >= MAX_LONG_SIGNED ? v-MAX_LONG_UNSIGNED : v
     end
 
     # converts bit-wise stored length from a header. "long" format is supported up to 32-bit

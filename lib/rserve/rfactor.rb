@@ -49,7 +49,7 @@ module Rserve
       @ids
     end
     def as_strings
-      @ids.map {|v| @levels[v-index_base]}
+      @ids.map {|v| v==REXP::Integer::NA ? nil : @levels[v-index_base]}
     end
     def index_at(i)
       @ids[i]
