@@ -5,9 +5,6 @@ describe Rserve::Connection do
     before do
       @r=Rserve::Connection.new()
     end
-    after do
-       @r.close
-    end
     it "should be open a connection and receive ID-String" do
       @r.get_server_version.should==103
       @r.protocol.should=="QAP1"
@@ -15,8 +12,7 @@ describe Rserve::Connection do
       @r.rt.should be_instance_of(Rserve::Talk)
     end
     it "should raise ServerNotAvailable if started another instance on another port" do
-     if RbConfig::CONFIG['arch']!~/mswin/
-	     
+     if RbConfig::CONFIG['arch']!~/mswin/     
 	lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailable)
      end
     end
@@ -38,9 +34,6 @@ describe Rserve::Connection do
   describe "basic eval methods" do
     before do
       @r=Rserve::Connection.new
-    end
-    after do
-	    @r.close
     end
     it "method eval_void should return true with correct expression" do
       @r.void_eval("x<-1").should be_true

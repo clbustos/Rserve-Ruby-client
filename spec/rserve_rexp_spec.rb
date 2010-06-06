@@ -4,9 +4,6 @@ describe Rserve::REXP do
   before do
     @r=Rserve::Connection.new
   end
-  after do
-    @r.close
-  end
   describe "with matrix" do
     before {@m=@r.eval('matrix(c(1,2,3,4,5,6,7,8,9), 3,3)') }
     it "method as_integers should return correct values for original vector" do

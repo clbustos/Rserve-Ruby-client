@@ -1,6 +1,7 @@
 require 'rbconfig'
 module Rserve
   class Connection < Rserve::Engine
+    @@connected_object=nil
     include Rserve::Protocol
 
     # :section: Exceptions
@@ -44,12 +45,12 @@ module Rserve
       @tries            = 0
       @connected=false
 
+      
 
       begin
         #puts "Tryin to connect..."
 	connect
       rescue Errno::ECONNREFUSED
-        raise "Please, start Rserve before using on Ruby" if RbConfig::CONFIG['arch']=~/mswin/
         if @tries<@max_tries
           @tries+=1
           # Rserve is available?
@@ -74,7 +75,14 @@ module Rserve
       end
     end
     def connect
+      # On windows, Rserve doesn't allows concurrent connections. 
+      # So, we must close the last open connection first
+      if RbConfig::CONFIG['arch']=~/mswin/ and !@@connected_object.nil?
+	@@connected_object.close
+      end
+
       close if @connected
+      
       @s = TCPSocket::new(@hostname, @port_number)
       @rt=Rserve::Talk.new(@s)
       #puts "Connected"
@@ -87,8 +95,9 @@ module Rserve
       raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
       @extra=input[4]
       @connected=true
+      @@connected_object=self
       @last_error="OK"
-
+      
     end
     def connected?
       @connected
@@ -100,6 +109,7 @@ module Rserve
       end
       raise "Can't close socket" unless @s.closed?
       @connected=false
+      @@connected_object=nil
       true
     end
     def get_server_version
