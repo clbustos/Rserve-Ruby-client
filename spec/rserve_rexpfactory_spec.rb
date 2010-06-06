@@ -7,7 +7,9 @@ describe Rserve::Protocol::REXPFactory do
   before do
     @r=Rserve::Connection.new
   end
-  
+  after do
+    @r.close
+  end
   it "should process null" do
     la=@r.eval("NULL")
     la.should be_instance_of(Rserve::REXP::Null)

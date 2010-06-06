@@ -1,3 +1,4 @@
+require 'rbconfig'
 module Rserve
   class Connection < Rserve::Engine
     include Rserve::Protocol
@@ -46,8 +47,9 @@ module Rserve
 
       begin
         #puts "Tryin to connect..."
-        connect
+	connect
       rescue Errno::ECONNREFUSED
+        raise "Please, start Rserve before using on Ruby" if RbConfig::CONFIG['arch']=~/mswin/
         if @tries<@max_tries
           @tries+=1
           # Rserve is available?
@@ -72,13 +74,12 @@ module Rserve
       end
     end
     def connect
-      
       close if @connected
       @s = TCPSocket::new(@hostname, @port_number)
       @rt=Rserve::Talk.new(@s)
       #puts "Connected"
       # Accept first input
-      input=@s.recv(32).unpack("a4a4a4a20")
+      input=@s.recv(32).unpack("a4a4a4a20")      
       raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
       @rsrv_version=input[1].to_i
       raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103

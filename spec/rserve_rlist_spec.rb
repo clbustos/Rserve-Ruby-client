@@ -5,6 +5,9 @@ describe Rserve::Rlist do
     @r=Rserve::Connection.new
     @l=@r.eval("list(name='Fred',age=30,10,20,kids=c(1,2,3))").as_list
   end
+  after do
+    @r.close
+   end
   it "method names return correct names" do
     @l.names.should==['name','age',"","","kids"]
   end

@@ -4,6 +4,9 @@ describe Rserve do
   before do
     @r=Rserve::Connection.new()
   end
+  after do
+	  @r.close
+  end
   it "should calcule a basic LR without hazzle" do
     script=<<-EOF
 ## Disease severity as a function of temperature

@@ -5,6 +5,9 @@ describe "Rserve::REXP#to_ruby" do
     before do
       @r=Rserve::Connection.new
     end
+    after do
+      @r.close
+    end
     it "should return a Fixnum with vector with one integer element" do
       @r.eval("1").to_ruby.should==1
     end

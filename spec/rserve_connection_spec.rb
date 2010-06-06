@@ -1,8 +1,12 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
+require 'rbconfig'
 describe Rserve::Connection do
   describe "opening and closing" do
     before do
       @r=Rserve::Connection.new()
+    end
+    after do
+       @r.close
     end
     it "should be open a connection and receive ID-String" do
       @r.get_server_version.should==103
@@ -11,7 +15,10 @@ describe Rserve::Connection do
       @r.rt.should be_instance_of(Rserve::Talk)
     end
     it "should raise ServerNotAvailable if started another instance on another port" do
-      lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailable)
+     if RbConfig::CONFIG['arch']!~/mswin/
+	     
+	lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailable)
+     end
     end
     it "should quit correctly" do
       @r.should be_connected
@@ -32,26 +39,31 @@ describe Rserve::Connection do
     before do
       @r=Rserve::Connection.new
     end
+    after do
+	    @r.close
+    end
     it "method eval_void should return true with correct expression" do
       @r.void_eval("x<-1").should be_true
     end
-    it "method eval_void should raise an error with an incorrect expression" do
-      lambda {@r.void_eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
-      lambda {@r.void_eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
-      e.request_packet.stat.should==127}
+    # On Windows, any error on a expression crash the server!
+    if RbConfig::CONFIG['arch']!~/mswin/
+	    it "method eval_void should raise an error with an incorrect expression" do
+	      lambda {@r.void_eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
+	      lambda {@r.void_eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
+	      e.request_packet.stat.should==127}
+	    end
+	    it "method eval should raise an error with an incorrect expression" do
+	      lambda {@r.eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
+	      lambda {@r.eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
+	      e.request_packet.stat.should==127}
+	    end
     end
-
     it "method eval should return a simple object" do
       la=@r.eval("TRUE")
       la.should be_instance_of(Rserve::REXP::Logical)
       la.true?.should==[true]
     end
 
-    it "method eval should raise an error with an incorrect expression" do
-      lambda {@r.eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
-      lambda {@r.eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
-      e.request_packet.stat.should==127}
-    end
 
     it "should eval_void and eval correctly" do
       @r.void_eval("x<-c(TRUE,FALSE)").should be_true
@@ -68,8 +80,10 @@ describe Rserve::Connection do
   describe "assign using REXPs" do
     before do
       @r=Rserve::Connection.new
-
     end
+    after do
+	    @r.close
+     end
     it "should assign double" do
       rexp=Rserve::REXP::Double.new([1.5,-1.5])
       @r.assign("x", rexp)
