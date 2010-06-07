@@ -27,10 +27,9 @@ describe "Rserve::Connection on unix" do
        s.close
     end
   else
-    it "shouldn't crash server with an incorrect expression as Windows does"
+    it "shouldn't crash server with an incorrect expression as Windows version does"
     it "shouldn't raise ServerNotAvailable if started another instance on another port as Windows version does"
     it "shouldn create a different session. On Windows, every new connection closes previously open session"
-    
   end
   
 end
