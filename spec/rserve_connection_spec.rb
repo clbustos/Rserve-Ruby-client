@@ -11,11 +11,6 @@ describe Rserve::Connection do
       @r.last_error.should=="OK"
       @r.rt.should be_instance_of(Rserve::Talk)
     end
-    it "should raise ServerNotAvailable if started another instance on another port" do
-     if RbConfig::CONFIG['arch']!~/mswin/     
-	lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailable)
-     end
-    end
     it "should quit correctly" do
       @r.should be_connected
       @r.close.should be_true
@@ -38,19 +33,7 @@ describe Rserve::Connection do
     it "method eval_void should return true with correct expression" do
       @r.void_eval("x<-1").should be_true
     end
-    # On Windows, any error on a expression crash the server!
-    if RbConfig::CONFIG['arch']!~/mswin/
-	    it "method eval_void should raise an error with an incorrect expression" do
-	      lambda {@r.void_eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
-	      lambda {@r.void_eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
-	      e.request_packet.stat.should==127}
-	    end
-	    it "method eval should raise an error with an incorrect expression" do
-	      lambda {@r.eval("x<-")}.should raise_exception(Rserve::Connection::EvalError) {|e| e.request_packet.stat.should==2}
-	      lambda {@r.eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
-	      e.request_packet.stat.should==127}
-	    end
-    end
+    
     it "method eval should return a simple object" do
       la=@r.eval("TRUE")
       la.should be_instance_of(Rserve::REXP::Logical)
