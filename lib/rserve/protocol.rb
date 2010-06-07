@@ -193,6 +193,7 @@ module Rserve
       hi
     end
     def longBitsToDouble(bits)
+      return [bits].pack("Q").unpack("d")[0]
       s = ((bits >> 63) == 0) ? 1 : -1;
       e = ((bits >> 52) & 0x7ff)
       m = (e == 0) ?
@@ -200,6 +201,7 @@ module Rserve
       (bits & 0xfffffffffffff) | 0x10000000000000;
       s*m*2**(e-1075)
     end
+    
     def doubleToRawLongBits(double)
       [double].pack("d").unpack("Q")[0]
     end
