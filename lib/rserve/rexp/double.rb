@@ -49,8 +49,8 @@ module Rserve
       #else  
       #  value.respond_to? :nan? and value.nan?
       #end
-      return value == NA unless value.nil?
-      @payload.map {|v| v==NA}
+      return value.to_i == NA unless value.nil?
+      @payload.map {|v| v.to_i==NA}
     end
     def to_debug_string
       t=super

@@ -38,16 +38,17 @@ Cons:
     * Work with Ruby 1.8, 1.9 and JRuby 1.5
     * All API tested
   * Cons:
-    * VERY SLOW
+    * VERY SLOW on assignation
     * Very limited datatypes: Only vector and Matrix
 * RSRuby
   * C Extension for Ruby, linked to R's shared library
   * Pros:
-    * Very fast data access
+    * Blazing speed! 5-10 times faster than Rserve and 100-1000 than RinRuby.
     * Seamless integration with ruby. Every method and object is treated like a Ruby one
   * Cons:
     * Transformation between R and Ruby types aren't trivial
     * Dependent on operating system, Ruby implementation and R version
+    * Ocassionaly crash
     * Not available for alternative implementations of Ruby (JRuby, IronRuby and Rubinius)
     
     

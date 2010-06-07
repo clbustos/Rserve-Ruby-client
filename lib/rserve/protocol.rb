@@ -192,6 +192,7 @@ module Rserve
       hi<<=32; hi|=low;
       hi
     end
+    
     def longBitsToDouble(bits)
       (bits==9218868437227407266) ? Rserve::REXP::Double::NA : [bits].pack("Q").unpack("d")[0]
     end
