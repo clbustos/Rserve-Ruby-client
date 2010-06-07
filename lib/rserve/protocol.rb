@@ -193,7 +193,10 @@ module Rserve
       hi
     end
     def longBitsToDouble(bits)
-      return [bits].pack("Q").unpack("d")[0]
+      (bits==9218868437227407266) ? Rserve::REXP::Double::NA : [bits].pack("Q").unpack("d")[0]
+    end
+    # Complete version of longBitsToDouble, as Java documentation established 
+    def longBitsToDouble_old(bits) # :nodoc:
       s = ((bits >> 63) == 0) ? 1 : -1;
       e = ((bits >> 52) & 0x7ff)
       m = (e == 0) ?
