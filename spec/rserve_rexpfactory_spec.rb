@@ -56,7 +56,6 @@ describe Rserve::Protocol::REXPFactory do
   end
   it "should process double vector with NA" do
     la=@r.eval("c(1,NA)")
-    p la
     la.should be_instance_of(Rserve::REXP::Double)
     la.na?.should==[false,true]
 
