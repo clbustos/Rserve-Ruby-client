@@ -5,10 +5,13 @@ $:.unshift(File.dirname(__FILE__)+"/../lib")
 require 'rubygems'
 require 'rserve'
 require 'rinruby'
+require 'rsruby'
 require 'benchmark'
-data_size=10000
+data_size=30000
 tries=50
 con=Rserve::Connection.new
+rs=RSRuby.instance
+R.eval("1",false)
 data=data_size.times.map {rand()}
 data_integer=data_size.times.map {rand(100)}
 Benchmark.bm(30) do |x|
@@ -20,7 +23,11 @@ Benchmark.bm(30) do |x|
   x.report("assign '1' rserve") {
     con.assign("a", 1)
   }
-
+  
+  x.report("assign '1' rsruby") {
+    rs.assign('a',1)
+  }
+  
   x.report("assign double(#{data_size}) rinruby") {
     tries.times {
       R.a=data
@@ -28,6 +35,9 @@ Benchmark.bm(30) do |x|
   }
   x.report("assign double(#{data_size}) rserve") {
     con.assign("a", data)
+  }
+  x.report("assign double(#{data_size}) rsruby") {
+    rs.assign("a", data)
   }
 
   x.report("void_eval rinruby") {
@@ -40,9 +50,15 @@ Benchmark.bm(30) do |x|
       con.void_eval("1")
     }
   }
+  x.report("void_eval rsruby") {
+    tries.times {
+      rs.eval("1")
+    }
+  }
   # Assign data
   R.a=1
   con.assign('a',1)
+  rs.assign('a',1)
   x.report("get '1' rinruby") {
     tries.times {
       R.pull('a')
@@ -53,10 +69,16 @@ Benchmark.bm(30) do |x|
       con.eval('a').to_ruby
     }
   }
+  x.report("get '1' rsruby") {
+    tries.times {
+      rs.a
+    }
+  }
+
   
   R.a=data
   con.assign('a',data)
-  
+  rs.assign('a',data)
   x.report("get double(#{data_size}) rinruby") {
     tries.times {
       R.pull('a')
@@ -67,4 +89,10 @@ Benchmark.bm(30) do |x|
       con.eval('a').to_ruby
     }
   }
+  x.report("get double(#{data_size}) rsruby") {
+    tries.times {
+      rs.a
+    }
+  }
+
 end

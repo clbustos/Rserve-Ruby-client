@@ -7,7 +7,7 @@ require 'benchmark'
 require 'statsample'
 
 max=40
-
+R.eval("1")
 con=Rserve::Connection.new
 rserve_assign    = []
 rserve_retrieve  = []
