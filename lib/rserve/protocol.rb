@@ -1,3 +1,4 @@
+require 'rbconfig'
 module Rserve
   #
   # This module encapsulates methods and constants related to QAP1 protocol used by Rserv. Follows almost exactly the interface on RTalk class
@@ -7,6 +8,15 @@ module Rserve
   # Policy: No other class should know about the internal of protocol!
   # See Rtalk class on Java version.
   module Protocol
+    # Arch dependent Long Nil value 
+    case Config::CONFIG['arch']
+      when 'i686-linux'
+        LONG_NA=9221120237041092514 # :nodoc:
+      when /mswin/
+	LONG_NA=9221120237041092514 # :nodoc:
+      else
+	LONG_NA=9218868437227407266 # :nodoc:
+      end
     # Defines from Rsrv.h
     CMD_RESP=0x010000 # all responses have this flag set
     RESP_OK=(CMD_RESP|0x0001) # command succeeded; returned parameters depend on the command issued
@@ -194,7 +204,7 @@ module Rserve
     end
     
     def longBitsToDouble(bits)
-      (bits==9218868437227407266) ? Rserve::REXP::Double::NA : [bits].pack("Q").unpack("d")[0]
+      (bits==LONG_NA) ? Rserve::REXP::Double::NA : [bits].pack("Q").unpack("d")[0]
     end
     # Complete version of longBitsToDouble, as Java documentation established 
     def longBitsToDouble_old(bits) # :nodoc:
