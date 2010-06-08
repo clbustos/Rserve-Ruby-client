@@ -172,12 +172,11 @@ module Rserve
     # make sure that the buffer is big enough
 
     def get_int(buf, o)
-      if true or Config::CONFIG['arch']=="x86_64-linux"
-        buf[o,4].pack("C*").unpack("l")[0]
-      else
-        v=((buf[o]&255)|((buf[o+1]&255)<<8)|((buf[o+2]&255)<<16)|((buf[o+3]&255)<<24))
-        v >= MAX_LONG_SIGNED ? v-MAX_LONG_UNSIGNED : v
-      end
+      buf[o,4].pack("C*").unpack("l")[0]
+    end
+    def get_int_original(buf,o) # :nodoc:
+      v=((buf[o]&255)|((buf[o+1]&255)<<8)|((buf[o+2]&255)<<16)|((buf[o+3]&255)<<24))
+      v >= MAX_LONG_SIGNED ? v-MAX_LONG_UNSIGNED : v
     end
 
     # converts bit-wise stored length from a header. "long" format is supported up to 32-bit
@@ -200,14 +199,13 @@ module Rserve
     # @param o offset (8 bytes will be used)
     # @return long value */
     def get_long(buf, o)
-      if true or Config::CONFIG['arch']=="x86_64-linux"
-        buf[o,8].pack("CCCCCCCC").unpack("Q")[0]
-      else
-        low=(get_int(buf,o))&0xffffffff;
-        hi=(get_int(buf,o+4))&0xffffffff;
-        hi<<=32; hi|=low;
-        hi
-      end
+      buf[o,8].pack("CCCCCCCC").unpack("Q")[0]
+    end
+    def get_long_original(buf,o)   #:nodoc:
+      low=(get_int(buf,o))&0xffffffff;
+      hi=(get_int(buf,o+4))&0xffffffff;
+      hi<<=32; hi|=low;
+      hi
     end
     
     def longBitsToDouble(bits)

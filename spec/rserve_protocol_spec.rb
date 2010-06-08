@@ -44,6 +44,7 @@ describe Rserve::Protocol do
     buffer=[0xFF,0x78,0x56,0x34,0x12]
     expected=0x12345678
     @t.get_int(buffer,1).should==expected
+    @t.get_int(buffer,1).should==@t.get_int_original(buffer,1)
 
     # Version with errors
 
@@ -51,6 +52,9 @@ describe Rserve::Protocol do
     expected=0x12345678
     @t.get_int(buffer,1).should==expected
   end
+  
+  
+  
   it "get_len method should return correct length from a header" do
     cmd=Rserve::Protocol::CMD_login
     len=0x12345678
@@ -61,6 +65,7 @@ describe Rserve::Protocol do
     buffer=[0xFF,0x78,0x56,0x34,0x12,0x78,0x56,0x34,0x12]
     expected=0x1234567812345678
     @t.get_long(buffer,1).should==expected
+    @t.get_long(buffer,1).should==@t.get_long_original(buffer,1)
 
   end
   it "set_long method should set correct long(32 bits) for a given buffer" do
