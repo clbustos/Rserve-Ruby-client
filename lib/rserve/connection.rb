@@ -87,13 +87,29 @@ module Rserve
       @rt=Rserve::Talk.new(@s)
       #puts "Connected"
       # Accept first input
-      input=@s.recv(32).unpack("a4a4a4a20")      
+      input=@s.recv(32).unpack("a4a4a4a4a4a4a4a4")      
       raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
       @rsrv_version=input[1].to_i
       raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
       @protocol=input[2]
       raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
-      @extra=input[4]
+      (3..7).each do |i|
+        attr=input[i]
+        if (attr=="ARpt") 
+          if (!auth_req) # this method is only fallback when no other was specified
+            auth_req=true
+            auth_type=AT_plain
+          end
+        end
+	if (attr=="ARuc") 
+          auth_req=true
+          authType=AT_crypt
+        end
+	if (attr[0]=='K') 
+          key=attr[1,3]
+        end
+	
+      end
       @connected=true
       @@connected_object=self
       @last_error="OK"
