@@ -1,5 +1,4 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
-require 'rbconfig'
 describe Rserve::Connection do
   describe "opening and closing" do
     before do
@@ -39,8 +38,25 @@ describe Rserve::Connection do
       la.should be_instance_of(Rserve::REXP::Logical)
       la.true?.should==[true]
     end
-
-
+    it "should eval_void_detach correctly" do
+      s=@r.void_eval_detach("x<-c(TRUE,FALSE)")
+      @r.should_not be_connected      
+      s.should be_instance_of(Rserve::Session)
+      s.host.should==@r.hostname
+      s.key.size.should==32
+    end
+    it "should detach correctly" do
+      x=rand(100)
+     @r.void_eval("x<-#{x}")
+      s=@r.detach
+      @r.should_not be_connected      
+      s.should be_instance_of(Rserve::Session)
+      s.host.should==@r.hostname
+      s.key.size.should==32
+      r=s.attach
+      r.eval("x").to_ruby==x
+    end
+    
     it "should eval_void and eval correctly" do
       @r.void_eval("x<-c(TRUE,FALSE)").should be_true
       la=@r.eval("x")

@@ -29,6 +29,7 @@ module Rserve
     attr_reader :rt
     attr_reader :s
     attr_reader :port
+    attr_reader :session
     attr_writer :transfer_charset
     attr_reader :rsrv_version
     attr_writer :persistent
@@ -42,14 +43,16 @@ module Rserve
       @hostname         = opts.delete(:hostname)          || "127.0.0.1"
       @port_number      = opts.delete(:port_number)       || 6311
       @max_tries        = opts.delete(:max_tries)         || 5
+      @session          = opts.delete(:session)           || nil
       @tries            = 0
       @connected=false
-
-      
-
+      if (!@session.nil?)
+        @hostname=@session.host
+        @port_number=@session.port
+      end
       begin
         #puts "Tryin to connect..."
-	connect
+        connect
       rescue Errno::ECONNREFUSED
         if @tries<@max_tries
           @tries+=1
@@ -78,42 +81,46 @@ module Rserve
       # On windows, Rserve doesn't allows concurrent connections. 
       # So, we must close the last open connection first
       if RbConfig::CONFIG['arch']=~/mswin/ and !@@connected_object.nil?
-	@@connected_object.close
+        @@connected_object.close
       end
 
       close if @connected
       
       @s = TCPSocket::new(@hostname, @port_number)
       @rt=Rserve::Talk.new(@s)
-      #puts "Connected"
-      # Accept first input
-      input=@s.recv(32).unpack("a4a4a4a4a4a4a4a4")      
-      raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
-      @rsrv_version=input[1].to_i
-      raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
-      @protocol=input[2]
-      raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
-      (3..7).each do |i|
-        attr=input[i]
-        if (attr=="ARpt") 
-          if (!auth_req) # this method is only fallback when no other was specified
-            auth_req=true
-            auth_type=AT_plain
+      if @session.nil?
+        #puts "Connected"
+        # Accept first input
+        input=@s.recv(32).unpack("a4a4a4a4a4a4a4a4")      
+        raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
+        @rsrv_version=input[1].to_i
+        raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
+        @protocol=input[2]
+        raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
+        (3..7).each do |i|
+          attr=input[i]
+          if (attr=="ARpt") 
+            if (!auth_req) # this method is only fallback when no other was specified
+              auth_req=true
+              auth_type=AT_plain
+            end
           end
+          if (attr=="ARuc") 
+            auth_req=true
+            authType=AT_crypt
+          end
+          if (attr[0]=='K') 
+            key=attr[1,3]
+          end
+          
         end
-	if (attr=="ARuc") 
-          auth_req=true
-          authType=AT_crypt
-        end
-	if (attr[0]=='K') 
-          key=attr[1,3]
-        end
-	
+      else # we have a session to take care of
+        @s.write(@session.key.pack("C*"))
+        @rsrv_version=session.rsrv_version
       end
       @connected=true
       @@connected_object=self
       @last_error="OK"
-      
     end
     def connected?
       @connected
@@ -144,6 +151,20 @@ module Rserve
       end
 
     end
+
+
+    def void_eval_detach(cmd)
+      raise NotConnected if !connected? or rt.nil?
+      rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachedVoidEval,:cont=>cmd+"\n")
+      if rp.nil? or !rp.ok?
+        raise EvalError.new(rp), "detached void eval failed : #{rp.to_s}"
+      else
+        s=Rserve::Session.new(self,rp)
+        close
+        s
+      end
+    end
+
 
 
     # evaluates the given command and retrieves the result
@@ -260,6 +281,19 @@ module Rserve
         raise "Shutdown failed"
       end
     end
-        
+    # detaches the session and closes the connection (requires Rserve 0.4+).
+    # The session can be only resumed by calling RSession.attach
+    
+    def detach
+      raise NotConnected if !connected? or rt.nil?
+      rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachSession)
+      if !rp.nil? and rp.ok? 
+        s=Rserve::Session.new(self,rp)
+        close
+        s
+      else
+        raise "Cannot detach"
+      end
+    end
   end
 end
