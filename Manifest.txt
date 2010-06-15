@@ -4,6 +4,10 @@ Introduction.txt
 Manifest.txt
 README.txt
 Rakefile
+benchmark/benchmark.rb
+benchmark/comparison_2010_06_07.xls
+benchmark/comparison_2010_06_07_using_pack.xls
+benchmark/plot.rb
 data/gettysburg.txt
 examples/gettysburg.rb
 examples/hello_world.rb
@@ -36,9 +40,11 @@ lib/rserve/rexp/vector.rb
 lib/rserve/rexp/wrapper.rb
 lib/rserve/rfactor.rb
 lib/rserve/rlist.rb
+lib/rserve/session.rb
 lib/rserve/talk.rb
 lib/rserve/withattributes.rb
 lib/rserve/withnames.rb
+spec/rserve_connection_on_unix_spec.rb
 spec/rserve_connection_spec.rb
 spec/rserve_double_spec.rb
 spec/rserve_genericvector_spec.rb
@@ -52,6 +58,7 @@ spec/rserve_rexp_wrapper_spec.rb
 spec/rserve_rexpfactory_spec.rb
 spec/rserve_rfactor_spec.rb
 spec/rserve_rlist_spec.rb
+spec/rserve_session_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb
 spec/rserve_withnames_spec.rb

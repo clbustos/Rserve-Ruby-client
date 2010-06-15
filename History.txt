@@ -1,5 +1,13 @@
-=== 0.1.9 / 2010-06-04
+=== 0.2.0 / 2010-06-15
+* Session implemented. 
+* Retrieve auth information from server first responde. TODO: Implement authentification
+* Rserve::Protocol get_int and get_long uses pack. Spec for test compatibility for old method 
+* Added benchmark, comparing Rserve with RinRuby and RsRuby
+* Windows Support:
+ * On windows, any new connection closes the previous. Rserve on Windows can't process parallel connections
+ * All Specification works on Windows
 
+=== 0.1.9 / 2010-06-04
 * Documentation:
  * Added commentaries on examples/regression.txt
  * Examples.txt on main directory renamed to Introduction.txt
