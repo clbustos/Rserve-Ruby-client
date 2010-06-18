@@ -123,11 +123,21 @@ describe Rserve::Connection do
       @r.eval("x").should==x
     end
     it "should assign a matrix" do
-      x=@r.eval("matrix(1:9,3,3)")
+      x=@r.eval("matrix(1:12,6,2)")
       @r.assign("x",x)
       @r.eval("x").should==x
-      
     end
+    it "should assign a ruby matrix" do
+      mat_ruby=Matrix[[1,7],[2,8],[3,9],[4,10],[5,11],[6,12]]
+      @r.assign('x',mat_ruby)
+      x=@r.eval('x')
+      y=@r.eval('y<-matrix(c(1,2,3,4,5,6,7,8,9,10,11,12),6,2)')
+      #p x.attr.to_ruby
+      x.as_floats.should==y.as_floats
+      x.attr.as_list['dim'].should==y.attr.as_list['dim']
+      x.to_ruby.should==mat_ruby
+    end
+    
     after do
       @r.void_eval("rm(x)")
     end

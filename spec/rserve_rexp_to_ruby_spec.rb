@@ -38,7 +38,7 @@ describe "Rserve::REXP#to_ruby" do
       a.attributes['names'].should==%w{a b c}
     end
     it "should return a Ruby Matrix with R matrix" do
-      @r.eval("matrix(c(1,2,3,4),2,2)").to_ruby.should==Matrix[[1,3],[2,4]]
+      @r.eval("matrix(c(1:12),6,2)").to_ruby.should==Matrix[[1,7],[2,8],[3,9],[4,10],[5,11], [6,12]]
     end
     it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions"  do
       @r.void_eval("a<-1:16; attr(a,'dim')<-c(2,2,2,2)")

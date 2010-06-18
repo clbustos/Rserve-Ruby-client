@@ -323,26 +323,31 @@ module Rserve
       dim = get_attribute "dim"
       raise MismatchException, "array (dim attribute missing" if dim.nil?
       ds = dim.as_integers.reverse
-      
       split_array(ct,ds)
     end
     
     def split_array(ar, dims) # :nodoc:
-#      puts "#{ar} - #{dims}"
+      #puts "#{ar} - #{dims}"
       if dims.size==1
         raise "Improper size ar:#{ar} , dims=#{dims[0]}" if ar.size!=dims[0]
         return ar 
       elsif dims.size==2
+        dims.reverse!
         # should rearrange values as R do
+        # dims[0]=cols, dims[1]=rows
+        if(true)
         out=[]
         ar.each_with_index {|v,i| 
-          r=(i/dims[1]).to_i;
-          c=i%dims[1];
-#          p "#{r} : #{c}";
-          out[c*dims[0]+r]=v
+          r=(i/dims[0]).to_i;
+          c=i%dims[0];
+          #p "#{r} : #{c}";
+          out[c*dims[1]+r]=v
         }
+        #p out
+        
         raise "out size should equal to ar size" if ar.size!=out.size
         ar=out
+        end
       end
       dims_c=dims.dup
       current_dim=dims_c.shift

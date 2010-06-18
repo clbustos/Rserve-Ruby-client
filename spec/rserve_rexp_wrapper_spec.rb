@@ -1,5 +1,5 @@
 require File.dirname(__FILE__)+"/spec_helper.rb"
-
+require 'matrix'
 describe Rserve::REXP::Wrapper do
   it "should wrap single value" do
     Rserve::REXP::Wrapper.wrap(1).should==Rserve::REXP::Integer.new(1)
@@ -13,6 +13,20 @@ describe Rserve::REXP::Wrapper do
     Rserve::REXP::Wrapper.wrap([true,false]).should==Rserve::REXP::Logical.new([1,0])
     Rserve::REXP::Wrapper.wrap(["a","b"]).should==Rserve::REXP::String.new(["a","b"])
   end
+  it "should wrap a standard library matrix" do 
+    mat=Matrix[[1,2],[3,4]]
+    expected=Rserve::REXP::Double.new([1,3,2,4], Rserve::REXP::List.new( Rserve::Rlist.new( 
+      [
+      Rserve::REXP::String.new('matrix'),
+      Rserve::REXP::Integer.new([2,2])
+      ],
+      ['class','dim']
+      )
+     )
+    )
+    Rserve::REXP::Wrapper.wrap(mat).should==expected
+  end
+  
   it "should wrap on a list mixed values" do
     r=Rserve::Connection.new
     Rserve::REXP::Wrapper.wrap([1,2.0,false,"a"]).should==
