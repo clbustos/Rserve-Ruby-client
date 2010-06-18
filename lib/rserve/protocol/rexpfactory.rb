@@ -446,7 +446,7 @@ module Rserve
         end
 
         if (xt==XT_S4)
-          @cont = new REXP::S4.new(get_attr)
+          @cont = REXP::S4.new(get_attr)
           o=eox
           return o;
         end
