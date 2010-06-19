@@ -10,12 +10,10 @@ module Rserve
   module Protocol
     # Arch dependent Long Nil value 
     case Config::CONFIG['arch']
-      when 'i686-linux'
+      when /i686-linux|mswin|mingw/
         LONG_NA=9221120237041092514 # :nodoc:
-      when /mswin/
-	LONG_NA=9221120237041092514 # :nodoc:
       else
-	LONG_NA=9218868437227407266 # :nodoc:
+        LONG_NA=9218868437227407266 # :nodoc:
       end
     # Defines from Rsrv.h
     CMD_RESP=0x010000 # all responses have this flag set
@@ -209,6 +207,9 @@ module Rserve
     end
     
     def longBitsToDouble(bits)
+      if [bits].pack("Q").unpack("d")[0].nan?
+        puts bits
+      end
       (bits==LONG_NA) ? Rserve::REXP::Double::NA : [bits].pack("Q").unpack("d")[0]
     end
     # Complete version of longBitsToDouble, as Java documentation established 

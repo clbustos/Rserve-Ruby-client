@@ -1,4 +1,3 @@
-require 'rbconfig'
 module Rserve
   class Connection < Rserve::Engine
     @@connected_object=nil
@@ -80,7 +79,7 @@ module Rserve
     def connect
       # On windows, Rserve doesn't allows concurrent connections. 
       # So, we must close the last open connection first
-      if RbConfig::CONFIG['arch']=~/mswin/ and !@@connected_object.nil?
+      if ON_WINDOWS and !@@connected_object.nil?
         @@connected_object.close
       end
 
