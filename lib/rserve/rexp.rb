@@ -253,12 +253,12 @@ module Rserve
     # 
     #  @return [Array] an array of integers with corresponding dimensions or <code>nil</code> if the object has no dimension attribute
     def dim
-    begin
-      return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
-      rescue MismatchException
-    # nothing to do
-    end
-    nil
+      begin
+        return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
+        rescue MismatchException
+      # nothing to do
+      end
+      nil
     end
     
     # determines whether this object inherits from a given class in the same fashion as the <code>inherits()</code> function in R does (i.e. ignoring S4 inheritance).
@@ -332,6 +332,7 @@ module Rserve
         raise "Improper size ar:#{ar} , dims=#{dims[0]}" if ar.size!=dims[0]
         return ar 
       elsif dims.size==2
+        return Array.new() if dims.any? {|v| v==0}
         dims.reverse!
         # should rearrange values as R do
         # dims[0]=cols, dims[1]=rows

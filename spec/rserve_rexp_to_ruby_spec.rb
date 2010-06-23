@@ -44,6 +44,10 @@ describe "Rserve::REXP#to_ruby" do
       @r.void_eval("a<-1:16; attr(a,'dim')<-c(2,2,2,2)")
       @r.eval("a").to_ruby.should==[[[[1.0, 3.0], [2.0, 4.0]], [[5.0, 7.0], [6.0, 8.0]]],
  [[[9.0, 11.0], [10.0, 12.0]], [[13.0, 15.0], [14.0, 16.0]]]]
+    end
+    it "should return an empty Matrix with a matrix with a 0 dim" do
+      @r.void_eval("a<-as.matrix(numeric(0))")
+      @r.eval("a").to_ruby.should==Matrix[]
       
     end
     it "should return a boolean with a logical with one element" do
