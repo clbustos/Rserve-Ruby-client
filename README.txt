@@ -16,7 +16,6 @@ Follows closely the new Java client API, but maintains all Ruby conventions when
 * Requires Rserve installed on the server machine. On debian /  ubuntu, you should use <tt>sudo apt-get install r-cran-rserve</tt>
 Pros:
 * Work with Ruby 1.8, 1.9 and JRuby 1.5.
-* Work on Windows. Rserve limitations on that plataform applies (single connection, crash on parse errors)
 * Retrieve and assign various R's datatypes: integer, doubles, chars, logical vectors, lists and raw data.
 * Session allows to process data asynchronously. You start a command, detach the process and retrieve result later. You can marshall the session, store on file or database and use it when you need it.
 * Ruby API follows closely the Java API, so any change on the server API could be adopted without much problem
@@ -27,6 +26,7 @@ Pros:
   * From Ruby side: Every REXP objects has a <tt>to_ruby</tt> method, which automagicly converts every R type on equivalent Ruby type. So, a vector of size 1 is converted to an integer or double, a vector of size>1 returns an array, a named list returns a hash and so on. If you need to create a complex expression, you could always use method <tt>eval</tt> without problem
 Cons:
 * Requires Rserve
+* Limited features on Windows, caused by limitations on Rserve on this platform: single concurrent connection allowed, server crash on parse errors and can't spawn sessions.
 
 == RELATED LIBRARIES (Ruby / R)
 
@@ -36,6 +36,7 @@ Cons:
   * Uses TCP/IP Sockets to send and retrieve data
   * Pros:
     * Doesn't requires anything but R
+    * Works flawlessly on Windows
     * Work with Ruby 1.8, 1.9 and JRuby 1.5
     * All API tested
   * Cons:
