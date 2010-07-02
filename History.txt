@@ -1,3 +1,6 @@
+=== 0.2.3 / 2010-07-02
+* Bug fix: assignation of double vector with NA doesn't work right
+
 === 0.2.2 / 2010-06-24
 * ¿Bug? fix: a R matrix with a 0 dims raise an error [clbustos]
 * Bug fix on rexpfactory: typo on creation of S4
