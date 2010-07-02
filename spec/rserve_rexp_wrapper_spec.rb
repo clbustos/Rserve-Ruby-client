@@ -46,5 +46,4 @@ describe Rserve::REXP::Wrapper do
     Rserve::REXP::Wrapper.wrap([true,nil]).should==Rserve::REXP::Logical.new([1,Rserve::REXP::Logical::NA])
     Rserve::REXP::Wrapper.wrap(["a",nil]).should==Rserve::REXP::String.new(["a", Rserve::REXP::String::NA])
   end
-
 end

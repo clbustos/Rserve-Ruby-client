@@ -50,6 +50,11 @@ describe Rserve::Connection do
       @r.assign("x","a string")
       @r.eval("x").to_ruby.should=="a string"
     end
+    it "should assign an array with nils values" do
+      
+      @r.assign('x',[1.0,2.5,nil])
+      @r.eval('x').to_ruby.should==[1.0,2.5,nil]
+    end
 
   end
   describe "assign using REXPs" do
@@ -64,7 +69,30 @@ describe Rserve::Connection do
       @r.assign("x", rexp)
       @r.eval("x").should==rexp
     end
+    it "should assign a double with nils and set correctly the nils" do
+      rexp=Rserve::REXP::Double.new([1.5, Rserve::REXP::Double::NA, -1.5])
+      @r.assign("x", rexp)
+      @r.eval('is.na(x)').to_ruby.should==[false,true,false]
+    end
+    it "should assign a integer with nils and set correctly the nils" do
+      rexp=Rserve::REXP::Integer.new([1, Rserve::REXP::Integer::NA, 2])
+      @r.assign("x", rexp)
+      @r.eval('is.na(x)').to_ruby.should==[false,true,false]
+    end
     
+    
+    it "should assign a double with nils and return correct values" do
+      rexp=Rserve::REXP::Double.new([1.5,Rserve::REXP::Double::NA, -1.5])
+      @r.assign("x", rexp)
+      rexp_out=@r.eval("x")
+      rexp_out.payload.should==rexp.payload
+    end
+    it "should assign a integer with nils and return correct values" do
+      rexp=Rserve::REXP::Integer.new([1,Rserve::REXP::Integer::NA, 2])
+      @r.assign("x", rexp)
+      rexp_out=@r.eval("x")
+      rexp_out.payload.should==rexp.payload
+    end
     it "should assign a null" do
       rexp=Rserve::REXP::Null.new
       @r.assign("x", rexp)

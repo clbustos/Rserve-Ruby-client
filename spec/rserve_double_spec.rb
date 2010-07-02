@@ -12,9 +12,6 @@ describe Rserve::REXP::Double do
       a=Rserve::REXP::Double.new(payload)
       a.payload.should==[1.1]
     end
-
-
-
   end
   describe "NA management" do
     before do

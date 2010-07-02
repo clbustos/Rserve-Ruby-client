@@ -55,9 +55,9 @@ describe Rserve::Protocol::REXPFactory do
     la.as_integers.should==(-10..10).to_a
   end
   it "should process double vector with NA" do
-    la=@r.eval("c(1,NA)")
+    la=@r.eval("c(1.0,2.0, NA)")
     la.should be_instance_of(Rserve::REXP::Double)
-    la.na?.should==[false,true]
+    la.na?.should==[false,false,true]
 
   end
   it "should process string vector" do

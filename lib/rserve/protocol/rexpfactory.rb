@@ -80,6 +80,7 @@ module Rserve
         STDERR.puts("Warning: #{type} SEXP size mismatch")
       end
       def initialize(*args)
+        @attr=nil
         if args.size==0
 
         elsif
@@ -563,6 +564,7 @@ module Rserve
         elsif(rxt==XT_INT)
           set_int(cont.as_integer, buf, off)
         elsif(rxt==XT_DOUBLE)
+
           set_long(doubleToRawLongBits(cont.as_double), buf, off)
         elsif(rxt==XT_ARRAY_INT)
           ia=cont.as_integers
@@ -585,10 +587,17 @@ module Rserve
           end
 
         elsif(rxt==XT_ARRAY_DOUBLE)
-          da=cont.as_doubles
+          da=cont.payload
           io=off
           da.each do |v|
-            set_long(doubleToRawLongBits(v),buf,io)
+            # HACK
+            # On i686, NA returns [162, 7, 0, 0, 0, 0, 240, 127]
+            # So if we got a Double::NA, we should set mannualy this array
+            if v==REXP::Double::NA
+              buf[io,8]=REXP::Double::NA_ARRAY
+            else
+              set_long(doubleToRawLongBits(v), buf, io)
+            end
             io+=8
           end
         elsif(rxt==XT_RAW)
