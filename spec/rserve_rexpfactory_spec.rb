@@ -55,9 +55,21 @@ describe Rserve::Protocol::REXPFactory do
     la.as_integers.should==(-10..10).to_a
   end
   it "should process double vector with NA" do
-    la=@r.eval("c(1.0,2.0, NA)")
+    la=@r.eval("c(0.03091136, NA, 0.07456851, 0.90000000)")
     la.should be_instance_of(Rserve::REXP::Double)
-    la.na?.should==[false,false,true]
+    la.na?.should==[false,true, false, false]
+  end
+  it "should process double vector with NaN" do
+    la=@r.eval("c(NaN,1.3)")
+    la.should be_instance_of(Rserve::REXP::Double)
+    la.na?.should==[true,false]
+  end
+  it "should process list with double vectors with NA" do
+    la=@r.eval("list(RMSE=c(0.03091136, NA, 0.07456851, 0.90000000))")
+    vector=la.as_list[0]
+    vector.should be_instance_of(Rserve::REXP::Double)
+    vector.na?.should==[false,true, false, false]
+    
 
   end
   it "should process string vector" do
@@ -121,6 +133,16 @@ describe Rserve::Protocol::REXPFactory do
     la.attr.as_list['class'].to_ruby.should=="data.frame"
     la.attr.as_list['row.names'].to_ruby.should==[nil,-10]
   end
+  it "should process data.frame with string row.names" do
+    @r.void_eval("df<-data.frame(a=1:10,b=1:10);
+      attr(df,'row.names')<-c('a','b','c',4,5,6,7,8,9,10);")
+    la=@r.eval("df")
+    la.should be_true
+    la.attr.as_list['names'].to_ruby.should==%w{a b}
+    la.attr.as_list['class'].to_ruby.should=="data.frame"
+    la.attr.as_list['row.names'].to_ruby.should==%w{a b c 4 5 6 7 8 9 10}
+  end
+  
   it "should process a nested array" do
     @r.void_eval("c=1:8; attr(c,'dim')<-c(2,2,2)")
     la=@r.eval("c")

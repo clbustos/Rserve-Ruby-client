@@ -406,7 +406,7 @@ module Rserve
       end
       
       # Hack: change attribute row.names according to spec 
-      if !attr.nil? and attr.as_list.has_name? 'class' and attr.as_list['class'].as_string=='data.frame' and attr.as_list['row.names'].as_integers[0]==REXP::Integer::NA
+      if !attr.nil? and attr.as_list.has_name? 'class' and attr.as_list['class'].as_string=='data.frame' and (attr.as_list['row.names'].is_a?(REXP::Integer)) and attr.as_list['row.names'].as_integers[0]==REXP::Integer::NA
         v.attributes['row.names']=(1..(-attr.as_list['row.names'].as_integers[1])).to_a
       end
       
