@@ -14,7 +14,7 @@ module Rserve
         LONG_NA=9221120237041092514 # :nodoc:
       else
         LONG_NA=9218868437227407266 # :nodoc:
-      end
+    end
     # Defines from Rsrv.h
     CMD_RESP=0x010000 # all responses have this flag set
     RESP_OK=(CMD_RESP|0x0001) # command succeeded; returned parameters depend on the command issued

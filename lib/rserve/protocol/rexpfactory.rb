@@ -136,7 +136,7 @@ module Rserve
         @cont=nil
         if has_at
           puts "Processing attribs:" if $DEBUG
-          o = attr.parse_REXP(buf,o)
+          o = attr.parse_REXP(buf, o)
           puts "FINAL ATTRIB:" if $DEBUG
           pp get_attr.as_list if $DEBUG
         end
@@ -190,7 +190,7 @@ module Rserve
           as=(eox-o)
           i=0
           d=Array.new(as)
-          (eox-i).times {|i| d[i]=buf[o+i]}
+          (eox-i).times {|ii| d[ii]=buf[o+ii]}
           o=eox
 
           d.length.each {|j|
@@ -205,7 +205,7 @@ module Rserve
           as=get_int(buf, o)
           o+=4
           d=Array.new(as)
-          as.times {|i| d[i]=buf[o+i]}
+          as.times {|ai| d[ai]=buf[o+ai]}
           d.collect! {|v|
             if v!=0 and v!=1
               REXP::Logical::NA
@@ -359,7 +359,7 @@ module Rserve
             if nam.string?
               names=nam.as_strings
             elsif nam.vector?
-              names=nam.as_list.map {|v| v.as_string}
+              names=nam.as_list.map {|vv| vv.as_string}
             end
             l=Rlist.new(v,names)
             @cont=(xt==XT_VECTOR_EXP) ? REXP::ExpressionVector.new(l,get_attr) : REXP::GenericVector.new(l,get_attr)
@@ -535,6 +535,9 @@ module Rserve
         l+=4 if (l>0xfffff0)
         l+4
       end
+      
+      
+      
       def get_binary_representation(buf,off)
         myl=get_binary_length;
         is_large=(myl>0xfffff0);
@@ -593,7 +596,8 @@ module Rserve
             # HACK
             # On i686, NA returns [162, 7, 0, 0, 0, 0, 240, 127]
             # So if we got a Double::NA, we should set mannualy this array
-            if v==REXP::Double::NA
+            if cont.na? v
+            #if v==REXP::Double::NA
               buf[io,8]=REXP::Double::NA_ARRAY
             else
               set_long(doubleToRawLongBits(v), buf, io)
@@ -611,7 +615,7 @@ module Rserve
           sa.each do |v|
             if !v.nil?
               b=v.unpack("C*")
-              b.each_with_index{|v,index| buf[io+index]=v}
+              b.each_with_index{|vv,index| buf[io+index]=vv}
               io+=b.length
             end
             buf[io]=0
@@ -630,8 +634,8 @@ module Rserve
           lst=cont.as_list
           #p lst
           if !lst.nil?
-            lst.size.times do |i|
-              x=lst.at(i)
+            lst.size.times do |ii|
+              x=lst.at(ii)
               #puts "#{x}"
               x==REXP::Null if x.nil?
               #p buf
@@ -640,7 +644,7 @@ module Rserve
               #p io
               if(rxt==XT_LIST_TAG or rxt==XT_LANG_TAG)
                 
-                io=REXPFactory.new(REXP::Symbol.new(lst.key_at(i))).get_binary_representation(buf, io)
+                io=REXPFactory.new(REXP::Symbol.new(lst.key_at(ii))).get_binary_representation(buf, io)
 
               end
             end #times

@@ -15,58 +15,60 @@ module Rserve
       
       def initialize(data, attrs=nil)
         @payload=case data
-      when Numeric
-        [data.to_f]
-      when Array
-        data
-      else
-        raise ArgumentError, "Should be Numeric or Array"
-      end
-      super(attrs)
-    end
-    def length
-      payload.length
-    end
-    def integer?
-      true
-    end
-    def numeric?
-      true
-    end
-    def as_integers
-      @payload.map(&:to_i)
-    end
-    def as_doubles
-      @payload.map(&:to_f)
-    end
-    def as_strings
-      @payload.map {|v| v.to_f.to_s}
-    end
-
-    def na?(value=nil)
-      #if value.nil?
-      #  @payload.map {|v| v.respond_to? :nan and v.nan?}
-      #else  
-      #  value.respond_to? :nan? and value.nan?
-      #end
-      return ((value.is_a? Float and value.nan?) or value.to_i==NA) unless value.nil?
-      @payload.map {|v| ((v.is_a? Float and v.nan?) or v.to_i==NA)}
-    end
-    def to_debug_string
-      t=super
-      t << "{"  << @payload.map(&:to_s).join(",") << "}"
-    end
-    def to_ruby_internal
-      if dim 
-        if dim.size==2
-          as_matrix
-        else
-          as_nested_array
+          when Numeric
+            [data.to_f]
+          when Array
+            data
+          else
+            raise ArgumentError, "Should be Numeric or Array"
         end
-      else
-        super
+        super(attrs)
+      end
+      def length
+        payload.length
+      end
+      def integer?
+        true
+      end
+      def numeric?
+        true
+      end
+      def as_integers
+        @payload.map(&:to_i)
+      end
+      def as_doubles
+        @payload.map do |v|
+          na?(v) ? NA : v.to_f
+        end
+      end
+      def as_strings
+        @payload.map {|v| v.to_f.to_s}
+      end
+
+      def na?(value=nil)
+        #if value.nil?
+        #  @payload.map {|v| v.respond_to? :nan and v.nan?}
+        #else  
+        #  value.respond_to? :nan? and value.nan?
+        #end
+        return ((value.is_a? Float and value.nan?) or value.to_i==NA) unless value.nil?
+        @payload.map {|v| ((v.is_a? Float and v.nan?) or v.to_i==NA)}
+      end
+      def to_debug_string
+        t=super
+        t << "{"  << @payload.map(&:to_s).join(",") << "}"
+      end
+      def to_ruby_internal
+        if dim 
+          if dim.size==2
+            as_matrix
+          else
+            as_nested_array
+          end
+        else
+          super
+        end
       end
     end
   end
-end
 end

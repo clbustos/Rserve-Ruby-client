@@ -16,7 +16,7 @@ module Rserve
     def pretty_print(q)
       q.group(1,'[|WN|',']') {
         q.seplist(self,nil,:each_with_index) {|v,i|
-         if (@names.nil? or @names[i].nil?) 
+          if (@names.nil? or @names[i].nil?) 
            q.pp v
           else
             q.group {
@@ -31,11 +31,11 @@ module Rserve
     def to_s
       out=[]
       self.each_with_index { |v,i| 
-      if !@names.nil? and !@names[i].nil?
-        out.push("#{@names[i]}=#{v}")
-      else
-        out.push("#{v}")
-      end
+        if !@names.nil? and !@names[i].nil?
+          out.push("#{@names[i]}=#{v}")
+        else
+          out.push("#{v}")
+        end
       }
       "[#{out.join(", ")}]"
     end
@@ -141,7 +141,7 @@ module Rserve
             i.nil? ? nil : at(i)
           else
             nil
-         end
+          end
       end
     end
   end

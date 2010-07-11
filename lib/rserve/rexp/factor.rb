@@ -1,6 +1,7 @@
 module Rserve
   class REXP
     class Factor < REXP::Integer
+      attr_reader :levels
       def initialize(ids,levels,attr=nil)
         super(ids,attr)
         @levels = (levels.nil?)? Array.new : levels;
