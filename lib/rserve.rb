@@ -1,7 +1,7 @@
 require 'socket'
 require 'rbconfig'
 module Rserve
-  VERSION = '0.2.4'
+  VERSION = '0.2.5'
   ON_WINDOWS=RbConfig::CONFIG['arch']=~/mswin|mingw/
 end
 

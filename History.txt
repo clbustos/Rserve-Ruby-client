@@ -1,3 +1,6 @@
+=== 0.2.5 / 2010-07-06
+* Fixed warning: NA values on Double and shadowed variables on blocks
+
 === 0.2.4 / 2010-07-06
 * Bug fixes: double vector with NaN crash to_ruby. Data frame with string row_names crash to_rubyC
 
