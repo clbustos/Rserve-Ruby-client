@@ -34,11 +34,13 @@ module Rserve
         true
       end
       def as_integers
-        @payload.map(&:to_i)
+        @payload.map do |v|
+          na?(v) ? nil : v.to_i
+        end
       end
       def as_doubles
         @payload.map do |v|
-          na?(v) ? NA : v.to_f
+          na?(v) ? nil : v.to_f
         end
       end
       def as_strings
