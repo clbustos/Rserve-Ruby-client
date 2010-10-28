@@ -2,7 +2,7 @@ module Rserve
   class REXP
     class String < REXP::Vector
       attr_reader :payload
-      NA="NA"
+      NA=["NA", "\xFF"]
       def initialize(data, attrs=nil)
         @payload=case data
         when Array
@@ -24,9 +24,9 @@ module Rserve
       
       def na?(value=nil)
         if value.nil?
-          @payload.map {|v| v==NA}
+          @payload.map {|v| NA.include? v}
         else
-          value==NA
+          NA.include? value
         end
       end
       def to_debug_string
