@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require File.dirname(__FILE__)+"/spec_helper.rb"
+require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
 
 describe Rserve::Protocol::REXPFactory do
 
@@ -46,7 +46,7 @@ describe Rserve::Protocol::REXPFactory do
     la.should be_instance_of(Rserve::REXP::Double)
     la.dim.should be_nil
     la.as_doubles.map(&:to_f).each_with_index {|v,i|
-      v.should be_close(a[i],1e-10)
+      v.should be_within(1e-10).of(a[i])
     }
   end
   it "should process integer" do

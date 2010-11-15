@@ -4,6 +4,16 @@ require 'rubygems'
 require 'hoe'
 require 'rserve'
 Hoe.plugin :git
+
+require 'rspec'
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new do |t|
+  t.rspec_opts = ["-c", "-f progress", "-r ./spec/spec_helper.rb"]
+  t.pattern = 'spec/**/*_spec.rb'
+end
+
+
 Hoe.spec 'rserve-client' do
    self.testlib=:rspec
    self.test_globs="spec/*_spec.rb"
@@ -11,6 +21,7 @@ Hoe.spec 'rserve-client' do
    self.rubyforge_name = 'ruby-statsample' # if different than 'rserve'
    self.remote_rdoc_dir = "rserve-client"
    self.developer('Claudio Bustos', 'clbustos_AT_gmail.com')
+   self.extra_dev_deps << ["rspec","~>2.0"]
 end
 
 # vim: syntax=ruby

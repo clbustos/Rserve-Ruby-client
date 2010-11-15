@@ -217,6 +217,7 @@ module Rserve
         assign_rexp(sym, Rserve::REXP::Wrapper.wrap(ct))
       end
     end
+    
     def assign_string(sym,ct)
       symn = sym.unpack("C*")
       ctn  = ct.unpack("C*")
