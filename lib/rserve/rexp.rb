@@ -450,4 +450,5 @@ require 'rserve/rexp/s4'
 require 'rserve/rexp/reference'
 
 require 'rserve/rexp/wrapper'
+require 'rserve/rexp/function'
 

@@ -282,7 +282,7 @@ module Rserve
               
               name=nf.cont.as_string if(nf.cont.symbol? or nf.cont.string?)
             end
-            puts "Agregando '#{name}'='#{lc.cont.inspect}'" if $DEBUG
+            puts "Adding '#{name}'='#{lc.cont.inspect}'" if $DEBUG
             if name.nil?
               l.push(lc.cont)
             else
@@ -436,7 +436,15 @@ module Rserve
         end
 
         if (xt==XT_CLOS)
-          o=eox;
+          headf = REXPFactory.new()
+          bodyf = REXPFactory.new()
+          o=headf.parse_REXP(buf,o)
+          o=bodyf.parse_REXP(buf,o)
+          @cont=REXP::Function.new(headf.cont,bodyf.cont)
+          if o!=eox
+            $STDERR.puts "CLOS SEXP size mismatch"
+            o=eox
+          end
           return o;
         end
 

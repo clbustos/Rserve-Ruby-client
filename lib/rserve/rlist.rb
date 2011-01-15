@@ -5,7 +5,7 @@ module Rserve
       @names=nil
       if data.nil?
         super()
-      else
+      else        
         case data
         when Array
           super(data)
@@ -15,7 +15,6 @@ module Rserve
           raise ArgumentError
         end
       end
-      
       if n
         @names=Array.new(size)
         n.each_index {|i| @names[i]=n[i]} if n.respond_to? :each_index

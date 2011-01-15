@@ -7,7 +7,23 @@ describe Rserve do
   after do
 	  @r.close
   end
-  it "should calcule a basic LR without hazzle" do
+  it "should calcule a basic gml(logit) without problem" do
+    script=<<-EOF
+a<-c(1,3,2,5,3,2,6,7,8,5,9,3,10,5,2,6,8,4,3,7)
+b<-c(7,5,3,7,2,7,4,3,7,5,7,8,4,3,3,6,7,4,3,10)
+y<-c(0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1)
+logit<-glm(y~a+b, family=binomial(link="logit"), na.action=na.pass)
+    EOF
+    @r.void_eval(script)
+    @r.eval('logit').should be_instance_of(Rserve::REXP::GenericVector)   
+    @r.eval('logit$family$variance').should be_true
+    @r.eval('logit').should be_true
+    @r.eval('logit').to_ruby.should be_true
+    @r.eval('summary(logit)').should be_true
+    @r.eval('summary(logit)').to_ruby.should be_true
+  end
+  
+  it "should calcule lr without problem" do
     script=<<-EOF
 ## Disease severity as a function of temperature
 
@@ -27,9 +43,6 @@ severity.lm <- lm(diseasesev~temperature,data=severity)
     @r.eval('severity.lm').to_ruby.should be_true
     @r.eval('summary(severity.lm)').should be_true
     @r.eval('summary(severity.lm)').to_ruby.should be_true
-
-
-
   end
 
 end

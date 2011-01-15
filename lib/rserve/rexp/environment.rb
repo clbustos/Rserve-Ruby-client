@@ -8,9 +8,9 @@ module Rserve
       # * @param eng engine responsible for this environment
       # * @param handle handle used by the engine to identify this environment
       def initialize(e,h)
-        super();
-        @eng = e;
-        @handle = h;
+        super()
+        @eng = e
+        @handle = h
       end
       def environment?
         true
