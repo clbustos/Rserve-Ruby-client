@@ -1,6 +1,5 @@
 module Rserve
-  #  Basic class representing an object of any type in R. Each type in R in represented by a specific subclass. 
-  #
+  # Basic class representing an object of any type in R. Each type in R in represented by a specific subclass. 
   # This class defines basic accessor methods (<tt>as</tt>_<i>xxx</i>), type check methods (<i>XXX</i><tt>?</tt>), gives access to attributes (REXP.get_attribute, REXP.has_attribute?) as well as several convenience methods. If a given method is not applicable to a particular type, it will throw the MismatchException exception.
   # 
   # This root class will throw on any accessor call and returns <code>false</code> for all type methods. This allows subclasses to override accessor and type methods selectively.
@@ -385,8 +384,7 @@ module Rserve
     # Retrieves the best Ruby representation of data
     #
     # If R object has attributes, the Ruby object is extended with Rserve::WithAttributes.
-    # If R object is names, the Ruby object is extended with Rserve::WithNames and
-    # their elements can be accessed with [] using numbers and literals.
+    # If R object have names, the Ruby object is extended with Rserve::WithNames and their elements can be accessed with [] using numbers and literals.
     #  
     # @return [Object] Ruby object.
     def to_ruby
@@ -409,7 +407,6 @@ module Rserve
       if !attr.nil? and attr.as_list.has_name? 'class' and attr.as_list['class'].as_string=='data.frame' and (attr.as_list['row.names'].is_a?(REXP::Integer)) and attr.as_list['row.names'].as_integers[0]==REXP::Integer::NA
         v.attributes['row.names']=(1..(-attr.as_list['row.names'].as_integers[1])).to_a
       end
-      
       
       v
     end

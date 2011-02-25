@@ -1,4 +1,5 @@
 module Rserve
+  # class providing TCP/IP connection to an Rserve
   class Connection < Rserve::Engine
     @@connected_object=nil
     include Rserve::Protocol
@@ -32,10 +33,11 @@ module Rserve
     attr_writer :transfer_charset
     attr_reader :rsrv_version
     attr_writer :persistent
-    
+    # authorization type: plain text
     AT_plain=0
+    # authorization type: unix crypt
     AT_crypt=1
-    # Initialize a new connection to rserve
+    # Make a new local connection 
     # You could provide a hash with options. Options are analog to java client:
     # [+:auth_req+]           If authentification is required (false by default)
     # [+:transfer_charset+]   Transfer charset ("UTF-8" by default)
@@ -43,9 +45,8 @@ module Rserve
     # [+:hostname+]           Hostname of Rserve ("127.0.0.1" by default)
     # [+:port_number+]        Port Number of Rserve (6311 by default)
     # [+:max_tries+]          Maximum number of tries before give up  (5 by default)
-    # [+:cmd_init]            Command to init Rserve if not initialized ("R CMD Rserve" by default)
-    # [+:proc_rserve_ok]      Proc testing if Rserve works (uses system by default)
-    # session                 Rserve::Session to resume (nil by default)
+    # [+:cmd_init+]            Command to init Rserve if not initialized ("R CMD Rserve" by default)
+    # [+:proc_rserve_ok+]      Proc testing if Rserve works (uses system by default)
     def initialize(opts=Hash.new)
       @auth_req         = opts.delete(:auth_req)          || false
       @transfer_charset = opts.delete(:transfer_charset)  || "UTF-8"
@@ -89,6 +90,8 @@ module Rserve
         end
       end
     end
+    
+    
     def connect
       # On windows, Rserve doesn't allows concurrent connections. 
       # So, we must close the last open connection first
@@ -134,9 +137,13 @@ module Rserve
       @@connected_object=self
       @last_error="OK"
     end
+    # Check connection state. Note that currently this state is not checked on-the-spot, that is if connection went down by an outside event this is not reflected by the flag.
+    # return +true+ if this connection is alive 
     def connected?
       @connected
     end
+    
+    # Closes current connection
     def close
       if !@s.nil? and !@s.closed?
         @s.close_write
@@ -147,6 +154,7 @@ module Rserve
       @@connected_object=nil
       true
     end
+    # Get server version as reported during the handshake.
     def get_server_version
       @rsrv_version
     end
@@ -164,7 +172,11 @@ module Rserve
 
     end
 
-
+    
+    # Evaluates the given command, detaches the session (see detach()) and closes connection while the command is being evaluted (requires Rserve 0.4+).
+    # Note that a session cannot be attached again until the commad was successfully processed. Technically the session is put into listening mode while the command is being evaluated but accept is called only after the command was evaluated. One commonly used techique to monitor detached working sessions is to use second connection to poll the status (e.g. create a temporary file and return the full path before detaching thus allowing new connections to read it).
+		# * @param cmd command/expression string.
+		# * @return session object that can be use to attach back to the session once the command completed 
     def void_eval_detach(cmd)
       raise NotConnected if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachedVoidEval,:cont=>cmd+"\n")
@@ -288,6 +300,10 @@ module Rserve
         raise "Assign Failed"
       end
     end
+    
+    
+    # Shutdown remote Rserve.
+    # Note that some Rserves cannot be shut down from the client side
     def shutdown
       raise NotConnected if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_shutdown)
@@ -297,9 +313,9 @@ module Rserve
         raise "Shutdown failed"
       end
     end
-    # detaches the session and closes the connection (requires Rserve 0.4+).
-    # The session can be only resumed by calling RSession.attach
     
+    # Detaches the session and closes the connection (requires Rserve 0.4+).
+    # The session can be only resumed by calling RSession.attach
     def detach
       raise NotConnected if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachSession)
