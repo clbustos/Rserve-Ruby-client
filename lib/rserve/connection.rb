@@ -32,9 +32,20 @@ module Rserve
     attr_writer :transfer_charset
     attr_reader :rsrv_version
     attr_writer :persistent
+    
     AT_plain=0
     AT_crypt=1
-
+    # Initialize a new connection to rserve
+    # You could provide a hash with options. Options are analog to java client:
+    # [+:auth_req+]           If authentification is required (false by default)
+    # [+:transfer_charset+]   Transfer charset ("UTF-8" by default)
+    # [+:auth_type+]          Type of authentification (AT_plain by default)
+    # [+:hostname+]           Hostname of Rserve ("127.0.0.1" by default)
+    # [+:port_number+]        Port Number of Rserve (6311 by default)
+    # [+:max_tries+]          Maximum number of tries before give up  (5 by default)
+    # [+:cmd_init]            Command to init Rserve if not initialized ("R CMD Rserve" by default)
+    # [+:proc_rserve_ok]      Proc testing if Rserve works (uses system by default)
+    # session                 Rserve::Session to resume (nil by default)
     def initialize(opts=Hash.new)
       @auth_req         = opts.delete(:auth_req)          || false
       @transfer_charset = opts.delete(:transfer_charset)  || "UTF-8"
@@ -42,6 +53,8 @@ module Rserve
       @hostname         = opts.delete(:hostname)          || "127.0.0.1"
       @port_number      = opts.delete(:port_number)       || 6311
       @max_tries        = opts.delete(:max_tries)         || 5
+      @cmd_init         = opts.delete(:cmd_init)          || "R CMD Rserve"
+      @proc_rserve_ok   = opts.delete(:proc_rserve_ok)    || lambda { system "killall -s 0 Rserve" } 
       @session          = opts.delete(:session)           || nil
       @tries            = 0
       @connected=false
@@ -56,13 +69,13 @@ module Rserve
         if @tries<@max_tries
           @tries+=1
           # Rserve is available?
-          if system "killall -s 0 Rserve"
+          if @proc_rserve_ok.call
             # Rserve is available. Incorrect host and/or portname
             raise ServerNotAvailable, "Rserve started, but not available on #{hostname}:#{port_number}"
             # Rserve not available. We should instanciate it first
           else
-            if system "R CMD Rserve"
-              # Wait a moment please
+            if system @cmd_init
+              # Wait a moment, please
               sleep(0.25)
               retry
             else
@@ -186,9 +199,12 @@ module Rserve
       if (rsrv_version>100) # /* since 0101 eval responds correctly by using DT_SEXP type/len header which is 4 bytes long */
         rxo=4
         # we should check parameter type (should be DT_SEXP) and fail if it's not
-        if (pc[0]!=Rserve::Protocol::DT_SEXP && pc[0]!=(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
-          raise "Error while processing eval output: SEXP (type "+Rserve::Protocol::DT_SEXP+") expected but found result type "+pc[0].to_s+"."
+        if pc.nil?
+          raise "Error while processing eval output: SEXP (type #{Rserve::Protocol::DT_SEXP}) expected but nil returned"
+        elsif (pc[0]!=Rserve::Protocol::DT_SEXP and pc[0]!=(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
+          raise "Error while processing eval output: SEXP (type #{Rserve::Protocol::DT_SEXP}) expected but found result type "+pc[0].to_s+"."
         end
+        
         if (pc[0]==(Rserve::Protocol::DT_SEXP|Rserve::Protocol::DT_LARGE))
           rxo=8; # large data need skip of 8 bytes
         end

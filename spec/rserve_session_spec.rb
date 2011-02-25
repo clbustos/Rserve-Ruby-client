@@ -4,6 +4,10 @@ describe Rserve::Session do
     before do
       @r=Rserve::Connection.new
     end
+    after do
+      @r.close if @r.connected?
+    end    
+
     it "should resume an detached session with void_eval_detach" do
         x2=10+rand(12)
         s=@r.void_eval_detach("x<-1:#{x2}")

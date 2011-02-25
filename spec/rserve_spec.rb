@@ -5,7 +5,7 @@ describe Rserve do
     @r=Rserve::Connection.new()
   end
   after do
-	  @r.close
+	  @r.close if @r.connected?
   end
   it "should calcule a basic gml(logit) without problem" do
     script=<<-EOF

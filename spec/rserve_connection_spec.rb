@@ -4,6 +4,9 @@ describe Rserve::Connection do
     before do
       @r=Rserve::Connection.new()
     end
+    after do
+      @r.close if @r.connected?
+    end    
     it "should be open a connection and receive ID-String" do
       @r.get_server_version.should==103
       @r.protocol.should=="QAP1"
