@@ -5,12 +5,12 @@ module Rserve
     include Rserve::Protocol
 
     # :section: Exceptions
-    RserveNotStarted=Class.new(Exception)
-    ServerNotAvailable=Class.new(Exception)
-    IncorrectServer=Class.new(Exception)
-    IncorrectServerVersion=Class.new(Exception)
-    IncorrectProtocol=Class.new(Exception)
-    NotConnected=Class.new(Exception)
+    RserveNotStarted=Class.new(StandardError)
+    ServerNotAvailable=Class.new(StandardError)
+    IncorrectServer=Class.new(StandardError)
+    IncorrectServerVersion=Class.new(StandardError)
+    IncorrectProtocol=Class.new(StandardError)
+    NotConnected=Class.new(StandardError)
     # Eval error
     class EvalError < RuntimeError
       attr_accessor :request_packet
