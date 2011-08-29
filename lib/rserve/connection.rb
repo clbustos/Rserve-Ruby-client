@@ -4,13 +4,13 @@ module Rserve
     @@connected_object=nil
     include Rserve::Protocol
 
-    # :section: Exceptions
-    RserveNotStarted=Class.new(StandardError)
-    ServerNotAvailable=Class.new(StandardError)
-    IncorrectServer=Class.new(StandardError)
-    IncorrectServerVersion=Class.new(StandardError)
-    IncorrectProtocol=Class.new(StandardError)
-    NotConnected=Class.new(StandardError)
+    # :section: Errors
+    RserveNotStartedError=Class.new(StandardError)
+    ServerNotAvailableError=Class.new(StandardError)
+    IncorrectServerError=Class.new(StandardError)
+    IncorrectServerVersionError=Class.new(StandardError)
+    IncorrectProtocolError=Class.new(StandardError)
+    NotConnectedError=Class.new(StandardError)
     # Eval error
     class EvalError < RuntimeError
       attr_accessor :request_packet
@@ -72,7 +72,7 @@ module Rserve
           # Rserve is available?
           if @proc_rserve_ok.call
             # Rserve is available. Incorrect host and/or portname
-            raise ServerNotAvailable, "Rserve started, but not available on #{hostname}:#{port_number}"
+            raise ServerNotAvailableError, "Rserve started, but not available on #{hostname}:#{port_number}"
             # Rserve not available. We should instanciate it first
           else
             if system @cmd_init
@@ -80,7 +80,7 @@ module Rserve
               sleep(0.25)
               retry
             else
-              raise RserveNotStarted, "Can't start Rserve"
+              raise RserveNotStartedError, "Can't start Rserve"
             end
           end
           #puts "Init RServe"
@@ -107,11 +107,11 @@ module Rserve
         #puts "Connected"
         # Accept first input
         input=@s.recv(32).unpack("a4a4a4a4a4a4a4a4")      
-        raise IncorrectServer,"Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
+        raise IncorrectServerError, "Handshake failed: Rsrv signature expected, but received [#{input[0]}]" unless input[0]=="Rsrv"
         @rsrv_version=input[1].to_i
-        raise IncorrectServerVersion, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
+        raise IncorrectServerVersionError, "Handshake failed: The server uses more recent protocol than this client." if @rsrv_version>103
         @protocol=input[2]
-        raise IncorrectProtocol, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
+        raise IncorrectProtocolError, "Handshake failed: unsupported transfer protocol #{@protocol}, I talk only QAP1." if @protocol!="QAP1"
         (3..7).each do |i|
           attr=input[i]
           if (attr=="ARpt") 
@@ -162,7 +162,7 @@ module Rserve
     # evaluates the given command, but does not fetch the result (useful for assignment operations)
     # * @param cmd command/expression string */
     def void_eval(cmd)
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_voidEval, :cont=>cmd+"\n")
       if !rp.nil? and rp.ok?
         true
@@ -178,7 +178,7 @@ module Rserve
 		# * @param cmd command/expression string.
 		# * @return session object that can be use to attach back to the session once the command completed 
     def void_eval_detach(cmd)
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachedVoidEval,:cont=>cmd+"\n")
       if rp.nil? or !rp.ok?
         raise EvalError.new(rp), "detached void eval failed : #{rp.to_s}"
@@ -195,7 +195,7 @@ module Rserve
     # * @param cmd command/expression string
     # * @return R-xpression or <code>null</code> if an error occured */
     def eval(cmd)
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_eval, :cont=>cmd+"\n")
       if !rp.nil? and rp.ok?
         parse_eval_response(rp)
@@ -235,7 +235,7 @@ module Rserve
     # @param sym symbol name. Currently assign uses CMD_setSEXP command of Rserve, i.e. the symbol value is NOT parsed. It is the responsibility of the user to make sure that the symbol name is valid in R (recall the difference between a symbol and an expression!). In fact R will always create the symbol, but it may not be accessible (examples: "bar\nfoo" or "bar$foo").
     # @param ct contents
     def assign(sym, ct)
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       case ct
       when String
         assign_string(sym,ct)
@@ -305,7 +305,7 @@ module Rserve
     # Shutdown remote Rserve.
     # Note that some Rserves cannot be shut down from the client side
     def shutdown
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_shutdown)
       if !rp.nil? and rp.ok? 
         true
@@ -317,7 +317,7 @@ module Rserve
     # Detaches the session and closes the connection (requires Rserve 0.4+).
     # The session can be only resumed by calling RSession.attach
     def detach
-      raise NotConnected if !connected? or rt.nil?
+      raise NotConnectedError if !connected? or rt.nil?
       rp=rt.request(:cmd=>Rserve::Protocol::CMD_detachSession)
       if !rp.nil? and rp.ok? 
         s=Rserve::Session.new(self,rp)

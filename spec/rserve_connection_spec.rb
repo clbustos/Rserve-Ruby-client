@@ -21,7 +21,7 @@ describe Rserve::Connection do
     end
     it "raise an error if eval is clased after closed" do
       @r.close
-      lambda {@r.eval("TRUE")}.should raise_exception(Rserve::Connection::NotConnected)
+      lambda {@r.eval("TRUE")}.should raise_exception(Rserve::Connection::NotConnectedError)
     end
     after do
       @r.close if @r.connected?

@@ -17,8 +17,8 @@ describe "Rserve::Connection on unix" do
       lambda {@r.eval("as.stt(c(1))")}.should raise_exception(Rserve::Connection::EvalError) {|e|
       e.request_packet.stat.should==127}
 	  end
-    it "should raise ServerNotAvailable if started another instance on another port" do
-       lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailable)
+    it "should raise ServerNotAvailableError if started another instance on another port" do
+       lambda {Rserve::Connection.new(:port_number=>6700)}.should raise_exception(Rserve::Connection::ServerNotAvailableError)
     end
     it "should create different session on *nix" do
        s=Rserve::Connection.new
@@ -48,7 +48,7 @@ describe "Rserve::Connection on unix" do
     end
   else
     it "shouldn't crash server with an incorrect expression as Windows version does"
-    it "shouldn't raise ServerNotAvailable if started another instance on another port as Windows version does"
+    it "shouldn't raise ServerNotAvailableError if started another instance on another port as Windows version does"
     it "shouldn't create a different session. On Windows, every new connection closes previously open session"
     it "shouldn't eval_void_detach correctly"
     it "shouldn't detach correctly"

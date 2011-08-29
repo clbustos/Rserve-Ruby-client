@@ -1,11 +1,11 @@
 module Rserve
   # Basic class representing an object of any type in R. Each type in R in represented by a specific subclass. 
-  # This class defines basic accessor methods (<tt>as</tt>_<i>xxx</i>), type check methods (<i>XXX</i><tt>?</tt>), gives access to attributes (REXP.get_attribute, REXP.has_attribute?) as well as several convenience methods. If a given method is not applicable to a particular type, it will throw the MismatchException exception.
+  # This class defines basic accessor methods (<tt>as</tt>_<i>xxx</i>), type check methods (<i>XXX</i><tt>?</tt>), gives access to attributes (REXP.get_attribute, REXP.has_attribute?) as well as several convenience methods. If a given method is not applicable to a particular type, it will throw the MismatchError exception.
   # 
   # This root class will throw on any accessor call and returns <code>false</code> for all type methods. This allows subclasses to override accessor and type methods selectively.
   #
   class REXP
-    MismatchException= Class.new(Exception)
+    MismatchError= Class.new(StandardError)
     attr_reader :attr
     def initialize(attr=nil)
       # Sorry for this, but I think is necessary to maintain sanity of attributes
@@ -125,14 +125,14 @@ module Rserve
     # 
     # @return [Array] 
     def as_strings
-      raise MismatchException, "String"
+      raise MismatchError, "String"
     end
     # returns the contents as an array of integers (if supported by the represented object)
     # 
     # @return [Array] 
     
     def as_integers
-      raise MismatchException, "int"
+      raise MismatchError, "int"
     end
 
     # returns the contents as an array of floats (C double precision) (if supported by the represented object).
@@ -140,7 +140,7 @@ module Rserve
     # @return [Array] 
 
     def as_doubles
-       raise MismatchException,"double"
+       raise MismatchError,"double"
     end
 
     # On Ruby, Float are stored in double precision.
@@ -155,26 +155,26 @@ module Rserve
     # @return [Array]
     
     def as_bytes
-      raise MismatchException , "byte"
+      raise MismatchError , "byte"
     end
     # returns the contents as a (named) list (if supported by the represented object)
     # 
     # @return [Array]
     def as_list
-      raise MismatchException,"list"
+      raise MismatchError,"list"
     end
     # returns the contents as a factor (if supported by the represented object).
     #
     # @return [RFactor]
     def as_factor
-      raise MismatchException,"factor"
+      raise MismatchError,"factor"
     end
     
     # returns the length of a vector object. Note that we use R semantics here, i.e. a matrix will have a length of <i>m * n</i> since it is represented by a single vector (see REXP.dim) for retrieving matrix and multidimentional-array dimensions).
     # 
     # @return [Integer] length (number of elements) in a vector object.
     def length
-      raise MismatchException, "vector"
+      raise MismatchError, "vector"
     end
     
     # returns a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values.
@@ -182,7 +182,7 @@ module Rserve
     # @return [boolean] a boolean vector of the same length as this vector with <code>true</code> for NA values and <code>false</code> for any other values.
     # 
     def na?
-      raise MismatchException, "vector"
+      raise MismatchError, "vector"
     end
     
     # :section: convenience accessor methods
@@ -254,7 +254,7 @@ module Rserve
     def dim
       begin
         return has_attribute?("dim") ? @attr.as_list['dim'].as_integers :  nil;
-        rescue MismatchException
+        rescue MismatchError
       # nothing to do
       end
       nil
@@ -271,7 +271,7 @@ module Rserve
         if (!c.nil?)
           return c.any? {|v| v.equals klass}
         end
-      rescue MismatchException
+      rescue MismatchError
       end
       false
     end
@@ -297,9 +297,9 @@ module Rserve
     def as_double_matrix
       ct = as_doubles()
       dim = get_attribute "dim"
-      raise MismatchException, "matrix (dim attribute missing)" if dim.nil?
+      raise MismatchError, "matrix (dim attribute missing)" if dim.nil?
       ds = dim.as_integers
-      raise MismatchException, "matrix (wrong dimensionality)"     if (ds.length!=2)
+      raise MismatchError, "matrix (wrong dimensionality)"     if (ds.length!=2)
       as_nested_array
       
       #m,n = ds[0], ds[1]
@@ -320,7 +320,7 @@ module Rserve
     def as_nested_array
       ct=as_doubles
       dim = get_attribute "dim"
-      raise MismatchException, "array (dim attribute missing" if dim.nil?
+      raise MismatchError, "array (dim attribute missing" if dim.nil?
       ds = dim.as_integers.reverse
       split_array(ct,ds)
     end
@@ -366,8 +366,8 @@ module Rserve
     # *  @param [Rlist] a (named) list of vectors (REXP::Vector subclasses), each element corresponds to a column and all elements must have the same length.
     # *  @return [GenericVector] a data frame object representation.
     def self.create_data_frame(l)
-      raise(MismatchException, "data frame (must have dim>0)") if l.nil? or l.size<1
-      raise MismatchException, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
+      raise(MismatchError, "data frame (must have dim>0)") if l.nil? or l.size<1
+      raise MismatchError, "data frame (contents must be vectors)" if (!(l[0].is_a? REXP::Vector))
       fe = l[0]
       return REXP::GenericVector.new(l,
       REXP::List.new(
