@@ -9,7 +9,7 @@ module Rserve
   # See Rtalk class on Java version.
   module Protocol
     # Arch dependent Long Nil value 
-    case Config::CONFIG['arch']
+    case RbConfig::CONFIG['arch']
       when /i686-linux|mswin|mingw/
         LONG_NA=9221120237041092514 # :nodoc:
       else
