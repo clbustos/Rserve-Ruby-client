@@ -3,7 +3,9 @@ $:.unshift(File.dirname(__FILE__)+"/lib")
 require 'rubygems'
 require 'hoe'
 require 'rserve'
+require 'rubyforge'
 Hoe.plugin :git
+Hoe.plugin :rubyforge
 
 require 'rspec'
 require 'rspec/core/rake_task'
