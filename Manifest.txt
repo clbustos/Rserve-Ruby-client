@@ -1,4 +1,5 @@
 .autotest
+.rspec
 History.txt
 Introduction.txt
 Manifest.txt
@@ -24,6 +25,7 @@ lib/rserve/rexp/double.rb
 lib/rserve/rexp/environment.rb
 lib/rserve/rexp/expressionvector.rb
 lib/rserve/rexp/factor.rb
+lib/rserve/rexp/function.rb
 lib/rserve/rexp/genericvector.rb
 lib/rserve/rexp/integer.rb
 lib/rserve/rexp/language.rb
@@ -62,5 +64,4 @@ spec/rserve_session_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb
 spec/rserve_withnames_spec.rb
-spec/spec.opts
 spec/spec_helper.rb

@@ -1,3 +1,13 @@
+=== 0.3.0 / 2011-12-26
+
+* Added some extra documentation
+* Double#to_double return nils for NA values 
+* Make Rserve exceptions subclass StandardError instead of exception, so they can be rescued by `rescue` blocks. [Jamison Dance]  
+* Funtions raises an exception when using REXP#to_ruby. We can't work with them, yet, but at least we can see what they have  
+* New options on Rserve::Connection - :cmd_init : Command to init Rserve - :proc_rserve_ok: Proc to test if Rserve is running (see source code). Thanks to John Prince for the idea.  
+* String now accepts \xFF as NA value (Rserve-0.6.2)  
+* Updated for rspec 2.0 [John Prince]
+  
 === 0.2.5 / 2010-07-06
 * Fixed warning: NA values on Double and shadowed variables on blocks
 
