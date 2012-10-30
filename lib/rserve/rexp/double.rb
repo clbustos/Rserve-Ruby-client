@@ -35,7 +35,7 @@ module Rserve
       end
       def as_integers
         @payload.map do |v|
-          (na?(v) or infinite?(v)) ? nil : v.to_i
+          (na?(v) or Double.infinite?(v)) ? nil : v.to_i
         end
       end
       def as_doubles
@@ -57,7 +57,7 @@ module Rserve
         @payload.map {|v| _na?(v) }
       end
 
-      def infinite?(value)
+      def self.infinite?(value)
         value.respond_to?(:infinite?) and value.infinite?
       end
 
