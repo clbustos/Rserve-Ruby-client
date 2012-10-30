@@ -35,7 +35,7 @@ module Rserve
       end
       def as_integers
         @payload.map do |v|
-          na?(v) ? nil : v.to_i
+          (na?(v) or infinite?(v)) ? nil : v.to_i
         end
       end
       def as_doubles
@@ -53,9 +53,15 @@ module Rserve
         #else  
         #  value.respond_to? :nan? and value.nan?
         #end
-        return ((value.is_a? Float and value.nan?) or value.to_i==NA) unless value.nil?
-        @payload.map {|v| ((v.is_a? Float and v.nan?) or v.to_i==NA)}
+        return _na?(value) unless value.nil?
+        @payload.map {|v| _na?(v) }
       end
+
+      def infinite?(value)
+        value.respond_to?(:infinite?) and value.infinite?
+      end
+
+
       def to_debug_string
         t=super
         t << "{"  << @payload.map(&:to_s).join(",") << "}"
@@ -71,6 +77,17 @@ module Rserve
           super
         end
       end
+
+protected
+
+      def _na?(value)
+        if value.is_a? Float
+          return true if value.nan?
+          return false if value.infinite?
+        end
+        value.to_i == NA
+      end
+
     end
   end
 end

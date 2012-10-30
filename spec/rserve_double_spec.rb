@@ -15,22 +15,24 @@ describe Rserve::REXP::Double do
   end
   describe "NA management" do
     before do
-      @payload=[3,5,Rserve::REXP::Double::NA, 10,20]
+      @payload=[3,5,Rserve::REXP::Double::NA, 10,20, (1.0 / 0)]
       @a=Rserve::REXP::Double.new(@payload)
     end
 
     it "method na? should return coherent answer" do
       @a.na?(@a.as_integers[0]).should be_false
       @a.na?(@a.as_integers[2]).should be_true
-      @a.na?.should==[false,false,true,false,false]
+      @a.na?.should==[false,false,true,false,false, false]
     end
     it "to_a should return correct values with NA" do
-      @a.to_a.should==[3,5, nil, 10, 20]
+      @a.to_a.should==[3,5, nil, 10, 20, Float::INFINITY]
     end
     it "to_ruby should return correct values with NA" do
-      @a.to_ruby.should==[3,5, nil, 10, 20]
+      @a.to_ruby.should==[3,5, nil, 10, 20, Float::INFINITY]
     end
+
   end
+
   describe "common methods" do
     before do
       @n=rand(10)+10
