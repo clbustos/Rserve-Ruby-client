@@ -15,22 +15,41 @@ describe Rserve::REXP::Double do
   end
   describe "NA management" do
     before do
-      @payload=[3,5,Rserve::REXP::Double::NA, 10,20]
+      @payload=[3,5,Rserve::REXP::Double::NA, 10,20, (1.0 / 0)]
       @a=Rserve::REXP::Double.new(@payload)
     end
 
     it "method na? should return coherent answer" do
       @a.na?(@a.as_integers[0]).should be_false
       @a.na?(@a.as_integers[2]).should be_true
-      @a.na?.should==[false,false,true,false,false]
+      @a.na?.should==[false,false,true,false,false, false]
     end
     it "to_a should return correct values with NA" do
-      @a.to_a.should==[3,5, nil, 10, 20]
+      @a.to_a.should==[3,5, nil, 10, 20, Float::INFINITY]
     end
     it "to_ruby should return correct values with NA" do
-      @a.to_ruby.should==[3,5, nil, 10, 20]
+      @a.to_ruby.should==[3,5, nil, 10, 20, Float::INFINITY]
     end
+
   end
+
+  describe "infinite?" do
+
+    it "should return false for non Float objects" do
+      Rserve::REXP::Double.infinite?(1).should be_false
+    end
+
+    it "should return false for non infinite floats" do
+      Rserve::REXP::Double.infinite?(Math::PI).should be_false
+    end
+
+    it "should return true for infinite floats" do
+      Rserve::REXP::Double.infinite?(-Float::INFINITY).should be_true
+      Rserve::REXP::Double.infinite?(Float::INFINITY).should be_true
+    end
+
+  end
+
   describe "common methods" do
     before do
       @n=rand(10)+10
