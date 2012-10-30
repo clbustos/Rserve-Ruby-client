@@ -200,7 +200,7 @@ module Rserve
       if !rp.nil? and rp.ok?
         parse_eval_response(rp)
       else
-        raise EvalError.new(rp), "voidEval failed: #{rp.to_s}"
+        raise EvalError.new(rp), "eval failed: #{rp.to_s}"
       end
     end
 
