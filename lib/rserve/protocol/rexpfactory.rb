@@ -265,7 +265,7 @@ module Rserve
           o+=4
           d=buf[o,as]
           o = eox;
-          @cont = new REXP::Raw.new(d, get_attr);
+          @cont = REXP::Raw.new(d, get_attr);
           return o;
         end
 
