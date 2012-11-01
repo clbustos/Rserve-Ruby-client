@@ -91,41 +91,64 @@ describe "Rserve::REXP#to_ruby" do
       
     end
 
-    context "when passing a 2d object" do
+    context "when passing an object with dim and dimnames attributes" do
 
-      let :two_d_object do
-        col_names = Rserve::REXP::String.new(%w((Intercept) x1 x2 x3), nil)
-        row_names = Rserve::REXP::String.new(%w(1 2 3), nil)
+      let :attr_with_dimnames do
+        col_names = Rserve::REXP::String.new(%w(c1 c2 c3 c4), nil)
+        row_names = Rserve::REXP::String.new(%w(r1 r2 r3), nil)
         names_list = Rserve::Rlist.new([row_names, col_names])
         names_vector = Rserve::REXP::GenericVector.new(names_list)
         dim_array = [3,4]
         dimensions = Rserve::REXP::Integer.new(dim_array)
         attr_payload = Rserve::Rlist.new([dimensions, names_vector], %w(dim dimnames))
-        attr_list = Rserve::REXP::List.new(attr_payload)
-        payload = [true, true, true, true, true, true, false, true, true, false, false, true]
-        Rserve::REXP::Logical.new(payload, attr_list)
+        Rserve::REXP::List.new(attr_payload)
       end
 
-      before do
-        @two_d_array = two_d_object.to_ruby
+      context "and the object is converted to an array" do
+
+        before do
+          payload = [true, true, true, true, true, true, false, true, true, false, false, true]
+          @array = Rserve::REXP::Logical.new(payload, attr_with_dimnames).to_ruby
+        end
+
+        it "should return a 2d object as an array with Rserve::With2DNames and Rserve::With2DSizes" do
+          @array.should be_an Array
+          @array.should be_a Rserve::With2DNames
+          @array.should be_a Rserve::With2DSizes
+        end
+
+        it "should set the row and column labels" do
+          @array.row_names.should == %w(r1 r2 r3)
+          @array.column_names.should == %W(c1 c2 c3 c4)
+        end
+
+        it "should set the row and column sizes" do
+          @array.row_size.should == 3
+          @array.column_size.should == 4
+        end
+
       end
 
-      it "should return a 2d object as an array with Rserve;;With2DNames" do
-        @two_d_array.should be_an Array
-        @two_d_array.should be_a Rserve::With2DNames
-      end
 
-      it "should set the row and column labels" do
-        @two_d_array.row_names.should == %w(1 2 3)
-        @two_d_array.column_names.should == %W((Intercept) x1 x2 x3)
-      end
+      context "and the object is converted to a matrix" do
 
-      it "should set the row and column sizes" do
-        @two_d_array.row_size.should == 3
-        @two_d_array.column_size.should == 4
+        before do
+          payload = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
+          @matrix = Rserve::REXP::Double.new(payload, attr_with_dimnames).to_ruby
+        end
+
+        it "should return a Matrix with Rserve::With2DNames" do
+          @matrix.should be_a Matrix
+          @matrix.should be_a Rserve::With2DNames
+        end
+
+        it "should set the row and column labels" do
+          @matrix.row_names.should == %w(r1 r2 r3)
+          @matrix.column_names.should == %W(c1 c2 c3 c4)
+        end
+
       end
 
     end
-
   end
 end
