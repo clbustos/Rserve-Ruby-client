@@ -8,6 +8,7 @@ end
 
 require 'rserve/withnames'
 require 'rserve/withattributes'
+require 'rserve/with2dnames'
 
 
 require 'rserve/protocol'

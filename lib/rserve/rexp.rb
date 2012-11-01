@@ -401,6 +401,12 @@ module Rserve
           
           v.names=v.attributes['names']
         end
+        if v.attributes and v.attributes.has_name? 'dim' and v.attributes.has_name? 'dimnames' and v.attributes['dim'].size == 2
+          # Maybe here we should check that dim, dimnames and the payload are consistent
+          v.extend Rserve::With2DNames
+          v.sizes = v.attributes['dim']
+          v.names = v.attributes['dimnames']
+        end
       end
       
       # Hack: change attribute row.names according to spec 
