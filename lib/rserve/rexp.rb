@@ -391,7 +391,7 @@ module Rserve
       #pp self
       v=to_ruby_internal
       #p v
-      if !v.nil? and !v.is_a? Fixnum and !v.is_a? TrueClass and !v.is_a? FalseClass
+      if !v.nil? and !v.is_a? Numeric and !v.is_a? TrueClass and !v.is_a? FalseClass
         v.extend Rserve::WithAttributes
         v.attributes=attr.to_ruby unless attr.nil?
         if !v.attributes.nil? and v.attributes.has_name? 'names'
