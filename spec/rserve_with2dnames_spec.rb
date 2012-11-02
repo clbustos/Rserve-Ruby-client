@@ -36,6 +36,20 @@ describe Rserve::With2DNames do
 
     end
 
+    context "when passing only names for one dimension" do
+
+      before do
+        @array.names = [%w(r1 r2 r3), nil]
+        @matrix.names = [nil, %w(c1 c2 c3 c4)]
+      end
+
+      it "should not assign the missing names" do
+        @array.column_names.should be_nil
+        @matrix.row_names.should be_nil
+      end
+
+    end
+
     context "when passed the wrong values" do
 
       it "should throw if the object passed does not have two elements" do
@@ -76,6 +90,28 @@ describe Rserve::With2DNames do
 
     end
 
+    context "when no row names have been assigned" do
+
+      it "should return nil" do
+        @array.names = [nil,%w(c1 c2 c3 c4)]
+        @matrix.names = [nil,%w(c1 c2 c3 c4)]
+        @array.row_by_name("r1").should be_nil
+        @matrix.row_by_name("r2").should be_nil
+      end
+
+    end
+
+    context "when no column names have been assigned" do
+
+      it "should return a plain (unnamed) array" do
+        @array.names = [%w(r1 r2 r3), nil]
+        @matrix.names = [%w(r1 r2 r3),nil]
+        @array.row_by_name("r1").should_not be_a Rserve::WithNames
+        @matrix.row_by_name("r2").should_not be_a Rserve::WithNames
+      end
+
+    end
+
     context "when the index is out of range" do
 
       it "should return nil" do
@@ -111,6 +147,28 @@ describe Rserve::With2DNames do
 
     end
 
+    context "when no column names have been assigned" do
+
+      it "should return nil" do
+        @array.names = [%w(r1 r2 r3), nil]
+        @matrix.names = [%w(r1 r2 r3),nil]
+        @array.column_by_name("c1").should be_nil
+        @matrix.column_by_name("c2").should be_nil
+      end
+
+    end
+
+    context "when no row names have been assigned" do
+
+      it "should return a plain (unnamed) array" do
+        @array.names = [nil,%w(c1 c2 c3 c4)]
+        @matrix.names = [nil,%w(c1 c2 c3 c4)]
+        @array.column_by_name("c1").should_not be_a Rserve::WithNames
+        @matrix.column_by_name("c2").should_not be_a Rserve::WithNames
+      end
+
+    end
+
     context "when the name is not present" do
 
       it "should return nil" do
@@ -134,6 +192,41 @@ describe Rserve::With2DNames do
       @matrix.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
       @array.named_2d?.should == true
       @matrix.named_2d?.should == true
+    end
+
+
+    it "should return false if only one dimension names are set" do
+      @array.names = [%w(r1 r2 r3), nil]
+      @matrix.names = [nil, %w(c1 c2 c3 c4)]
+      @array.named_2d?.should == false
+      @array.named_2d?.should == false
+    end
+
+  end
+
+  describe "by_name" do
+
+    before do
+      @array.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
+      @matrix.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
+    end
+
+    it "should return the correct value" do
+      @array.by_name("r1","c2").should == 2
+      @matrix.by_name("r3","c4").should == 12
+    end
+
+    it "should return nil if either of the parameters is not found" do
+      @array.by_name("not_there","c1").should be_nil
+      @matrix.by_name("r1","not_there").should be_nil
+
+    end
+
+    it "should return nil when either column or row names are set" do
+      @array.names = [nil,%w(c1 c2 c3 c4)]
+      @matrix.names = [%w(r1 r2 r3),nil]
+      @array.by_name("r1","c1").should be_nil
+      @matrix.by_name("r1","c1").should be_nil
     end
 
   end

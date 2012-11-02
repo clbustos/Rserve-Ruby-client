@@ -407,7 +407,7 @@ module Rserve
             v.sizes = v.attributes['dim']
           end
           v.extend Rserve::With2DNames
-          v.names = v.attributes['dimnames'].map{|dimension_names| dimension_names.is_a?(Array) ? dimension_names : [dimension_names]}
+          v.names = v.attributes['dimnames'].map{|dimension_names| (dimension_names.nil? or dimension_names.is_a?(Array)) ? dimension_names : [dimension_names]}
         end
       end
       
