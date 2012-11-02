@@ -32,13 +32,17 @@ module Rserve
     def row_by_name(name)
       i = @row_names.index(name)
       return nil unless i
-      row(i)
+      result = row(i).to_a.extend WithNames
+      result.names = @column_names
+      result
     end
 
     def column_by_name(name)
       j = @column_names.index(name)
       return nil unless j
-      column(j)
+      result = column(j).to_a.extend WithNames
+      result.names = @row_names
+      result
     end
 
     def named_2d?
