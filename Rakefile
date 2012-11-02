@@ -6,6 +6,7 @@ require 'rserve'
 require 'rubyforge'
 Hoe.plugin :git
 Hoe.plugin :rubyforge
+Hoe.plugin :gemspec
 
 require 'rspec'
 require 'rspec/core/rake_task'
