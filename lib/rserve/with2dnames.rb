@@ -42,7 +42,7 @@ module Rserve
     end
 
     def named_2d?
-      @row_names and @column_names
+      !(@row_names.nil? or @column_names.nil?)
     end
 
   end

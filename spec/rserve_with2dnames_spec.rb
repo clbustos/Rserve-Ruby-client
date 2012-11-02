@@ -112,8 +112,21 @@ describe Rserve::With2DNames do
 
   end
 
+  describe "named_2d?" do
 
+    it "should return false if no names are set" do
+      @array.named_2d?.should == false
+      @matrix.named_2d?.should == false
+    end
 
+    it "should return true if names have been set" do
+      @array.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
+      @matrix.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
+      @array.named_2d?.should == true
+      @matrix.named_2d?.should == true
+      puts(@array.named_2d?)
+    end
 
+  end
 
 end
