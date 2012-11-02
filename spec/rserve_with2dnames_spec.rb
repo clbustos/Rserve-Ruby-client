@@ -65,8 +65,13 @@ describe Rserve::With2DNames do
         @array.row_by_name("r2").should == [5, 6, 7, 8]
       end
 
-      it "should return the correct row for matrices" do
-        @matrix.row_by_name("r2").to_a.should == [5, 6, 7, 8]
+      it "should return the correct row as an array for matrices" do
+        @matrix.row_by_name("r2").should == [5, 6, 7, 8]
+      end
+
+      it "should return a named object" do
+        @array.row_by_name("r1").named?.should == true
+        @matrix.row_by_name("r1").named?.should == true
       end
 
     end
@@ -95,8 +100,13 @@ describe Rserve::With2DNames do
         @array.column_by_name("c1").should == [1, 5, 9]
       end
 
-      it "should return the correct column for matrix" do
-        @matrix.column_by_name("c1").to_a.should == [1, 5, 9]
+      it "should return the correct column as an array for matrix" do
+        @matrix.column_by_name("c1").should == [1, 5, 9]
+      end
+
+      it "should return a named object" do
+        @array.column_by_name("c1").named?.should == true
+        @matrix.column_by_name("c1").named?.should == true
       end
 
     end
@@ -124,7 +134,6 @@ describe Rserve::With2DNames do
       @matrix.names = [%w(r1 r2 r3),%w(c1 c2 c3 c4)]
       @array.named_2d?.should == true
       @matrix.named_2d?.should == true
-      puts(@array.named_2d?)
     end
 
   end
