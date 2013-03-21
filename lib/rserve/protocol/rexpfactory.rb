@@ -617,6 +617,11 @@ module Rserve
           set_int(by.length,buf,off);
           off+=4
           by.each_with_index {|v,i| buf[off+i]=v}
+		  off+=by.length
+		  while ((off & 3) != 0)
+            buf[off] = 0
+            off+=1
+          end
         elsif(rxt==XT_ARRAY_STR)
           sa=cont.as_strings
           io=off
