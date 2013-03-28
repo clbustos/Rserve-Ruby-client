@@ -74,6 +74,11 @@ describe "Rserve::REXP#to_ruby" do
     it "should return an array of strings with a vector with two or more strings" do
       @r.eval("c('a','b',NA)").to_ruby.should==['a','b',nil]
     end
+    it "should handle named floats" do
+      @r.void_eval('y <- sample(1:100, 10)')
+      @r.void_eval('x <- sample(1:100, 10)')
+      @r.eval('lm(y ~ 0 + x)').to_ruby
+    end
     it "should return an array extended with Rserve::WithNames and Rserve::WithAttributes for a list" do
       expected=[1,2,3].extend Rserve::WithNames
       expected.names=%w{a b c}
