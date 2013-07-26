@@ -75,7 +75,7 @@ module Rserve
             raise ServerNotAvailableError, "Rserve started, but not available on #{hostname}:#{port_number}"
             # Rserve not available. We should instanciate it first
           else
-            if system @cmd_init
+            if run_server
               # Wait a moment, please
               sleep(0.25)
               retry
@@ -327,5 +327,19 @@ module Rserve
         raise "Cannot detach"
       end
     end
+
+    private
+
+      def run_server
+        if RUBY_PLATFORM != "java"
+          system @cmd_init
+        else
+          pid = Spoon.spawnp *@cmd_init.split
+          return false if pid < 0
+          Process.waitpid pid
+          true
+        end
+      end
+
   end
 end

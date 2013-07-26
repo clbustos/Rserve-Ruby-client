@@ -5,6 +5,7 @@ module Rserve
   ON_WINDOWS=RbConfig::CONFIG['arch']=~/mswin|mingw/
 end
 
+require 'spoon' if RUBY_PLATFORM == "java"
 
 require 'rserve/withnames'
 require 'rserve/withattributes'
