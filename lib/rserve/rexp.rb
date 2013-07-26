@@ -388,17 +388,13 @@ module Rserve
     #  
     # @return [Object] Ruby object.
     def to_ruby
-      #pp self
       v=to_ruby_internal
-      #p v
       if !v.nil? and !v.is_a? Numeric and !v.is_a? TrueClass and !v.is_a? FalseClass
         v.extend Rserve::WithAttributes
         v.attributes=attr.to_ruby unless attr.nil?
         if !v.attributes.nil? and v.attributes.has_name? 'names'
           v.attributes['names']=[v.attributes['names']] unless v.attributes['names'].is_a? Array or v.attributes['names'].nil?
-          
           v.extend Rserve::WithNames
-          
           v.names=v.attributes['names']
         end
         if v.attributes and v.attributes.has_name? 'dim' and v.attributes.has_name? 'dimnames' and v.attributes['dim'].size == 2
