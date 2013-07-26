@@ -44,6 +44,8 @@ lib/rserve/rfactor.rb
 lib/rserve/rlist.rb
 lib/rserve/session.rb
 lib/rserve/talk.rb
+lib/rserve/with2dnames.rb
+lib/rserve/with2dsizes.rb
 lib/rserve/withattributes.rb
 lib/rserve/withnames.rb
 spec/rserve_connection_on_unix_spec.rb
@@ -63,5 +65,7 @@ spec/rserve_rlist_spec.rb
 spec/rserve_session_spec.rb
 spec/rserve_spec.rb
 spec/rserve_talk_spec.rb
+spec/rserve_with2dnames_spec.rb
+spec/rserve_with2dsizes_spec.rb
 spec/rserve_withnames_spec.rb
 spec/spec_helper.rb

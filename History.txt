@@ -1,3 +1,25 @@
+=== 0.3.1 / 2013-07-26
+
+* 2D Names functionality for Arrays and Matrices
+* A bug that occurs when R returns a named array consisting of only 1
+* Added code to handle Infinity values from double
+* Added functionality to recognize 2D named objects
+* Added specs for infinite? method
+* Added support for cases when only one dimension of names is specified
+* Bugfix: undefined method 'new' for #<Rserve::Protocol::REXPFactory
+* Fix for raw expressions transfer error.Padding to size divisible by 4 was not being done.
+* Fixed bug for named numerics
+* Fixed failing specs, split new functionality between With2DNames (applied to Array and Matrix) and With2DSizes (only applied to Array)
+* Fixed named_2d? not returning booleans
+* Fixed starting of Rserve when running on JRuby
+* Fixed starting of server inside Rserve::Connection when running on JRuby
+* Incorrect Handling of infinite values
+* Make row_by_name and column_by_name return named arrays
+* No method exception when converting a "named Float" to ruby
+* Raw expression transfer to rserve error.
+* eval Exception is not caused by voidEval
+
+
 === 0.3.0 / 2011-12-26
 
 * Added some extra documentation
