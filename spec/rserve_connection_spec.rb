@@ -15,9 +15,9 @@ describe Rserve::Connection do
     end
     it "should quit correctly" do
       @r.should be_connected
-      @r.close.should be_true
+      @r.close.should be true
       @r.should_not be_connected
-      @r.close.should be_true
+      @r.close.should be true
     end
     it "raise an error if eval is clased after closed" do
       @r.close
@@ -33,7 +33,7 @@ describe Rserve::Connection do
       @r=Rserve::Connection.new
     end
     it "method eval_void should return true with correct expression" do
-      @r.void_eval("x<-1").should be_true
+      @r.void_eval("x<-1").should be true
     end
     
     it "method eval should return a simple object" do
@@ -44,7 +44,7 @@ describe Rserve::Connection do
     
     
     it "should eval_void and eval correctly" do
-      @r.void_eval("x<-c(TRUE,FALSE)").should be_true
+      @r.void_eval("x<-c(TRUE,FALSE)").should be true
       la=@r.eval("x")
       la.should be_instance_of(Rserve::REXP::Logical)
       la.true?.should==[true,false]

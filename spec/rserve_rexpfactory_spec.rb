@@ -77,6 +77,7 @@ describe Rserve::Protocol::REXPFactory do
     la.should be_instance_of(Rserve::REXP::String)
     la.as_strings.should==['abc','def','ghi']
   end
+  
   it "should process string vector with NA" do
     la=@r.eval("c('abc','def',NA)")
     la.should be_instance_of(Rserve::REXP::String)
@@ -95,8 +96,8 @@ describe Rserve::Protocol::REXPFactory do
       la.should be_factor
       la.as_factor.levels.sort.should==%w{act nsw nt  qld sa tas vic wa}.sort
 
-      la.as_factor.contains?("tas").should be_true
-      la.as_factor.contains?("nn").should be_false
+      la.as_factor.contains?("tas").should be true
+      la.as_factor.contains?("nn").should be false
       @r.void_eval("rm(state, statef)")
     end
     it "should process factors with NA" do
@@ -121,14 +122,14 @@ describe Rserve::Protocol::REXPFactory do
 
   it "should process list with booleans and NA" do
     la=@r.eval("list(TRUE)")
-    la.should be_true
+    la.should be_truthy
     la=@r.eval("list(2,NA)")
-    la.should be_true
+    la.should be_truthy
   end
 
   it "should process data.frame" do
     la=@r.eval("data.frame(a=1:10,b=1:10)")
-    la.should be_true
+    la.should be_truthy
     la.attr.as_list['names'].to_ruby.should==%w{a b}
     la.attr.as_list['class'].to_ruby.should=="data.frame"
     la.attr.as_list['row.names'].to_ruby.should==[nil,-10]
@@ -137,7 +138,7 @@ describe Rserve::Protocol::REXPFactory do
     @r.void_eval("df<-data.frame(a=1:10,b=1:10);
       attr(df,'row.names')<-c('a','b','c',4,5,6,7,8,9,10);")
     la=@r.eval("df")
-    la.should be_true
+    la.should be_truthy
     la.attr.as_list['names'].to_ruby.should==%w{a b}
     la.attr.as_list['class'].to_ruby.should=="data.frame"
     la.attr.as_list['row.names'].to_ruby.should==%w{a b c 4 5 6 7 8 9 10}

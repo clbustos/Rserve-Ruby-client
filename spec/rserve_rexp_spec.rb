@@ -43,13 +43,13 @@ describe Rserve::REXP do
       @v.as_string.should=="1.5"
     end
     it "method has_attribute? should return false for non-lists" do
-      @v.has_attribute?('randomattribute').should be_false
+      @v.has_attribute?('randomattribute').should be false
     end
     it "method has_attribute? should return true for existing value" do
-      @l.has_attribute?('names').should be_true
+      @l.has_attribute?('names').should be true
     end
     it "method has_attribute? should return false for non existing value" do
-      @l.has_attribute?('at2').should be_false
+      @l.has_attribute?('at2').should be false
     end
     it "method get_attribute should return correct value for attribute" do
       @l.get_attribute('names').as_strings.should==['at']

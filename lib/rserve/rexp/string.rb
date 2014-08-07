@@ -22,11 +22,14 @@ module Rserve
         @payload
       end
       
-      def na?(value=nil)
-        if value.nil?
-          @payload.map {|v| NA.include? v}
+      def na?(value=:nil)
+      
+        if value==:nil
+          @payload.map {|v|
+            v.unpack("C")==[255] or v=="NA" # Ugly hack
+          }
         else
-          NA.include? value
+          value.unpack("C")==[255] or value=="NA"
         end
       end
       def to_debug_string

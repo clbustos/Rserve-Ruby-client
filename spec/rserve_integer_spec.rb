@@ -20,11 +20,10 @@ describe Rserve::REXP::Integer do
     before do
       @payload=[3,5,Rserve::REXP::Integer::NA, 10,20]
       @a=Rserve::REXP::Integer.new(@payload)
-
     end
     it "method is_NA should return coherent answer" do
-      @a.na?(@a.as_integers[0]).should be_false
-      @a.na?(@a.as_integers[2]).should be_true
+      @a.na?(@a.as_integers[0]).should be false
+      @a.na?(@a.as_integers[2]).should be true
       @a.na?.should==[false,false,true,false,false]
     end
     it "to_a should return correct values with NA" do

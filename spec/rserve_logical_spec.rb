@@ -21,8 +21,8 @@ describe Rserve::REXP::Integer do
     end
     it "method is_NA should return coherent answer" do
       @a.na?.should==[false,true,false]
-      @a.na?(@a.as_bytes[0]).should be_false
-      @a.na?(@a.as_bytes[1]).should be_true
+      @a.na?(@a.as_bytes[0]).should be false
+      @a.na?(@a.as_bytes[1]).should be true
     end
     it "method to_a should return correct answer" do
       @a.to_a.should==[true,nil,false]

@@ -55,7 +55,7 @@ describe "Rserve::REXP#to_ruby" do
       
     end
     it "should return a boolean with a logical with one element" do
-      @r.eval("TRUE").to_ruby.should be_true
+      @r.eval("TRUE").to_ruby.should be true
     end
     it "should return an array extended with Rserve::WithNames if vector is named" do
       @r.void_eval("a<-c(1,2,3);names(a)<-c('a','b','c')")
@@ -73,7 +73,9 @@ describe "Rserve::REXP#to_ruby" do
       @r.eval("'a'").to_ruby.should=='a'
     end
     it "should return an array of strings with a vector with two or more strings" do
-      @r.eval("c('a','b',NA)").to_ruby.should==['a','b',nil]
+      obj=@r.eval("c('a','b',NA)").to_ruby
+      p @r.eval("c('a','b',NA)")
+      obj.should==['a','b',nil]
     end
     it "should handle named floats" do
       @r.void_eval('y <- sample(1:100, 10)')

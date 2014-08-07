@@ -16,11 +16,11 @@ logit<-glm(y~a+b, family=binomial(link="logit"), na.action=na.pass)
     EOF
     @r.void_eval(script)
     @r.eval('logit').should be_instance_of(Rserve::REXP::GenericVector)   
-    @r.eval('logit$family$variance').should be_true
-    @r.eval('logit').should be_true
-    @r.eval('logit').to_ruby.should be_true
-    @r.eval('summary(logit)').should be_true
-    @r.eval('summary(logit)').to_ruby.should be_true
+    @r.eval('logit$family$variance').should be_truthy
+    @r.eval('logit').should be_truthy
+    @r.eval('logit').to_ruby.should be_truthy
+    @r.eval('summary(logit)').should be_truthy
+    @r.eval('summary(logit)').to_ruby.should be_truthy
   end
   
   it "should calcule lr without problem" do
@@ -41,9 +41,9 @@ severity.lm <- lm(diseasesev~temperature,data=severity)
     @r.void_eval(script)
     temp = @r.eval('severity.lm')
     @r.eval('severity.lm').should be_instance_of(Rserve::REXP::GenericVector)
-    @r.eval('severity.lm').to_ruby.should be_true
-    @r.eval('summary(severity.lm)').should be_true
-    @r.eval('summary(severity.lm)').to_ruby.should be_true
+    @r.eval('severity.lm').to_ruby.should be_truthy
+    @r.eval('summary(severity.lm)').should be_truthy
+    @r.eval('summary(severity.lm)').to_ruby.should be_truthy
   end
 
 end

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
 
 describe Rserve::Talk do
   before do
-    @iomock=mock('IO Mock')
+    @iomock=double('IO Mock')
     @talk=Rserve::Talk.new(@iomock)
   end
   it "method request_string should return a valid string" do

@@ -4,7 +4,9 @@ module Rserve
     class Double < REXP::Vector
       attr_reader :payload
       # NA is arch dependent
+      
       case RbConfig::CONFIG['arch']
+      
       when /i686-linux|mswin|mingw/
           NA = 269653970229425383598692395468593241088322026492507901905402939417320933254485890939796955099302180188971623023005661539310855695935759376615857567599472873400528811349204333736152257830107446553333670133666606746438802800063353690283455789426038632208916715592554825644961573453826957827246636338344317943808
         else
@@ -47,18 +49,19 @@ module Rserve
         @payload.map {|v| v.to_f.to_s}
       end
 
-      def na?(value=nil)
+      def na?(value=:nil)
         #if value.nil?
         #  @payload.map {|v| v.respond_to? :nan and v.nan?}
         #else  
         #  value.respond_to? :nan? and value.nan?
         #end
-        return _na?(value) unless value.nil?
+        #p @payload
+        return _na?(value) unless value==:nil
         @payload.map {|v| _na?(v) }
       end
 
       def self.infinite?(value)
-        value.respond_to?(:infinite?) and value.infinite?
+        value.respond_to?(:infinite?) and !value.infinite?.nil?
       end
 
 
@@ -81,6 +84,7 @@ module Rserve
 protected
 
       def _na?(value)
+        return true if value.nil?
         if value.is_a? Float
           return true if value.nan?
           return false if value.infinite?

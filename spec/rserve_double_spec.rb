@@ -20,9 +20,9 @@ describe Rserve::REXP::Double do
     end
 
     it "method na? should return coherent answer" do
-      @a.na?(@a.as_integers[0]).should be_false
-      @a.na?(@a.as_integers[2]).should be_true
-      @a.na?.should==[false,false,true,false,false, false]
+      expect(@a.na?(@a.as_integers[0])).to be false
+      expect(@a.na?(@a.as_integers[2])).to be true
+      expect(@a.na?).to eq([false,false,true,false,false, false])
     end
     it "to_a should return correct values with NA" do
       @a.to_a.should==[3,5, nil, 10, 20, Float::INFINITY]
@@ -36,16 +36,16 @@ describe Rserve::REXP::Double do
   describe "infinite?" do
 
     it "should return false for non Float objects" do
-      Rserve::REXP::Double.infinite?(1).should be_false
+      expect(Rserve::REXP::Double.infinite?(1)).to be false
     end
 
     it "should return false for non infinite floats" do
-      Rserve::REXP::Double.infinite?(Math::PI).should be_false
+      Rserve::REXP::Double.infinite?(Math::PI).should be false
     end
 
     it "should return true for infinite floats" do
-      Rserve::REXP::Double.infinite?(-Float::INFINITY).should be_true
-      Rserve::REXP::Double.infinite?(Float::INFINITY).should be_true
+      Rserve::REXP::Double.infinite?(-Float::INFINITY).should be true
+      Rserve::REXP::Double.infinite?(Float::INFINITY).should be true
     end
 
   end

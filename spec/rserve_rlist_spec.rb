@@ -14,13 +14,13 @@ describe Rserve::Rlist do
   it "method == should return true for rlist with equal data and names" do
     a=Rserve::Rlist.new([1,2,3],%w{a b c})
     b=Rserve::Rlist.new([1,2,3],%w{a b c})
-    (a==b).should be_true
+    (a==b).should be true
     a=Rserve::Rlist.new([1,2,3],%w{a b c})
     b=Rserve::Rlist.new([1,2,3])
-    (a==b).should be_false
+    (a==b).should be false
     a=Rserve::Rlist.new([1,2,3],%w{a b c})
     b=Rserve::Rlist.new([4,5,6],%w{c d e})
-    (a==b).should be_false
+    (a==b).should be false
 
   end
   it "method [] return correct values for strings" do

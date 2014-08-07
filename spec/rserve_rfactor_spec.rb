@@ -20,10 +20,10 @@ describe Rserve::RFactor do
     }
   end
   it "methods contains? should work with integers and strings" do
-    @factor.contains?(1).should be_true
-    @factor.contains?(5).should be_false
-    @factor.contains?('a').should be_true
-    @factor.contains?('z').should be_false
+    @factor.contains?(1).should be true
+    @factor.contains?(5).should be false
+    @factor.contains?('a').should be true
+    @factor.contains?('z').should be false
   end
   it "methods count should work with integers and strings" do
     @factor.count(2).should==2
