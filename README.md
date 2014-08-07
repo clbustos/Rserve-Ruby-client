@@ -1,15 +1,16 @@
-= rserve-client
+# rserve-client
 
 * http://github.com/clbustos/Rserve-Ruby-client
 
+[![Build Status](https://travis-ci.org/clbustos/Rserve-Ruby-client.svg?branch=master)](https://travis-ci.org/clbustos/Rserve-Ruby-client)
 
-== DESCRIPTION:
+## DESCRIPTION:
 
 Ruby client for Rserve, a Binary R server (http://www.rforge.net/Rserve/).
 
 Follows closely the new Java client API, but maintains all Ruby conventions when possible.
 
-== FEATURES / LIMITATIONS
+## FEATURES / LIMITATIONS
 
 * 100% ruby
 * Uses TCP/IP sockets to interchange data and commands
@@ -28,7 +29,7 @@ Cons:
 * Requires Rserve
 * Limited features on Windows, caused by limitations on Rserve on this platform: single concurrent connection allowed, server crash on parse errors and can't spawn sessions.
 
-== RELATED LIBRARIES (Ruby / R)
+## RELATED LIBRARIES (Ruby / R)
 
 * Rinruby [http://rinruby.ddahl.org/]
   * 100% ruby 
@@ -54,7 +55,7 @@ Cons:
     * Not available for alternative implementations of Ruby (JRuby, IronRuby and Rubinius)
     
     
-== TODO
+## TODO
 
 Implements
 
@@ -67,7 +68,7 @@ Spec
 * First tutorial on R
 
 
-== SYNOPSIS:
+## SYNOPSIS:
 
     require 'rserve'
     con=Rserve::Connection.new
@@ -105,16 +106,16 @@ Spec
     
     => #<Rserve::REXP::GenericVector:0x000000010c81d0 @attr=nil, @payload=#<Rserve::Rlist:0x000000010c8278 @names=nil, @data=[#<Rserve::REXP::String:0x000000010c86d8 @payload=["a"], @attr=nil>, #<Rserve::REXP::String:0x000000010c85c0 @payload=["b"], @attr=nil>, #<Rserve::REXP::String:0x000000010c82e8 @payload=["c", "d"], @attr=nil>]>>
     
-== REQUIREMENTS:
+## REQUIREMENTS:
 
 * R
 * Rserve
 
-== INSTALL:
+## INSTALL:
 
   sudo gem install rserve-client
 
-== LICENSE:
+## LICENSE:
 
 REngine - Java interface to R
 Copyright (C) 2004,5,6,7  Simon Urbanek 

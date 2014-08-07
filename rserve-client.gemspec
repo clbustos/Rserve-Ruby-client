@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+$:.unshift(File.expand_path(File.dirname(__FILE__)+"/lib"))
+
 require File.expand_path("../lib/rserve", __FILE__)
 
 Gem::Specification.new do |s|
