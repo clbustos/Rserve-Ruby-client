@@ -1,12 +1,12 @@
 require 'socket'
 require 'rbconfig'
 module Rserve
-  VERSION = '0.3.1'
   ON_WINDOWS=RbConfig::CONFIG['arch']=~/mswin|mingw/
 end
 
 require 'spoon' if RUBY_PLATFORM == "java"
 
+require 'rserve/version'
 require 'rserve/withnames'
 require 'rserve/withattributes'
 require 'rserve/with2dnames'
@@ -22,5 +22,3 @@ require 'rserve/session'
 require 'rserve/connection'
 require 'rserve/rlist'
 require 'rserve/rfactor'
-
-
