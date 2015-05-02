@@ -5,6 +5,7 @@ GEM
     hoe (3.12.0)
       rake (>= 0.8, < 11.0)
     rake (10.3.2)
+    rbx-require-relative (0.0.9)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -24,4 +25,5 @@ PLATFORMS
 DEPENDENCIES
   hoe
   rake
+  rbx-require-relative
   rspec

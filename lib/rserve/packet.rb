@@ -6,6 +6,7 @@ module Rserve
     ERROR_DESCRIPTIONS={
       2=>'Invalid expression',
       3=>'Parse error',
+     65=>'Login error',
     127=>'Unknown variable/method'}
 
     def initialize(cmd, cont)

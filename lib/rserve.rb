@@ -6,21 +6,22 @@ module Rserve
 end
 
 require 'spoon' if RUBY_PLATFORM == "java"
+require 'require_relative' if RUBY_VERSION < "1.9"
 
-require 'rserve/withnames'
-require 'rserve/withattributes'
-require 'rserve/with2dnames'
-require 'rserve/with2dsizes'
+require_relative 'rserve/withnames'
+require_relative 'rserve/withattributes'
+require_relative 'rserve/with2dnames'
+require_relative 'rserve/with2dsizes'
 
 
-require 'rserve/protocol'
-require 'rserve/packet'
-require 'rserve/talk'
-require 'rserve/rexp'
-require 'rserve/engine'
-require 'rserve/session'
-require 'rserve/connection'
-require 'rserve/rlist'
-require 'rserve/rfactor'
+require_relative 'rserve/protocol'
+require_relative 'rserve/packet'
+require_relative 'rserve/talk'
+require_relative 'rserve/rexp'
+require_relative 'rserve/engine'
+require_relative 'rserve/session'
+require_relative 'rserve/connection'
+require_relative 'rserve/rlist'
+require_relative 'rserve/rfactor'
 
 

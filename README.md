@@ -58,7 +58,6 @@ Cons:
 
 Implements
 
-* Authentification
 * Original test
 
 Spec
