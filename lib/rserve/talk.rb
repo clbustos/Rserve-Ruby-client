@@ -41,7 +41,7 @@ module Rserve
 
 
       if (!cont.nil?)
-        raise ":cont shouldn't contain anything but Fixnum" if cont.any? {|v| !v.is_a? Fixnum}
+        raise ":cont shouldn't contain anything but Numbers" unless cont.inject(true) {|t, v| t && v.class == 1.class}
         if (offset>=cont.length)
           cont=nil;len=0
         elsif (len>cont.length-offset)
