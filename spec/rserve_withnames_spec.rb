@@ -10,10 +10,10 @@ describe Rserve::WithNames do
     end
   describe "with incorrect naming" do
     it "should raise an error with names array of another size" do
-      lambda {@a.names=["1","2"]}.should raise_exception
+      lambda {@a.names=["1","2"]}.should raise_exception(ArgumentError)
     end
     it "should raise an error with names array !(String or nil)  " do
-      lambda {@a.names=[1,"a","b","c"]}.should raise_exception
+      lambda {@a.names=[1,"a","b","c"]}.should raise_exception(ArgumentError)
       lambda {@a.names=[nil,"a","b","c"]}.should_not raise_exception
     end
   end

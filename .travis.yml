@@ -13,4 +13,4 @@ script:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y r-base r-base-dev
-  - sudo Rscript -e "install.packages(c('Rserve'),,'http://cran.us.r-project.org')"
+  - sudo Rscript -e "install.packages(c('Rserve','icc'),,'http://cran.us.r-project.org')"

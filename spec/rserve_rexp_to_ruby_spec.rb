@@ -44,6 +44,10 @@ describe "Rserve::REXP#to_ruby" do
     it "should return a Ruby Matrix with R matrix with NA values" do
       @r.eval("matrix(c(NA,2,3,4),2,2,byrow=TRUE)").to_ruby.should==Matrix[[nil,2],[3,4]]
     end
+    it "should return a Ruby Matrix with R matrix with floats with NA values" do
+      @r.eval("matrix(c(NA,2.5,3.5,NA),2,2,byrow=TRUE)").to_ruby.should==Matrix[[nil,2.5],[3.5,nil]]
+    end
+
     it "should return a nested array of Ruby Matrixes with vector with more than tree dimensions"  do
       @r.void_eval("a<-1:16; attr(a,'dim')<-c(2,2,2,2)")
       @r.eval("a").to_ruby.should==[[[[1.0, 3.0], [2.0, 4.0]], [[5.0, 7.0], [6.0, 8.0]]],
