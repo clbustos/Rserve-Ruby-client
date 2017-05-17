@@ -1,3 +1,8 @@
+=== 0.3.2 / 2017-05-17
+
+* Updated Gemfile
+* Fixed bug 26: Error handling NA values on integer matrix
+
 === 0.3.1 / 2013-07-26
 
 * 2D Names functionality for Arrays and Matrices
