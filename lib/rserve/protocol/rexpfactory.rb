@@ -113,8 +113,10 @@ module Rserve
             @type = XT_RAW
           elsif r.is_a? REXP::Logical
             @type = XT_ARRAY_BOOL
+          elsif r.is_a? REXP::Complex
+            @type = XT_ARRAY_CPLX
           else
-            raise ArgumentError("***REXPFactory unable to interpret #{r}")
+            raise ArgumentError.new("***REXPFactory unable to interpret #{r}")
           end
         end
       end
@@ -122,9 +124,9 @@ module Rserve
 
         xl=get_len(buf,o)
         has_at  = (buf[o]&128)!=0
-        
+
         puts "content:#{buf.slice(o,xl+4)} '#{buf.slice(o+4,xl+4).pack("C*")}'" if $DEBUG
-        
+
         is_long = (buf[o]&64 )!=0
         xt = buf[o]&63
         o+=4 if is_long
@@ -241,7 +243,7 @@ module Rserve
             $STDERR.puts "int SEXP size mismatch"
             o=eox
           end
-          
+
           # hack for factors
           if (!get_attr.nil?)
             ca = get_attr().as_list["class"]
@@ -252,9 +254,9 @@ module Rserve
               xt = XT_FACTOR;
             end
           end
-          
+
           if @cont.nil?
-            
+
             @cont=REXP::Integer.new(d,get_attr)
           end
           return o
@@ -270,7 +272,7 @@ module Rserve
         end
 
         if xt==XT_LIST_NOTAG or xt==XT_LIST_TAG or xt==XT_LANG_NOTAG or xt==XT_LANG_TAG
-          
+
           lc=REXPFactory.new
           nf=REXPFactory.new
           l=Rlist.new
@@ -279,7 +281,7 @@ module Rserve
             o=lc.parse_REXP(buf,o)
             if(xt==XT_LIST_TAG or xt==XT_LANG_TAG)
               o=nf.parse_REXP(buf,o)
-              
+
               name=nf.cont.as_string if(nf.cont.symbol? or nf.cont.string?)
             end
             puts "Adding '#{name}'='#{lc.cont.inspect}'" if $DEBUG
@@ -448,6 +450,27 @@ module Rserve
           return o;
         end
 
+        if xt==XT_ARRAY_CPLX
+          as=(eox-o).quo(8)
+          i=0
+          d=Array.new(as)
+          while(o<eox)
+            d[i]=longBitsToDouble(get_long(buf,o))
+            o+=8
+            i+=1
+          end
+          if(o!=eox)
+            sexp_mismatch("complex")
+            o=eox
+          end
+          unless (d.length % 2) == 0
+            sexp_mismatch("complex: expected even number of doubles")
+            o=eox
+          end
+          @cont=REXP::Complex.parse(d,get_attr)
+          return o
+        end
+
         if (xt==XT_UNKNOWN)
           @cont = REXP::Unknown.new(get_int(buf,o), get_attr)
           o=eox;
@@ -543,9 +566,9 @@ module Rserve
         l+=4 if (l>0xfffff0)
         l+4
       end
-      
-      
-      
+
+
+
       def get_binary_representation(buf,off)
         myl=get_binary_length;
         is_large=(myl>0xfffff0);
@@ -612,13 +635,30 @@ module Rserve
             end
             io+=8
           end
+
+        # elsif(rxt==XT_ARRAY_CPLX)
+          # da=cont.payload
+          # io=off
+          # da.each do |v|
+            # # HACK
+            # # On i686, NA returns [162, 7, 0, 0, 0, 0, 240, 127]
+            # # So if we got a Double::NA, we should set mannualy this array
+            # if cont.na? v
+            # #if v==REXP::Double::NA
+              # buf[io,8]=REXP::Double::NA_ARRAY
+            # else
+              # set_long(doubleToRawLongBits(v), buf, io)
+            # end
+            # io+=8
+          # end
+
         elsif(rxt==XT_RAW)
           by=cont.as_bytes
           set_int(by.length,buf,off);
           off+=4
           by.each_with_index {|v,i| buf[off+i]=v}
-		  off+=by.length
-		  while ((off & 3) != 0)
+      off+=by.length
+      while ((off & 3) != 0)
             buf[off] = 0
             off+=1
           end
@@ -656,7 +696,7 @@ module Rserve
               #p buf
               #p io
               if(rxt==XT_LIST_TAG or rxt==XT_LANG_TAG)
-                
+
                 io=REXPFactory.new(REXP::Symbol.new(lst.key_at(ii))).get_binary_representation(buf, io)
 
               end
@@ -666,7 +706,7 @@ module Rserve
         elsif (rxt==XT_SYMNAME or rxt==XT_STR)
           get_string_binary_representation(buf,off,cont.as_string)
         else
-          raise "Can't represent on binary #{xt_name{rxt}}"
+          raise "Can't represent on binary #{xt_name(rxt)}"
         end
 
         # end def
