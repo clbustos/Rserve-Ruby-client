@@ -4,6 +4,7 @@ require 'rserve'
 require 'matrix'
 require 'pp'
 
+INFINITY = +1.0/0.0 if RUBY_VERSION < "1.9"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|

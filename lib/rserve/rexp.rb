@@ -424,32 +424,32 @@ module Rserve
 end
     
     
-require 'rserve/rexp/environment'
-require 'rserve/rexp/null'
-require 'rserve/rexp/unknown'
+require_relative 'rexp/environment'
+require_relative 'rexp/null'
+require_relative 'rexp/unknown'
 
 
-require 'rserve/rexp/vector'
+require_relative 'rexp/vector'
 
-require 'rserve/rexp/raw'
-require 'rserve/rexp/symbol'
-require 'rserve/rexp/string'
-require 'rserve/rexp/double'
-require 'rserve/rexp/integer'
-require 'rserve/rexp/logical'
+require_relative 'rexp/raw'
+require_relative 'rexp/symbol'
+require_relative 'rexp/string'
+require_relative 'rexp/double'
+require_relative 'rexp/integer'
+require_relative 'rexp/logical'
 
-require 'rserve/rexp/factor'
+require_relative 'rexp/factor'
 
-require 'rserve/rexp/genericvector'
-require 'rserve/rexp/expressionvector'
+require_relative 'rexp/genericvector'
+require_relative 'rexp/expressionvector'
 
 
-require 'rserve/rexp/list'
-require 'rserve/rexp/language'
-require 'rserve/rexp/s4'
+require_relative 'rexp/list'
+require_relative 'rexp/language'
+require_relative 'rexp/s4'
 
-require 'rserve/rexp/reference'
+require_relative 'rexp/reference'
 
-require 'rserve/rexp/wrapper'
-require 'rserve/rexp/function'
+require_relative 'rexp/wrapper'
+require_relative 'rexp/function'
 
