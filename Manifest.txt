@@ -50,6 +50,7 @@ lib/rserve/withattributes.rb
 lib/rserve/withnames.rb
 spec/rserve_bug_1_spec.rb
 spec/rserve_bug_26_spec.rb
+spec/rserve_connection_authentication_spec.rb 
 spec/rserve_connection_on_unix_spec.rb
 spec/rserve_connection_spec.rb
 spec/rserve_double_spec.rb
