@@ -9,8 +9,9 @@ require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
     it "should return a correct irr object" do
 
     @r.void_eval("
-    install.packages('irr');
-    library(irr);
+    irr.ins<-require('irr')
+
+    if(!irr.ins) install.packages('irr',repos='https://cloud.r-project.org');
     ds<-data.frame(a=rnorm(100),b=rnorm(100),c=rnorm(100),d=rnorm(100));
     iccs=list(
     icc_1=icc(ds,'o','c','s'),
