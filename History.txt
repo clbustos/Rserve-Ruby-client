@@ -1,3 +1,7 @@
+=== 0.3.3 / 2017-07-06
+
+* Added support for crypt and plaintext authentication 
+
 === 0.3.2 / 2017-05-17
 
 * Updated Gemfile
