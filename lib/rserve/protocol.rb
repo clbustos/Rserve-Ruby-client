@@ -230,4 +230,4 @@ module Rserve
   end
 end
 
-require 'rserve/protocol/rexpfactory'
+require_relative 'protocol/rexpfactory'

@@ -1,8 +1,8 @@
-require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
+require_relative "spec_helper.rb"
 describe "Rserve::Connection on unix" do
   if !Rserve::ON_WINDOWS
     before do
-        @r=Rserve::Connection.new
+      @r=Rserve::Connection.new
     end
     after do
       @r.close if @r.connected?

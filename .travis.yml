@@ -2,15 +2,15 @@ language:
   ruby
 
 rvm:
-  - '1.8.7'
   - '1.9.3'
   - '2.0.0'
   - '2.1.1'
+  - '2.3.1'
 
 script:
-  bundle exec rake spec 
+  bundle exec rspec spec/*.rb 
   
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y r-base r-base-dev
-  - sudo Rscript -e "install.packages(c('Rserve'),,'http://cran.us.r-project.org')"
+  - sudo Rscript -e "install.packages(c('Rserve','icc','irr'),,'http://cran.us.r-project.org')"

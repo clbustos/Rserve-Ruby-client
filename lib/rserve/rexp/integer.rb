@@ -3,7 +3,7 @@ module Rserve
     class Integer < REXP::Vector
       public_class_method :new
       attr_reader :payload
-      NA = -2147483648;
+      NA = -2147483648
       def initialize(data, attrs=nil)
         @payload=case data
         when Integer
@@ -11,7 +11,7 @@ module Rserve
         when Numeric
           [data.to_i]
         when Array
-          data
+          data.map {|v| v.to_i}
         else
           raise ArgumentError, "Should be Numeric or Array"
         end
@@ -30,7 +30,7 @@ module Rserve
         @payload
       end
       def as_doubles
-        @payload.map(&:to_f)
+        @payload.map {|v| na?(v) ? nil : v.to_f}
       end
       def as_strings
         @payload.map(&:to_s)

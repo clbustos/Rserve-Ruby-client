@@ -4,3 +4,5 @@ coverage.info
 doc
 pkg
 coverage
+Gemfile.lock
+.idea
