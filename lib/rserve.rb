@@ -12,7 +12,6 @@ require_relative 'rserve/withattributes'
 require_relative 'rserve/with2dnames'
 require_relative 'rserve/with2dsizes'
 
-
 require_relative 'rserve/protocol'
 require_relative 'rserve/packet'
 require_relative 'rserve/talk'
