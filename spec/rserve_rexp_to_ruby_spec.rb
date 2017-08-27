@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
+require_relative "spec_helper.rb"
 
 describe "Rserve::REXP#to_ruby" do
   describe "method to_ruby" do
@@ -84,7 +84,9 @@ describe "Rserve::REXP#to_ruby" do
     it "should handle named floats" do
       @r.void_eval('y <- sample(1:100, 10)')
       @r.void_eval('x <- sample(1:100, 10)')
-      @r.eval('lm(y ~ 0 + x)').to_ruby
+      
+      @r.eval('lm(y ~ 0 + x)').to_ruby.should be_instance_of(Array)
+    
     end
     it "should return an array extended with Rserve::WithNames and Rserve::WithAttributes for a list" do
       expected=[1,2,3].extend Rserve::WithNames
