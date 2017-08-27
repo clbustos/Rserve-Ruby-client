@@ -1,0 +1,4 @@
+port 6312
+auth required
+plaintext enable
+remote enable

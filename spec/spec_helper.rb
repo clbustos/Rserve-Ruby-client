@@ -1,9 +1,11 @@
-$:.unshift(File.dirname(__FILE__)+"/../lib")
 require 'rspec'
-require 'rserve'
 require 'matrix'
 require 'pp'
 
+require_relative '../lib/rserve'
+
+
+INFINITY = +1.0/0.0 if RUBY_VERSION < "1.9"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|

@@ -10,6 +10,7 @@ module Rserve
     IncorrectServerError=Class.new(StandardError)
     IncorrectServerVersionError=Class.new(StandardError)
     IncorrectProtocolError=Class.new(StandardError)
+    IncorrectCredentialsError=Class.new(StandardError)
     NotConnectedError=Class.new(StandardError)
     # Eval error
     class EvalError < RuntimeError
@@ -41,12 +42,14 @@ module Rserve
     # You could provide a hash with options. Options are analog to java client:
     # [+:auth_req+]           If authentification is required (false by default)
     # [+:transfer_charset+]   Transfer charset ("UTF-8" by default)
-    # [+:auth_type+]          Type of authentification (AT_plain by default)
+    # [+:auth_type+]          Type of authentication (AT_plain by default)
     # [+:hostname+]           Hostname of Rserve ("127.0.0.1" by default)
     # [+:port_number+]        Port Number of Rserve (6311 by default)
     # [+:max_tries+]          Maximum number of tries before give up  (5 by default)
-    # [+:cmd_init+]            Command to init Rserve if not initialized ("R CMD Rserve" by default)
-    # [+:proc_rserve_ok+]      Proc testing if Rserve works (uses system by default)
+    # [+:cmd_init+]           Command to init Rserve if not initialized ("R CMD Rserve" by default)
+    # [+:proc_rserve_ok+]     Proc testing if Rserve works (uses system by default)
+    # [+:username+]           Username to use (if authentication is required)
+    # [+:password+]           Password to use (if authentication is required)
     def initialize(opts=Hash.new)
       @auth_req         = opts.delete(:auth_req)          || false
       @transfer_charset = opts.delete(:transfer_charset)  || "UTF-8"
@@ -56,6 +59,8 @@ module Rserve
       @max_tries        = opts.delete(:max_tries)         || 5
       @cmd_init         = opts.delete(:cmd_init)          || "R CMD Rserve"
       @proc_rserve_ok   = opts.delete(:proc_rserve_ok)    || lambda { system "killall -s 0 Rserve" } 
+      @username         = opts.delete(:username)          || nil
+      @password         = opts.delete(:password)          || nil
       @session          = opts.delete(:session)           || nil
       @tries            = 0
       @connected=false
@@ -115,20 +120,15 @@ module Rserve
         (3..7).each do |i|
           attr=input[i]
           if (attr=="ARpt") 
-            if (!auth_req) # this method is only fallback when no other was specified
-              auth_req=true
-              auth_type=AT_plain
-            end
+            @auth_req=true
+          elsif (attr=="ARuc") 
+            @auth_req=true
+            @auth_type=AT_crypt
+          elsif (attr[0..0]=='K') 
+            @key=attr[1,2]
           end
-          if (attr=="ARuc") 
-            auth_req=true
-            authType=AT_crypt
-          end
-          if (attr[0]=='K') 
-            key=attr[1,3]
-          end
-          
         end
+        login if auth_req
       else # we have a session to take care of
         @s.write(@session.key.pack("C*"))
         @rsrv_version=session.rsrv_version
@@ -141,6 +141,14 @@ module Rserve
     # return +true+ if this connection is alive 
     def connected?
       @connected
+    end
+    
+    # This server requires a login. Send the required credentials to the server.
+    def login
+      raise IncorrectCredentialsError, "Need username and password to connect" if @username.nil? || @password.nil?
+      @password = @password.crypt(key) if key && auth_type == AT_crypt
+      rp = @rt.request({:cmd => Rserve::Protocol::CMD_login, :cont => "#{@username}\n#{@password}"})
+      raise IncorrectCredentialsError, "Server did not accept credentials" if rp.error?
     end
     
     # Closes current connection

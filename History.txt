@@ -1,3 +1,18 @@
+=== 0.3.4 / 2017-08-27
+
+* Updated rserve_talk_spec to latest rspec
+* Deleted Gemfile.lock (545ch4 idea). Starting process to deprecate ruby 1.9
+* Corrected deprecation of Fixnum : https://github.com/545ch4/Rserve-Ruby-client/commit/ab27f5ccd95ed58dd325a0e073649f6b9b1b0727
+* Removes unsafe require from gemspec : https://github.com/apptopia/Rserve-Ruby-client/commit/506b06d6c27e3d2a5302a8c2ffd17436ce4d36ad 
+=== 0.3.3 / 2017-07-06
+
+* Added support for crypt and plaintext authentication 
+
+=== 0.3.2 / 2017-05-17
+
+* Updated Gemfile
+* Fixed bug 26: Error handling NA values on integer matrix
+
 === 0.3.1 / 2013-07-26
 
 * 2D Names functionality for Arrays and Matrices
