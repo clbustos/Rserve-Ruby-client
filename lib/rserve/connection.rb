@@ -123,7 +123,7 @@ module Rserve
             @auth_req=true
           elsif (attr=="ARuc") 
             @auth_req=true
-            @auth_type=AT_crypt #
+            @auth_type=AT_crypt
           elsif (attr[0..0]=='K') 
             @key=attr[1,2]
           end

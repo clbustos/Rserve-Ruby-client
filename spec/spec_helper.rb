@@ -1,6 +1,5 @@
-$:.unshift(File.dirname(__FILE__)+"/../lib")
 require 'rspec'
-require 'rserve'
+require_relative '../lib/rserve'
 require 'matrix'
 require 'pp'
 
