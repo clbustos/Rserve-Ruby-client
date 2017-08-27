@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__)+"/spec_helper.rb")
+require_relative "spec_helper.rb"
 require 'matrix'
 describe Rserve::REXP::Wrapper do
   it "should wrap single value" do

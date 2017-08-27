@@ -1,7 +1,9 @@
 require 'rspec'
-require_relative '../lib/rserve'
 require 'matrix'
 require 'pp'
+
+require_relative '../lib/rserve'
+
 
 INFINITY = +1.0/0.0 if RUBY_VERSION < "1.9"
 
