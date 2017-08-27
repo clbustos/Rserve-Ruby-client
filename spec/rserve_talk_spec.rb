@@ -30,9 +30,10 @@ describe Rserve::Talk do
     server_response_1=[rep,cl,0,0].pack("IIII")
     server_response_2=cont
 
-    @iomock.should_receive(:write).once.with(buf.pack("C*"))
-    @iomock.should_receive(:recv).once.with(16).and_return(server_response_1)
-    @iomock.should_receive(:recv).once.with(cl).and_return(server_response_2)
+    expect(@iomock).to receive(:write).once.with(buf.pack("C*"))
+
+    expect(@iomock).to receive(:recv).once.with(16).and_return(server_response_1)
+    expect(@iomock).to receive(:recv).once.with(cl).and_return(server_response_2)
 
     ret=@talk.request(:cmd=>ty)
     ret.should be_instance_of(Rserve::Packet)
@@ -56,11 +57,11 @@ describe Rserve::Talk do
     cl=cont.length
     server_response_1=[rep,cl,0,0].pack("IIII")
     server_response_2=cont
-    @iomock.should_receive(:write).once.with(buf.pack("C*"))
-    @iomock.should_receive(:write).once.with(es_proc)
+    expect(@iomock).to receive(:write).once.with(buf.pack("C*"))
+    expect(@iomock).to receive(:write).once.with(es_proc)
 
-    @iomock.should_receive(:recv).once.with(16).and_return(server_response_1)
-    @iomock.should_receive(:recv).once.with(cl).and_return(server_response_2)
+    expect(@iomock).to receive(:recv).once.with(16).and_return(server_response_1)
+    expect(@iomock).to receive(:recv).once.with(cl).and_return(server_response_2)
 
     ret=@talk.request(:cmd=>ty,:cont=>es)
 
