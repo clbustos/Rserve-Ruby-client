@@ -23,8 +23,6 @@ module Rserve
             REXP::String.new(o)
           when Integer
             REXP::Integer.new(o)
-          when Fixnum
-            REXP::Integer.new(o)
           when Float
             REXP::Double.new(o)
           when Array
@@ -53,7 +51,7 @@ module Rserve
       def self.find_type_of_array(o)
         if o.all? {|v| v.nil?}
           REXP::Integer.new([REXP::Integer::NA]*o.size)
-        elsif o.all? {|v| v.is_a? Integer or v.is_a? Fixnum or v.nil?}
+        elsif o.all? {|v| v.is_a? Integer or v.nil?}
           REXP::Integer.new(o.map {|v| v.nil? ? REXP::Integer::NA : v})
         elsif o.all? {|v| v.is_a? Numeric or v.nil?}
           REXP::Double.new(o.map {|v| v.nil? ? REXP::Double::NA : v.to_f})
