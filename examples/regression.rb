@@ -35,7 +35,7 @@ est=r.eval("est").to_ruby
 puts "E(y|x) ~= #{est['(Intercept)'].to_f} + #{est['x'].to_f} * x"
 
 # fit$pvalue is a vector of size 1. So, the method #to_ruby
-# retrieves a rational or a Fixnum, according to original representation
+# retrieves a rational or a Integer, according to original representation
 
 if r.eval("pvalue").to_ruby < alpha
  puts "Reject the null hypothesis and conclude that x and y are related."
