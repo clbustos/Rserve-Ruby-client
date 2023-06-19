@@ -9,14 +9,14 @@ describe "Rserve::REXP#to_ruby" do
     after do
       @r.close
     end
-    it "should return a Fixnum with vector with one integer element" do
+    it "should return a Integer with vector with one integer element" do
       @r.eval("1").to_ruby.should==1
     end
-    it "should return an array of Fixnum and nils with vector with two or more elements" do
+    it "should return an array of Integer and nils with vector with two or more elements" do
       @r.eval("c(1,2,3,NA)").to_ruby.should==[1,2,3,nil]
     end
     
-    it "should return an array of Fixnum with an enumeration" do
+    it "should return an array of Integer with an enumeration" do
       @r.eval("1:10").to_ruby.should==[1,2,3,4,5,6,7,8,9,10]
     end
     it "should return an array of String with a factor" do

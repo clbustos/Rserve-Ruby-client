@@ -41,7 +41,7 @@ module Rserve
 
 
       if (!cont.nil?)
-        raise ":cont shouldn't contain anything but Fixnum" if cont.any? {|v| v.class != 1.class}
+        raise ":cont shouldn't contain anything but Integer" if cont.any? {|v| v.class != 1.class}
         if (offset>=cont.length)
           cont=nil;len=0
         elsif (len>cont.length-offset)
